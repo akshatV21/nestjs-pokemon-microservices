@@ -1,12 +1,3 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" ta# NestJS Pokemon Backend
-
 🔥 Welcome to NestJS Pokemon Backend! This repository serves as the backend codebase for a Pokémon game, providing a robust API and essential features for gameplay.
 
 ## Features
