@@ -1,0 +1,26 @@
+services:
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    ports:
+      - '8080:8080'
+    volumes:
+      - .:/app
+    env_file:
+      - ./apps/auth/.env
+
+  pokemon:
+    build:
+      context: .
+      dockerfile: ./apps/pokemon/Dockerfile
+      target: development
+    command: npm run start:dev pokemon
+    ports:
+      - '8081:8081'
+    volumes:
+      - .:/app
+    env_file:
+      - ./apps/pokemon/.env

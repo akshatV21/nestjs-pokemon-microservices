@@ -1,3 +1,5 @@
+FROM node:19-alpine as development
+
 WORKDIR /app
 
 COPY /package*.json .
@@ -18,4 +20,4 @@ RUN npm install --prod
 
 COPY --from=development /app/dist ./dist
 
-CMD ["node", "dist/apps/pokemon/main"]
+CMD ["node", "dist/apps/auth/main"]
