@@ -1,5 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
-import { PokemonService } from './pokemon.service';
+import { Controller, Get } from '@nestjs/common'
+import { PokemonService } from './pokemon.service'
 
 @Controller()
 export class PokemonController {
@@ -7,6 +7,6 @@ export class PokemonController {
 
   @Get()
   getHello(): string {
-    return this.pokemonService.getHello();
+    return this.pokemonService.getHello()
   }
 }

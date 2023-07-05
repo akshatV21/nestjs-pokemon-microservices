@@ -1,5 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { Controller, Get } from '@nestjs/common'
+import { AuthService } from './auth.service'
 
 @Controller()
 export class AuthController {
@@ -7,6 +7,6 @@ export class AuthController {
 
   @Get()
   getHello(): string {
-    return this.authService.getHello();
+    return this.authService.getHello()
   }
 }
