@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { DEFAULT_VALUES } from '@utils/utils'
 import { Types, Document } from 'mongoose'
 
 export type UserDocument = User & Document
@@ -17,7 +18,7 @@ class PokemonSchema {
   @Prop({ default: new PokemonCaughtSchema() })
   caught: PokemonCaughtSchema
 
-  @Prop({ default: 100 })
+  @Prop({ default: DEFAULT_VALUES.POKEMON_STORAGE_LIMIT })
   storageLimit: number
 }
 

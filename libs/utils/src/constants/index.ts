@@ -1,0 +1,3 @@
+export const DEFAULT_VALUES = {
+  POKEMON_STORAGE_LIMIT: 100,
+}
