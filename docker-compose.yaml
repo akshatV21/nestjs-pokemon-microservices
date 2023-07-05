@@ -24,3 +24,8 @@ services:
       - .:/app
     env_file:
       - ./apps/pokemon/.env
+
+  mongo-server:
+    image: mongo
+    logging:
+      driver: none
