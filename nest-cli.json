@@ -1,8 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/pokemon/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/pokemon/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/pokemon",
+  "projects": {
+    "auth": {
+      "type": "application",
+      "root": "apps/auth",
+      "entryFile": "main",
+      "sourceRoot": "apps/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auth/tsconfig.app.json"
+      }
+    },
+    "pokemon": {
+      "type": "application",
+      "root": "apps/pokemon",
+      "entryFile": "main",
+      "sourceRoot": "apps/pokemon/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/pokemon/tsconfig.app.json"
+      }
+    }
   }
 }
