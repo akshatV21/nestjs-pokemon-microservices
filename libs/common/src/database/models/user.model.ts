@@ -7,19 +7,19 @@ export type UserDocument = User & Document
 @Schema()
 class PokemonCaughtSchema {
   @Prop({ default: [], ref: 'Pokemon' })
-  inStorage: Types.ObjectId[]
+  inStorage?: Types.ObjectId[]
 
   @Prop({ default: [], ref: 'Pokemon' })
-  transferred: Types.ObjectId[]
+  transferred?: Types.ObjectId[]
 }
 
 @Schema()
 class PokemonSchema {
   @Prop({ default: new PokemonCaughtSchema() })
-  caught: PokemonCaughtSchema
+  caught?: PokemonCaughtSchema
 
   @Prop({ default: DEFAULT_VALUES.POKEMON_STORAGE_LIMIT })
-  storageLimit: number
+  storageLimit?: number
 }
 
 @Schema({ timestamps: true })
@@ -31,7 +31,7 @@ export class User {
   password: string
 
   @Prop({ default: new PokemonSchema() })
-  pokemon: PokemonSchema
+  pokemon?: PokemonSchema
 }
 
 const UserSchema = SchemaFactory.createForClass(User)
