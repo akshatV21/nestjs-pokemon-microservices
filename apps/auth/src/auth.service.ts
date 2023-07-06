@@ -1,4 +1,4 @@
-import { UserRepository } from '@lib/common'
+import { UserDocument, UserRepository } from '@lib/common'
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
 import { RegisterDto } from './dtos/register.dto'
 import { LoginDto } from './dtos/login.dto'
@@ -14,8 +14,10 @@ export class AuthService {
     const isUsernameAlreadyInUse = await this.UserRepository.exists({ username: registerDto.username })
     if (isUsernameAlreadyInUse) throw new BadRequestException('Username is already in use.')
 
-    const user = await this.UserRepository.create(registerDto)
-    return user
+    const user = (await this.UserRepository.create(registerDto)).toObject<UserDocument>()
+    const { password, ...rest } = user
+
+    return rest
   }
 
   async login(loginDto: LoginDto) {
