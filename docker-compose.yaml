@@ -29,3 +29,8 @@ services:
     image: mongo
     logging:
       driver: none
+
+  rmq-server:
+    image: rabbitmq
+    logging:
+      driver: none

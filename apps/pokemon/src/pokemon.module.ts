@@ -3,8 +3,9 @@ import { PokemonController } from './pokemon.controller'
 import { PokemonService } from './pokemon.service'
 import { ConfigModule } from '@nestjs/config'
 import * as Joi from 'joi'
-import { Authorize, DatabaseModule, User, UserRepository, UserSchema } from '@lib/common'
+import { Authorize, DatabaseModule, RmqModule, User, UserRepository, UserSchema } from '@lib/common'
 import { APP_GUARD } from '@nestjs/core'
+import { SERVICES } from '@utils/utils'
 
 @Module({
   imports: [
@@ -13,10 +14,14 @@ import { APP_GUARD } from '@nestjs/core'
       validationSchema: Joi.object({
         PORT: Joi.number().required(),
         MONGO_URI: Joi.string().required(),
+        RMQ_URL: Joi.string().required(),
+        RMQ_AUTH_QUEUE: Joi.string().required(),
+        RMQ_POKEMON_QUEUE: Joi.string().required(),
       }),
     }),
     DatabaseModule,
     DatabaseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    RmqModule.register([SERVICES.AUTH_SERVICE]),
   ],
   controllers: [PokemonController],
   providers: [PokemonService, UserRepository, { provide: APP_GUARD, useClass: Authorize }],

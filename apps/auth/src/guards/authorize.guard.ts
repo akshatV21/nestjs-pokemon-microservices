@@ -1,4 +1,4 @@
-import { AuthorizeDto } from '@lib/common'
+import { AuthorizeDto, UserRepository } from '@lib/common'
 import { CanActivate, ContextType, ExecutionContext, Injectable, UnauthorizedException, UsePipes, ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RpcException } from '@nestjs/microservices'
@@ -9,7 +9,7 @@ import { Observable } from 'rxjs'
 @Injectable()
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class Authorize implements CanActivate {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService, private readonly UserRepository: UserRepository) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const data = context.switchToRpc().getData<AuthorizeDto>()
@@ -25,6 +25,7 @@ export class Authorize implements CanActivate {
       return true
     }
 
+    data.user = await this.UserRepository.findById(id)
     return true
   }
 

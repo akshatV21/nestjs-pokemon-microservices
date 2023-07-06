@@ -70,7 +70,7 @@ export class Authorize implements CanActivate {
     const response = await lastValueFrom(this.authService.send<any, AuthorizeDto>(EVENTS.AUTHORIZE, authorizeDto)).catch(err => {
       catchAuthErrors(err, type)
     })
-
+    
     if (type === 'ws') request.entityId = response.user
     else if (type === 'http') {
       request.user = response.user

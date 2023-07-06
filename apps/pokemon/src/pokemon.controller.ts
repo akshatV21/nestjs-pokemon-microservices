@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Get, Req } from '@nestjs/common'
 import { PokemonService } from './pokemon.service'
 import { Auth } from '@lib/common'
 
@@ -8,7 +8,7 @@ export class PokemonController {
 
   @Get()
   @Auth()
-  getHello(): string {
-    return this.pokemonService.getHello()
+  getHello(@Req() req: any): string {
+    return req.user
   }
 }

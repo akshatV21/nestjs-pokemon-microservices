@@ -4,7 +4,7 @@ import { AuthOptions } from '@utils/utils'
 export const Auth = (authOptions?: AuthOptions) => {
   const metadata: AuthOptions = {
     isLive: authOptions?.isLive ?? true,
-    isOpen: authOptions?.isOpen ?? true,
+    isOpen: authOptions?.isOpen ?? false,
   }
 
   return SetMetadata('authOptions', metadata)
