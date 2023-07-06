@@ -3,7 +3,8 @@ import { PokemonController } from './pokemon.controller'
 import { PokemonService } from './pokemon.service'
 import { ConfigModule } from '@nestjs/config'
 import * as Joi from 'joi'
-import { DatabaseModule } from '@lib/common'
+import { Authorize, DatabaseModule, User, UserRepository, UserSchema } from '@lib/common'
+import { APP_GUARD } from '@nestjs/core'
 
 @Module({
   imports: [
@@ -15,8 +16,9 @@ import { DatabaseModule } from '@lib/common'
       }),
     }),
     DatabaseModule,
+    DatabaseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [PokemonController],
-  providers: [PokemonService],
+  providers: [PokemonService, UserRepository, { provide: APP_GUARD, useClass: Authorize }],
 })
 export class PokemonModule {}

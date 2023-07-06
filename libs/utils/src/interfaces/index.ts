@@ -5,6 +5,6 @@ export interface HttpSuccessResponse {
 }
 
 export interface AuthOptions {
-  isLive: boolean
-  isOpen: boolean
+  isLive?: boolean
+  isOpen?: boolean
 }
