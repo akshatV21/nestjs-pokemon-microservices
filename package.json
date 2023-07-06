@@ -23,6 +23,7 @@
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^9.0.0",
+    "@nestjs/microservices": "^9.4.1",
     "@nestjs/mongoose": "^10.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "bcrypt": "^5.1.0",
