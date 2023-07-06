@@ -33,7 +33,7 @@ class StageDto {
   current: number
 
   @IsOptional()
-  @IsJWT()
+  @IsString()
   previous: Types.ObjectId
 }
 

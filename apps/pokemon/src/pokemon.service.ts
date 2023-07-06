@@ -18,7 +18,7 @@ export class PokemonService {
 
     if (hasPreEvolution) {
       const updatePreEvoPokemonPromise = this.BasePokemonRepository.update(createPokemonDto.stage.previous, {
-        $set: { 'stage.previous': createPokemonDto.stage.previous },
+        $set: { 'stage.next': createPokemonDto.stage.previous },
       })
       promises.push(updatePreEvoPokemonPromise)
     }
