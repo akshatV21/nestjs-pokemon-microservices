@@ -12,6 +12,7 @@ import { DatabaseModule, User, UserRepository, UserSchema } from '@lib/common'
       validationSchema: Joi.object({
         PORT: Joi.number().required(),
         MONGO_URI: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
       }),
     }),
     DatabaseModule,
