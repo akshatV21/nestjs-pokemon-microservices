@@ -1,10 +1,14 @@
 import { UserRepository } from '@lib/common'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
 import { RegisterDto } from './dtos/register.dto'
+import { LoginDto } from './dtos/login.dto'
+import { compareSync } from 'bcrypt'
+import { sign } from 'jsonwebtoken'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly UserRepository: UserRepository) {}
+  constructor(private readonly UserRepository: UserRepository, private readonly configService: ConfigService) {}
 
   async register(registerDto: RegisterDto) {
     const isUsernameAlreadyInUse = await this.UserRepository.exists({ username: registerDto.username })
@@ -12,5 +16,18 @@ export class AuthService {
 
     const user = await this.UserRepository.create(registerDto)
     return user
+  }
+
+  async login(loginDto: LoginDto) {
+    const registeredUser = await this.UserRepository.findOne({ username: loginDto.username }, {}, { lean: true })
+    if (!registeredUser) throw new BadRequestException('No registered user with provided username.')
+
+    const passwordMatches = compareSync(loginDto.password, registeredUser.password)
+    if (!passwordMatches) throw new UnauthorizedException('Invalid password provided.')
+
+    const token = sign({ id: registeredUser._id }, this.configService.get('JWT_SECRET'), { expiresIn: '24h' })
+    const { password, ...rest } = registeredUser
+
+    return { user: rest, token }
   }
 }
