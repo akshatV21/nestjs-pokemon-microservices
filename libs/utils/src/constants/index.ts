@@ -11,3 +11,12 @@ export const EXCEPTION_MSGS = {
   JWT_EXPIRED: 'JwtExpired',
   INVALID_JWT: 'InvalidJwt',
 } as const
+
+export const SERVICES = {
+  AUTH_SERVICE: 'AUTH',
+  POKEMON_SERVICE: 'POKEMON',
+} as const
+
+export const EVENTS = {
+  AUTHORIZE: 'authorize',
+} as const
