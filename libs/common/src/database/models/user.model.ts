@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { DEFAULT_VALUES } from '@utils/utils'
+import { hashSync } from 'bcrypt'
 import { Types, Document } from 'mongoose'
 
 export type UserDocument = User & Document
 
-@Schema()
+@Schema({ _id: false })
 class PokemonCaughtSchema {
   @Prop({ default: [], ref: 'Pokemon' })
   inStorage?: Types.ObjectId[]
@@ -13,7 +14,7 @@ class PokemonCaughtSchema {
   transferred?: Types.ObjectId[]
 }
 
-@Schema()
+@Schema({ _id: false })
 class PokemonSchema {
   @Prop({ default: new PokemonCaughtSchema() })
   caught?: PokemonCaughtSchema
@@ -35,5 +36,12 @@ export class User {
 }
 
 const UserSchema = SchemaFactory.createForClass(User)
+
+UserSchema.pre('save', function (next) {
+  if (!this.isModified('password')) return next()
+
+  this.password = hashSync(this.password, 4)
+  return next()
+})
 
 export { UserSchema }
