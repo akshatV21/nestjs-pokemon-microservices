@@ -71,7 +71,7 @@ export class Authorize implements CanActivate {
       catchAuthErrors(err, type)
     })
 
-    if (type === 'ws') request.entityId = response.userId
+    if (type === 'ws') request.entityId = response.user
     else if (type === 'http') {
       request.user = response.user
       request.token = authorizeDto.token

@@ -3,7 +3,8 @@ import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { ConfigModule } from '@nestjs/config'
 import * as Joi from 'joi'
-import { DatabaseModule, User, UserRepository, UserSchema } from '@lib/common'
+import { Authorize, DatabaseModule, User, UserRepository, UserSchema } from '@lib/common'
+import { APP_GUARD } from '@nestjs/core'
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { DatabaseModule, User, UserRepository, UserSchema } from '@lib/common'
     DatabaseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, UserRepository],
+  providers: [AuthService, UserRepository, { provide: APP_GUARD, useClass: Authorize }],
 })
 export class AuthModule {}
