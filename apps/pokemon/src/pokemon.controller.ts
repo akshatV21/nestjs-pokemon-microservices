@@ -14,4 +14,11 @@ export class PokemonController {
     const pokemon = await this.pokemonService.create(createPokemonDto)
     return { success: true, message: 'New pokemon created successfully.', data: { pokemon } }
   }
+
+  @Get('list')
+  @Auth()
+  async httpListPokemon(): Promise<HttpSuccessResponse> {
+    const pokemon = await this.pokemonService.list()
+    return { success: true, message: 'Pokemon fetched successfully.', data: { pokemon } }
+  }
 }

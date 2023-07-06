@@ -26,4 +26,8 @@ export class PokemonService {
     const [pokemon] = await Promise.all(promises)
     return pokemon
   }
+
+  async list() {
+    return this.BasePokemonRepository.find({})
+  }
 }
