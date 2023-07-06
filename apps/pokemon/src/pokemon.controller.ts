@@ -1,14 +1,17 @@
-import { Controller, Get, Req } from '@nestjs/common'
+import { Body, Controller, Get, Post, Req } from '@nestjs/common'
 import { PokemonService } from './pokemon.service'
 import { Auth } from '@lib/common'
+import { CreatePokemonDto } from './dtos/create-pokemon.dto'
+import { HttpSuccessResponse } from '@utils/utils'
 
-@Controller()
+@Controller('pokemon')
 export class PokemonController {
   constructor(private readonly pokemonService: PokemonService) {}
 
-  @Get()
+  @Post()
   @Auth()
-  getHello(@Req() req: any): string {
-    return req.user
+  async httpCreatePokemon(@Body() createPokemonDto: CreatePokemonDto): Promise<HttpSuccessResponse> {
+    const pokemon = await this.pokemonService.create(createPokemonDto)
+    return { success: true, message: 'New pokemon created successfully.', data: { pokemon } }
   }
 }

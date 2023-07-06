@@ -3,7 +3,17 @@ import { PokemonController } from './pokemon.controller'
 import { PokemonService } from './pokemon.service'
 import { ConfigModule } from '@nestjs/config'
 import * as Joi from 'joi'
-import { Authorize, DatabaseModule, RmqModule, User, UserRepository, UserSchema } from '@lib/common'
+import {
+  Authorize,
+  BasePokemon,
+  BasePokemonRepository,
+  BasePokemonSchema,
+  DatabaseModule,
+  RmqModule,
+  User,
+  UserRepository,
+  UserSchema,
+} from '@lib/common'
 import { APP_GUARD } from '@nestjs/core'
 import { SERVICES } from '@utils/utils'
 
@@ -20,10 +30,13 @@ import { SERVICES } from '@utils/utils'
       }),
     }),
     DatabaseModule,
-    DatabaseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    DatabaseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: BasePokemon.name, schema: BasePokemonSchema },
+    ]),
     RmqModule.register([SERVICES.AUTH_SERVICE]),
   ],
   controllers: [PokemonController],
-  providers: [PokemonService, UserRepository, { provide: APP_GUARD, useClass: Authorize }],
+  providers: [PokemonService, UserRepository, BasePokemonRepository, { provide: APP_GUARD, useClass: Authorize }],
 })
 export class PokemonModule {}

@@ -2,6 +2,8 @@ import { ContextType } from '@nestjs/common'
 
 export const DEFAULT_VALUES = {
   POKEMON_STORAGE_LIMIT: 100,
+  MIN_BASE_STAT: 10,
+  MAX_BASE_STAT: 100,
 } as const
 
 export const REQUEST_TYPES = ['http', 'rpc', 'ws'] as const
