@@ -14,6 +14,15 @@ class ImgSchema {
 }
 
 @Schema({ _id: false })
+class EvolutionSchema {
+  @Prop({ required: true })
+  currentStage: number
+
+  @Prop({ default: null, ref: 'EvolutionLine' })
+  line?: Types.ObjectId
+}
+
+@Schema({ _id: false })
 class PokemonStatsSchema {
   @Prop({ required: true, min: DEFAULT_VALUES.MIN_BASE_STAT, max: DEFAULT_VALUES.MAX_BASE_STAT })
   attack: number
@@ -48,8 +57,8 @@ export class BasePokemon {
   @Prop({ required: true, min: 1, max: 9 })
   generation: number
 
-  @Prop({ default: null, ref: 'EvolutionLine' })
-  evolution: Types.ObjectId
+  @Prop({ required: true, ref: 'EvolutionLine' })
+  evolution: EvolutionSchema
 
   @Prop({ required: true })
   stats: PokemonStatsSchema

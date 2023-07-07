@@ -25,16 +25,12 @@ class ImgDto {
   shiny: string
 }
 
-class StageDto {
+class EvolutionDto {
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
   @Max(3)
-  current: number
-
-  @IsOptional()
-  @IsString()
-  previous: Types.ObjectId
+  currentStage: number
 }
 
 class StatsDto {
@@ -95,8 +91,8 @@ export class CreatePokemonDto {
   @IsDefined()
   @IsNotEmptyObject()
   @ValidateNested()
-  @Type(() => StageDto)
-  stage: StageDto
+  @Type(() => EvolutionDto)
+  evolution: EvolutionDto
 
   @IsDefined()
   @IsNotEmptyObject()
