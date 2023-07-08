@@ -28,6 +28,10 @@ export class AbstractRepository<T extends Document, S extends Record<string, any
     return this.AbstractModel.findOneAndUpdate(query, updateDto, { new: true })
   }
 
+  async updateMany(query: FilterQuery<T>, updateDto: UpdateQuery<T>) {
+    return this.AbstractModel.updateMany(query, updateDto, { new: true })
+  }
+
   async startTransaction() {
     const session = await this.connection.startSession()
     session.startTransaction()

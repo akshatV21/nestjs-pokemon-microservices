@@ -9,6 +9,9 @@ import {
   BasePokemonRepository,
   BasePokemonSchema,
   DatabaseModule,
+  EvolutionLine,
+  EvolutionLineRepository,
+  EvolutionLineSchema,
   RmqModule,
   User,
   UserRepository,
@@ -33,10 +36,11 @@ import { SERVICES } from '@utils/utils'
     DatabaseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: BasePokemon.name, schema: BasePokemonSchema },
+      { name: EvolutionLine.name, schema: EvolutionLineSchema },
     ]),
     RmqModule.register([SERVICES.AUTH_SERVICE]),
   ],
   controllers: [PokemonController],
-  providers: [PokemonService, UserRepository, BasePokemonRepository, { provide: APP_GUARD, useClass: Authorize }],
+  providers: [PokemonService, UserRepository, BasePokemonRepository, EvolutionLineRepository, { provide: APP_GUARD, useClass: Authorize }],
 })
 export class PokemonModule {}

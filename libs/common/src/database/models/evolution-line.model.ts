@@ -30,7 +30,7 @@ class EvolutionStages {
 @Schema({ timestamps: true })
 export class EvolutionLine {
   @Prop({ required: true })
-  pokemon: Types.ObjectId
+  pokemon: Types.ObjectId[]
 
   @Prop({ required: true })
   stages: EvolutionStages

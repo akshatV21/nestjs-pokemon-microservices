@@ -43,3 +43,10 @@ export const POKEMON_TYPINGS = {
   STEEL: 'steel',
   FAIRY: 'fairy',
 } as const
+
+export const EVOLUTION_STAGES = {
+  0: 'stageZero',
+  1: 'stageOne',
+  2: 'stageTwo',
+  3: 'stageThree',
+} as const
