@@ -48,4 +48,15 @@ export class PokemonService {
       throw error
     }
   }
+
+  async getPokemonEvolutionLine(basePokemonId: Types.ObjectId) {
+    const evolutionLine = await this.EvolutionLineRepository.findOne(
+      { pokemon: { $elemMatch: { $in: [basePokemonId] } } },
+      {},
+      {
+        populate: { path: 'pokemon' },
+      },
+    )
+    return evolutionLine
+  }
 }

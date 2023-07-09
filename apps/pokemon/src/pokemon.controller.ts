@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common'
+import { Types } from 'mongoose'
 import { PokemonService } from './pokemon.service'
 import { Auth } from '@lib/common'
 import { CreatePokemonDto } from './dtos/create-pokemon.dto'
-import { HttpSuccessResponse } from '@utils/utils'
+import { HttpSuccessResponse, ParseObjectId } from '@utils/utils'
 import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
 
 @Controller('pokemon')
@@ -28,5 +29,12 @@ export class PokemonController {
   async httpCreateEvolutionLine(@Body() createEvolutionLineDto: CreateEvolutionLineDto): Promise<HttpSuccessResponse> {
     const evolutionLine = await this.pokemonService.createEvolutionLine(createEvolutionLineDto)
     return { success: true, message: 'Evolution line created successfully.', data: { evolutionLine } }
+  }
+
+  @Get('evolution/:basePokemonId')
+  @Auth()
+  async httpGetPokemonEvolutionLine(@Param('basePokemonId', ParseObjectId) basePokemonId: Types.ObjectId): Promise<HttpSuccessResponse> {
+    const evolutionLine = await this.pokemonService.getPokemonEvolutionLine(basePokemonId)
+    return { success: true, message: 'Fetched evolution line successfully.', data: { evolutionLine } }
   }
 }
