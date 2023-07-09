@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common'
 import { EVOLUTION_STAGES, EvolutionStage, IsObjectId } from '@utils/utils'
 import { Transform, Type } from 'class-transformer'
 import {
@@ -26,12 +27,13 @@ export class EvolutionStageDto {
   stage: EvolutionStage
 
   @IsNotEmpty()
-  @IsObjectId()
   @ArrayMinSize(1)
-  @Transform(({ value }) => {
-    console.log('transformation')
-    return value.map((stringId: string) => new Types.ObjectId(stringId))
-  })
+  @Transform(({ key, value }) =>
+    value.map((stringId: string) => {
+      if (!Types.ObjectId.isValid(stringId)) throw new BadRequestException(`${key} should be valid object id.`)
+      return new Types.ObjectId(stringId)
+    }),
+  )
   pokemon: Types.ObjectId[]
 
   @IsNotEmpty()

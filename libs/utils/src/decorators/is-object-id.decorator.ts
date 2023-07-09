@@ -14,6 +14,7 @@ export function IsObjectId(validationOptions?: ValidationOptions) {
       options: validationOptions ?? defaultValidationOption,
       validator: {
         validate(value: any, args: ValidationArguments) {
+          console.log(value)
           return Types.ObjectId.isValid(value)
         },
       },
