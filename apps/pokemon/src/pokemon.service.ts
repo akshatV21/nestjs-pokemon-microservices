@@ -54,7 +54,10 @@ export class PokemonService {
       { pokemon: { $elemMatch: { $in: [basePokemonId] } } },
       {},
       {
-        populate: { path: 'pokemon' },
+        populate: {
+          path: 'stages.stageZero.pokemon stages.stageOne.pokemon stages.stageTwo.pokemon stages.stageThree.pokemon',
+          select: 'species typings description',
+        },
       },
     )
     return evolutionLine

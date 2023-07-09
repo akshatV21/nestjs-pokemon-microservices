@@ -36,7 +36,7 @@ export class EvolutionStageDto {
   )
   pokemon: Types.ObjectId[]
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   @Min(1)
   @Max(40)
