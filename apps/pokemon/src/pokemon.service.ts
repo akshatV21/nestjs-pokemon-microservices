@@ -29,7 +29,7 @@ export class PokemonService {
     if (cachedPokemon) return cachedPokemon
 
     const pokemon = await this.BasePokemonRepository.findById(basePokemonId)
-    if (pokemon) await this.cacheManager.set(`${CACHE_KEYS.BASE_POKEMON}-${basePokemonId}`, pokemon)
+    if (pokemon) await this.cacheManager.set(`${CACHE_KEYS.BASE_POKEMON}-${basePokemonId}`, pokemon, 3600)
 
     return pokemon
   }
