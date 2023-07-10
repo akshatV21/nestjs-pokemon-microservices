@@ -6,7 +6,7 @@ services:
       target: development
     command: npm run start:dev auth
     ports:
-      - '8080:8080'
+      - '8082:8082'
     volumes:
       - .:/app
     env_file:
@@ -32,5 +32,10 @@ services:
 
   rmq-server:
     image: rabbitmq
+    logging:
+      driver: none
+
+  redis-server:
+    image: redis
     logging:
       driver: none

@@ -1,14 +1,17 @@
 import { BasePokemonDocument, BasePokemonRepository, EvolutionLine, EvolutionLineDocument, EvolutionLineRepository } from '@lib/common'
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { Types } from 'mongoose'
 import { CreatePokemonDto } from './dtos/create-pokemon.dto'
 import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
+import { CACHE_MANAGER } from '@nestjs/cache-manager'
+import { Cache } from 'cache-manager'
 
 @Injectable()
 export class PokemonService {
   constructor(
     private readonly BasePokemonRepository: BasePokemonRepository,
     private readonly EvolutionLineRepository: EvolutionLineRepository,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(createPokemonDto: CreatePokemonDto) {
