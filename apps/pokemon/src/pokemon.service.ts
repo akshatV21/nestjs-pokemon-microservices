@@ -21,7 +21,14 @@ export class PokemonService {
   }
 
   async list() {
-    return this.BasePokemonRepository.find({})
+    const cachedPokemon = await this.cacheManager.get<BasePokemonDocument[] | null>(`${CACHE_KEYS.BASE_POKEMON_LIST}`)
+    if (cachedPokemon) return cachedPokemon
+
+    const pokemon = await this.BasePokemonRepository.find({})
+    console.log('cached-base-pokemon-list')
+    if (pokemon.length > 0) await this.cacheManager.set(`${CACHE_KEYS.BASE_POKEMON_LIST}`, pokemon, { ttl: 20 })
+
+    return pokemon
   }
 
   async getBasePokemon(basePokemonId: Types.ObjectId) {
@@ -56,7 +63,7 @@ export class PokemonService {
 
       const [evolutionLine] = await Promise.all([createEvolutionLinePromise, updateBasePokemonPromise])
       await session.commitTransaction()
-     
+
       return evolutionLine
     } catch (error) {
       await session.abortTransaction()

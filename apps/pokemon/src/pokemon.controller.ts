@@ -21,7 +21,7 @@ export class PokemonController {
   @Auth()
   async httpListPokemon(): Promise<HttpSuccessResponse> {
     const pokemon = await this.pokemonService.list()
-    return { success: true, message: 'Pokemon fetched successfully.', data: { pokemon } }
+    return { success: true, message: 'Pokemon fetched successfully.', data: { pokemon, total: pokemon.length } }
   }
 
   @Get(':basePokemonId')

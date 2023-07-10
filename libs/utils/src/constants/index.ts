@@ -54,4 +54,5 @@ export const EVOLUTION_STAGES = {
 export const CACHE_KEYS = {
   EVOLUTION_LINE: 'evolution-line',
   BASE_POKEMON: 'base-pokemon',
+  BASE_POKEMON_LIST: 'base-pokemon-list',
 } as const
