@@ -24,6 +24,13 @@ export class PokemonController {
     return { success: true, message: 'Pokemon fetched successfully.', data: { pokemon } }
   }
 
+  @Get(':basePokemonId')
+  @Auth()
+  async httpGetBasePokemon(@Param('basePokemonId', ParseObjectId) basePokemonId: Types.ObjectId): Promise<HttpSuccessResponse> {
+    const pokemon = await this.pokemonService.getBasePokemon(basePokemonId)
+    return { success: true, message: 'Base pokemon fetched successfully.', data: { pokemon } }
+  }
+
   @Post('evolution')
   @Auth()
   async httpCreateEvolutionLine(@Body() createEvolutionLineDto: CreateEvolutionLineDto): Promise<HttpSuccessResponse> {

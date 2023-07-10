@@ -24,6 +24,16 @@ export class PokemonService {
     return this.BasePokemonRepository.find({})
   }
 
+  async getBasePokemon(basePokemonId: Types.ObjectId) {
+    const cachedPokemon = await this.cacheManager.get<BasePokemonDocument | null>(`${CACHE_KEYS.BASE_POKEMON}-${basePokemonId}`)
+    if (cachedPokemon) return cachedPokemon
+
+    const pokemon = await this.BasePokemonRepository.findById(basePokemonId)
+    if (pokemon) await this.cacheManager.set(`${CACHE_KEYS.BASE_POKEMON}-${basePokemonId}`, pokemon)
+
+    return pokemon
+  }
+
   async createEvolutionLine({ stages }: CreateEvolutionLineDto) {
     const body: EvolutionLine = {
       pokemon: stages.reduce((prev, curr) => [...prev, ...curr.pokemon], []),
