@@ -50,3 +50,8 @@ export const EVOLUTION_STAGES = {
   2: 'stageTwo',
   3: 'stageThree',
 } as const
+
+export const CACHE_KEYS = {
+  EVOLUTION_LINE: 'evolution-line',
+  BASE_POKEMON: 'base-pokemon',
+}

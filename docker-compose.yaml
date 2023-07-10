@@ -6,7 +6,7 @@ services:
       target: development
     command: npm run start:dev auth
     ports:
-      - '8082:8082'
+      - '8080:8080'
     volumes:
       - .:/app
     env_file:

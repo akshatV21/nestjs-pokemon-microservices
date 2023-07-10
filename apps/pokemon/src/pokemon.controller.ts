@@ -32,7 +32,7 @@ export class PokemonController {
   }
 
   @Get('evolution/:basePokemonId')
-  @Auth()
+  @Auth({ isOpen: true })
   async httpGetPokemonEvolutionLine(@Param('basePokemonId', ParseObjectId) basePokemonId: Types.ObjectId): Promise<HttpSuccessResponse> {
     const evolutionLine = await this.pokemonService.getPokemonEvolutionLine(basePokemonId)
     return { success: true, message: 'Fetched evolution line successfully.', data: { evolutionLine } }

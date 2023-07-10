@@ -5,6 +5,7 @@ import { CreatePokemonDto } from './dtos/create-pokemon.dto'
 import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import { Cache } from 'cache-manager'
+import { CACHE_KEYS } from '@utils/utils'
 
 @Injectable()
 export class PokemonService {
@@ -53,6 +54,9 @@ export class PokemonService {
   }
 
   async getPokemonEvolutionLine(basePokemonId: Types.ObjectId) {
+    const cachedEvolutionLine = await this.cacheManager.get<EvolutionLineDocument | null>(`${CACHE_KEYS.EVOLUTION_LINE}-${basePokemonId}`)
+    if (cachedEvolutionLine) return cachedEvolutionLine
+
     const evolutionLine = await this.EvolutionLineRepository.findOne(
       { pokemon: { $elemMatch: { $in: [basePokemonId] } } },
       {},
@@ -63,6 +67,8 @@ export class PokemonService {
         },
       },
     )
+
+    if (evolutionLine) await this.cacheManager.set(`${CACHE_KEYS.EVOLUTION_LINE}-${basePokemonId}`, evolutionLine, 30)
     return evolutionLine
   }
 }
