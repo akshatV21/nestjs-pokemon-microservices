@@ -40,7 +40,7 @@ import { SERVICES } from '@utils/utils'
       { name: EvolutionLine.name, schema: EvolutionLineSchema },
     ]),
     RmqModule.register([SERVICES.AUTH_SERVICE]),
-    RedisModule,
+    RedisModule.register(),
   ],
   controllers: [PokemonController],
   providers: [PokemonService, UserRepository, BasePokemonRepository, EvolutionLineRepository, { provide: APP_GUARD, useClass: Authorize }],

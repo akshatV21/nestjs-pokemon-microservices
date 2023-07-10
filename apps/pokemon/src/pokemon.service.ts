@@ -29,7 +29,8 @@ export class PokemonService {
     if (cachedPokemon) return cachedPokemon
 
     const pokemon = await this.BasePokemonRepository.findById(basePokemonId)
-    if (pokemon) await this.cacheManager.set(`${CACHE_KEYS.BASE_POKEMON}-${basePokemonId}`, pokemon, 3600)
+    console.log('base-pokemon-cached')
+    if (pokemon) await this.cacheManager.set(`${CACHE_KEYS.BASE_POKEMON}-${basePokemonId}`, pokemon, { ttl: 20 })
 
     return pokemon
   }
@@ -55,7 +56,7 @@ export class PokemonService {
 
       const [evolutionLine] = await Promise.all([createEvolutionLinePromise, updateBasePokemonPromise])
       await session.commitTransaction()
-
+     
       return evolutionLine
     } catch (error) {
       await session.abortTransaction()
@@ -77,8 +78,8 @@ export class PokemonService {
         },
       },
     )
-
-    if (evolutionLine) await this.cacheManager.set(`${CACHE_KEYS.EVOLUTION_LINE}-${basePokemonId}`, evolutionLine, 30)
+    console.log('evolution-line-cached')
+    if (evolutionLine) await this.cacheManager.set(`${CACHE_KEYS.EVOLUTION_LINE}-${basePokemonId}`, evolutionLine, { ttl: 20 })
     return evolutionLine
   }
 }
