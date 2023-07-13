@@ -8,6 +8,8 @@ import {
   BasePokemonRepository,
   BasePokemonSchema,
   DatabaseModule,
+  EvolutionLine,
+  EvolutionLineSchema,
   RedisModule,
   RmqModule,
   Spawn,
@@ -38,6 +40,7 @@ import { ScheduleModule } from '@nestjs/schedule'
     DatabaseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: BasePokemon.name, schema: BasePokemonSchema },
+      { name: EvolutionLine.name, schema: EvolutionLineSchema },
       { name: Spawn.name, schema: SpawnSchema },
     ]),
     RmqModule.register([SERVICES.AUTH_SERVICE]),

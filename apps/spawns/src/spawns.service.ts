@@ -1,6 +1,6 @@
 import { BasePokemonRepository, EvolutionLineDocument, Spawn, SpawnDocument, SpawnRepository } from '@lib/common'
 import { Injectable } from '@nestjs/common'
-import { CITIES, EVOLUTION_STAGES, INITIAL_SPAWN_SIZE, MAX_LEVEL_IN_WILD, SPAWN_TIME } from '@utils/utils'
+import { CITIES, City, EVOLUTION_STAGES, INITIAL_SPAWN_SIZE, MAX_LEVEL_IN_WILD, SPAWN_TIME } from '@utils/utils'
 import { SpawnsManager } from './spawns-manager.servier'
 import { Types } from 'mongoose'
 import { SchedulerRegistry } from '@nestjs/schedule'
@@ -15,7 +15,11 @@ export class SpawnsService {
   ) {}
 
   async generateSpawns() {
-    const pokemonList = await this.BasePokemonRepository.find({}, { _id: 1, evolution: 1 }, { populate: { path: 'evolution.line' } })
+    const pokemonList = await this.BasePokemonRepository.find(
+      {},
+      { _id: 1, species: 1, evolution: 1 },
+      { populate: { path: 'evolution.line' } },
+    )
     const cities = Object.values(CITIES)
     const promises: Promise<SpawnDocument>[] = []
 
@@ -46,14 +50,40 @@ export class SpawnsService {
           spawnObjectId,
         )
 
-        emptyBlocks.splice(randomBlockIndex)
-        pokemonList.splice(randomPokemonIndex)
+        emptyBlocks.splice(randomBlockIndex, 1)
+        pokemonList.splice(randomPokemonIndex, 1)
 
         promises.push(createSpawnPromise)
         this.spawnsManager.addNewSpawn(city, randomBlock, spawnObjectId)
+        this.scheduleDespawningPokemon(spawnObjectId, randomPokemon.species, despawnsIn)
       }
     }
 
     await Promise.all(promises)
+  }
+
+  scheduleDespawningPokemon(spawnId: Types.ObjectId, pokemonSpecies: string, despawnsIn: number) {
+    const callback = this.despawnPokemon(spawnId, pokemonSpecies)
+    const timeout = setTimeout(callback, despawnsIn)
+    this.schedulerRegistry.addTimeout(spawnId.toString(), timeout)
+  }
+
+  despawnPokemon(spawnId: Types.ObjectId, pokemonSpecies: string) {
+    return async () => {
+      const spawn = await this.SpawnRepository.delete({ _id: spawnId })
+      console.log(`despawned ${pokemonSpecies}`)
+    }
+  }
+
+  async getCitySpawns(city: City) {
+    return this.SpawnRepository.find(
+      { 'location.city': city },
+      {},
+      { populate: { path: 'pokemon', select: 'species description typings img' } },
+    )
+  }
+
+  async despawnEveryPokemon() {
+    await this.SpawnRepository.deleteMany({ 'location.city': 'blazeville' })
   }
 }

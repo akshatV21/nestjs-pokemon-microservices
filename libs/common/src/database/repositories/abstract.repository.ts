@@ -41,4 +41,12 @@ export class AbstractRepository<T extends Document, S extends Record<string, any
   async exists(query: FilterQuery<T>) {
     return this.AbstractModel.exists(query)
   }
+
+  async delete(query: FilterQuery<T>, options?: QueryOptions<T>) {
+    return this.AbstractModel.deleteOne(query, options)
+  }
+
+  async deleteMany(query: FilterQuery<T>) {
+    return this.AbstractModel.deleteMany(query)
+  }
 }
