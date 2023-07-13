@@ -71,7 +71,6 @@ export class SpawnsService {
   despawnPokemon(spawnId: Types.ObjectId, pokemonSpecies: string) {
     return async () => {
       const spawn = await this.SpawnRepository.delete({ _id: spawnId })
-      console.log(`despawned ${pokemonSpecies}`)
     }
   }
 
