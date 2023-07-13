@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { CITIES, EVOLUTION_STAGES, INITIAL_SPAWN_SIZE, MAX_LEVEL_IN_WILD, SPAWN_TIME } from '@utils/utils'
 import { SpawnsManager } from './spawns-manager.servier'
 import { Types } from 'mongoose'
+import { SchedulerRegistry } from '@nestjs/schedule'
 
 @Injectable()
 export class SpawnsService {
@@ -10,6 +11,7 @@ export class SpawnsService {
     private readonly BasePokemonRepository: BasePokemonRepository,
     private readonly SpawnRepository: SpawnRepository,
     private readonly spawnsManager: SpawnsManager,
+    private schedulerRegistry: SchedulerRegistry,
   ) {}
 
   async generateInitialSpawns() {

@@ -6,10 +6,10 @@ export type SpawnDocument = Spawn & Document
 
 @Schema({ _id: false })
 class SpawnLocationSchema {
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   city: City
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   block: Block
 }
 

@@ -19,6 +19,7 @@ import {
 } from '@lib/common'
 import { SERVICES } from '@utils/utils'
 import { SpawnsManager } from './spawns-manager.servier'
+import { ScheduleModule } from '@nestjs/schedule'
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { SpawnsManager } from './spawns-manager.servier'
     ]),
     RmqModule.register([SERVICES.AUTH_SERVICE]),
     RedisModule.register(),
+    ScheduleModule.forRoot(),
   ],
   controllers: [SpawnsController],
   providers: [SpawnsService, UserRepository, BasePokemonRepository, SpawnRepository, SpawnsManager],
