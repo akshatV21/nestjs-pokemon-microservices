@@ -1,8 +1,57 @@
-import { Injectable } from '@nestjs/common';
+import { BasePokemonRepository, EvolutionLineDocument, Spawn, SpawnDocument, SpawnRepository } from '@lib/common'
+import { Injectable } from '@nestjs/common'
+import { CITIES, EVOLUTION_STAGES, INITIAL_SPAWN_SIZE, MAX_LEVEL_IN_WILD, SPAWN_TIME } from '@utils/utils'
+import { SpawnsManager } from './spawns-manager.servier'
+import { Types } from 'mongoose'
 
 @Injectable()
 export class SpawnsService {
-  getHello(): string {
-    return 'Hello World!';
+  constructor(
+    private readonly BasePokemonRepository: BasePokemonRepository,
+    private readonly SpawnRepository: SpawnRepository,
+    private readonly spawnsManager: SpawnsManager,
+  ) {}
+
+  async generateInitialSpawns() {
+    const pokemonList = await this.BasePokemonRepository.find({}, { _id: 1, evolution: 1 }, { populate: { path: 'evolution.line' } })
+    const cities = Object.values(CITIES)
+    const promises: Promise<SpawnDocument>[] = []
+
+    for (const city of cities) {
+      const emptyBlocks = this.spawnsManager.getEmptyBlocksByCity(city)
+
+      for (let i = 0; i < INITIAL_SPAWN_SIZE; i++) {
+        const randomBlockIndex = Math.floor(Math.random() * emptyBlocks.length)
+        const randomPokemonIndex = Math.floor(Math.random() * pokemonList.length)
+
+        const randomBlock = emptyBlocks[randomBlockIndex]
+        const randomPokemon = pokemonList[randomPokemonIndex]
+
+        const pokemonEovultionLine = randomPokemon.evolution.line as unknown as EvolutionLineDocument
+        const stage = randomPokemon.evolution.currentStage === 1 ? 1 : randomPokemon.evolution.currentStage - 1
+        const minLevel = pokemonEovultionLine.stages[EVOLUTION_STAGES[stage]].evolvesAtLevel
+
+        const spawnObjectId = new Types.ObjectId()
+        const despawnsIn = Math.floor(Math.random() * (SPAWN_TIME.MAX - SPAWN_TIME.MIN + 1)) + SPAWN_TIME.MIN
+
+        const createSpawnPromise = this.SpawnRepository.create(
+          {
+            pokemon: randomPokemon._id,
+            level: Math.floor(Math.random() * (MAX_LEVEL_IN_WILD - minLevel + 1)) + minLevel,
+            location: { city, block: randomBlock },
+            despawnsAt: new Date(Date.now() + despawnsIn),
+          },
+          spawnObjectId,
+        )
+
+        emptyBlocks.splice(randomBlockIndex)
+        pokemonList.splice(randomPokemonIndex)
+
+        promises.push(createSpawnPromise)
+        this.spawnsManager.addNewSpawn(city, randomBlock, spawnObjectId)
+      }
+    }
+
+    await Promise.all(promises)
   }
 }

@@ -3,8 +3,22 @@ import { SpawnsController } from './spawns.controller'
 import { SpawnsService } from './spawns.service'
 import { ConfigModule } from '@nestjs/config'
 import * as Joi from 'joi'
-import { DatabaseModule, RedisModule, RmqModule, User, UserSchema } from '@lib/common'
+import {
+  BasePokemon,
+  BasePokemonRepository,
+  BasePokemonSchema,
+  DatabaseModule,
+  RedisModule,
+  RmqModule,
+  Spawn,
+  SpawnRepository,
+  SpawnSchema,
+  User,
+  UserRepository,
+  UserSchema,
+} from '@lib/common'
 import { SERVICES } from '@utils/utils'
+import { SpawnsManager } from './spawns-manager.servier'
 
 @Module({
   imports: [
@@ -20,11 +34,15 @@ import { SERVICES } from '@utils/utils'
       }),
     }),
     DatabaseModule,
-    DatabaseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    DatabaseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: BasePokemon.name, schema: BasePokemonSchema },
+      { name: Spawn.name, schema: SpawnSchema },
+    ]),
     RmqModule.register([SERVICES.AUTH_SERVICE]),
     RedisModule.register(),
   ],
   controllers: [SpawnsController],
-  providers: [SpawnsService],
+  providers: [SpawnsService, UserRepository, BasePokemonRepository, SpawnRepository, SpawnsManager],
 })
 export class SpawnsModule {}

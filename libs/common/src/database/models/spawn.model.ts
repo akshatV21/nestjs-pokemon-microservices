@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Block, City } from '@utils/utils'
 import { Types, Document } from 'mongoose'
 
 export type SpawnDocument = Spawn & Document
@@ -6,10 +7,10 @@ export type SpawnDocument = Spawn & Document
 @Schema({ _id: false })
 class SpawnLocationSchema {
   @Prop({ required: true })
-  city: string
+  city: City
 
   @Prop({ required: true })
-  block: string
+  block: Block
 }
 
 @Schema({ timestamps: true })

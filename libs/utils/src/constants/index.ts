@@ -63,3 +63,21 @@ export const CITIES = {
   AURORA: 'aurora',
   SOLACE: 'solace',
 } as const
+
+export const BLOCKS_VALUE = {
+  MIN_LEFT: 1,
+  MIN_TOP: 1,
+  MAX_LEFT: 5,
+  MAX_TOP: 5,
+} as const
+
+export const MAX_SPAWNS_PER_BLOCK = 1
+
+export const INITIAL_SPAWN_SIZE = 8
+
+export const SPAWN_TIME = {
+  MIN: 120000,
+  MAX: 360000,
+} as const
+
+export const MAX_LEVEL_IN_WILD = 24
