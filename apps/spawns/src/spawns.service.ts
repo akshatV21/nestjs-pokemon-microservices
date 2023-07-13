@@ -14,7 +14,7 @@ export class SpawnsService {
     private schedulerRegistry: SchedulerRegistry,
   ) {}
 
-  async generateInitialSpawns() {
+  async generateSpawns() {
     const pokemonList = await this.BasePokemonRepository.find({}, { _id: 1, evolution: 1 }, { populate: { path: 'evolution.line' } })
     const cities = Object.values(CITIES)
     const promises: Promise<SpawnDocument>[] = []
