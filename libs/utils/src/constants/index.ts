@@ -57,3 +57,9 @@ export const CACHE_KEYS = {
   BASE_POKEMON: 'base-pokemon',
   BASE_POKEMON_LIST: 'base-pokemon-list',
 } as const
+
+export const CITIES = {
+  BLAZEVILLE: 'blazeville',
+  AURORA: 'aurora',
+  SOLACE: 'solace',
+} as const
