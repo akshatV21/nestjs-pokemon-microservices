@@ -17,6 +17,7 @@ export const EXCEPTION_MSGS = {
 export const SERVICES = {
   AUTH_SERVICE: 'AUTH',
   POKEMON_SERVICE: 'POKEMON',
+  SPAWNS_SERVICE: 'SPAWNS',
 } as const
 
 export const EVENTS = {

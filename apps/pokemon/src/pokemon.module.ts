@@ -31,6 +31,7 @@ import { SERVICES } from '@utils/utils'
         RMQ_URL: Joi.string().required(),
         RMQ_AUTH_QUEUE: Joi.string().required(),
         RMQ_POKEMON_QUEUE: Joi.string().required(),
+        RMQ_SPAWNS_QUEUE: Joi.string().required(),
       }),
     }),
     DatabaseModule,

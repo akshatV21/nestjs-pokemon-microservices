@@ -25,6 +25,19 @@ services:
     env_file:
       - ./apps/pokemon/.env
 
+  spawns:
+    build:
+      context: .
+      dockerfile: ./apps/spawns/Dockerfile
+      target: development
+    command: npm run start:dev spawns
+    ports:
+      - '8082:8082'
+    volumes:
+      - .:/app
+    env_file:
+      - ./apps/spawns/.env
+
   mongo-server:
     image: mongo
     logging:

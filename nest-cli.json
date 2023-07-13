@@ -45,6 +45,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/utils/tsconfig.lib.json"
       }
+    },
+    "spawns": {
+      "type": "application",
+      "root": "apps/spawns",
+      "entryFile": "main",
+      "sourceRoot": "apps/spawns/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/spawns/tsconfig.app.json"
+      }
     }
   }
 }
