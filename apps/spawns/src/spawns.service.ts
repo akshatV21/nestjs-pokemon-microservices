@@ -133,7 +133,7 @@ export class SpawnsService {
       block,
     })
 
-    console.log(`spawned ${randomPokemon.species} in ${city} city`)
+    console.log(`spawned ${randomPokemon.species} in ${city} city at ${block}`)
     return createSpawnPromise
   }
 
@@ -146,6 +146,6 @@ export class SpawnsService {
   }
 
   async despawnEveryPokemon() {
-    await this.SpawnRepository.deleteMany({ 'location.city': 'solace' })
+    await this.SpawnRepository.deleteMany({})
   }
 }
