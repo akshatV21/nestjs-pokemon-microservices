@@ -7,6 +7,7 @@ import { RmqService } from '@lib/common'
 import { SERVICES } from '@utils/utils'
 import { ValidationPipe } from '@nestjs/common'
 import { SpawnsService } from './spawns.service'
+import { SPAWN_RATES } from './spawn-rates'
 
 async function bootstrap() {
   const app = await NestFactory.create(SpawnsModule)
@@ -23,8 +24,8 @@ async function bootstrap() {
   app.use(helmet())
   app.use(morgan('dev'))
 
-  // await spawnsService.generateSpawns()
-  await spawnsService.despawnEveryPokemon()
+  await spawnsService.generateSpawns(SPAWN_RATES)
+  // await spawnsService.despawnEveryPokemon()
   await app.startAllMicroservices()
   await app.listen(PORT, () => console.log(`Spawns service is listening to requests on port: ${PORT}`))
 }

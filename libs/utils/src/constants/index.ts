@@ -76,8 +76,10 @@ export const MAX_SPAWNS_PER_BLOCK = 1
 export const INITIAL_SPAWN_SIZE = 1
 
 export const SPAWN_TIME = {
-  MIN: 120000,
-  MAX: 360000,
+  MIN: 10000,
+  MAX: 14000,
 } as const
 
 export const MAX_LEVEL_IN_WILD = 24
+
+export const TOTAL_SPAWN_RATE = 100

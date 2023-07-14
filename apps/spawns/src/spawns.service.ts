@@ -1,9 +1,19 @@
-import { BasePokemonRepository, EvolutionLineDocument, Spawn, SpawnDocument, SpawnRepository } from '@lib/common'
+import { BasePokemonDocument, BasePokemonRepository, EvolutionLineDocument, Spawn, SpawnDocument, SpawnRepository } from '@lib/common'
 import { Injectable } from '@nestjs/common'
-import { CITIES, City, EVOLUTION_STAGES, INITIAL_SPAWN_SIZE, MAX_LEVEL_IN_WILD, SPAWN_TIME } from '@utils/utils'
+import {
+  CITIES,
+  City,
+  DespawnInfo,
+  EVOLUTION_STAGES,
+  INITIAL_SPAWN_SIZE,
+  MAX_LEVEL_IN_WILD,
+  SPAWN_TIME,
+  TOTAL_SPAWN_RATE,
+} from '@utils/utils'
 import { SpawnsManager } from './spawns-manager.servier'
 import { Types } from 'mongoose'
 import { SchedulerRegistry } from '@nestjs/schedule'
+import { SPAWN_RATES } from './spawn-rates'
 
 @Injectable()
 export class SpawnsService {
@@ -14,11 +24,11 @@ export class SpawnsService {
     private schedulerRegistry: SchedulerRegistry,
   ) {}
 
-  async generateSpawns() {
+  async generateSpawns(spawnRates: typeof SPAWN_RATES) {
     const pokemonList = await this.BasePokemonRepository.find(
       {},
-      { _id: 1, species: 1, evolution: 1 },
-      { populate: { path: 'evolution.line' } },
+      { _id: 1, species: 1, evolution: 1, pokedexNo: 1 },
+      { populate: { path: 'evolution.line' }, sort: { pokedexNo: 1 } },
     )
     const cities = Object.values(CITIES)
     const promises: Promise<SpawnDocument>[] = []
@@ -28,10 +38,19 @@ export class SpawnsService {
 
       for (let i = 0; i < INITIAL_SPAWN_SIZE; i++) {
         const randomBlockIndex = Math.floor(Math.random() * emptyBlocks.length)
-        const randomPokemonIndex = Math.floor(Math.random() * pokemonList.length)
-
         const randomBlock = emptyBlocks[randomBlockIndex]
-        const randomPokemon = pokemonList[randomPokemonIndex]
+
+        let randomPokemon: BasePokemonDocument
+        let cumulativeSpawnRate = 0
+        const randomSpawnRate = Math.random() * TOTAL_SPAWN_RATE
+
+        for (const pokemon of pokemonList) {
+          cumulativeSpawnRate += SPAWN_RATES[pokemon.pokedexNo]
+          if (randomSpawnRate <= cumulativeSpawnRate) {
+            randomPokemon = pokemon
+            break
+          }
+        }
 
         const pokemonEovultionLine = randomPokemon.evolution.line as unknown as EvolutionLineDocument
         const stage = randomPokemon.evolution.currentStage === 1 ? 1 : randomPokemon.evolution.currentStage - 1
@@ -50,27 +69,28 @@ export class SpawnsService {
           spawnObjectId,
         )
 
-        emptyBlocks.splice(randomBlockIndex, 1)
-        pokemonList.splice(randomPokemonIndex, 1)
-
         promises.push(createSpawnPromise)
+        emptyBlocks.splice(randomBlockIndex, 1)
+
         this.spawnsManager.addNewSpawn(city, randomBlock, spawnObjectId)
-        this.scheduleDespawningPokemon(spawnObjectId, randomPokemon.species, despawnsIn)
+        this.scheduleDespawningPokemon({ spawnId: spawnObjectId, city, pokemonSpecies: randomPokemon.species, despawnsIn })
+        console.log(`spawned ${randomPokemon.species} in ${city} city`)
       }
     }
 
     await Promise.all(promises)
   }
 
-  scheduleDespawningPokemon(spawnId: Types.ObjectId, pokemonSpecies: string, despawnsIn: number) {
-    const callback = this.despawnPokemon(spawnId, pokemonSpecies)
-    const timeout = setTimeout(callback, despawnsIn)
-    this.schedulerRegistry.addTimeout(spawnId.toString(), timeout)
+  scheduleDespawningPokemon(despawnInfo: DespawnInfo) {
+    const callback = this.despawnPokemon(despawnInfo)
+    const timeout = setTimeout(callback, despawnInfo.despawnsIn)
+    this.schedulerRegistry.addTimeout(despawnInfo.spawnId.toString(), timeout)
   }
 
-  despawnPokemon(spawnId: Types.ObjectId, pokemonSpecies: string) {
+  despawnPokemon(despawnInfo: DespawnInfo) {
     return async () => {
-      const spawn = await this.SpawnRepository.delete({ _id: spawnId })
+      await this.SpawnRepository.delete({ _id: despawnInfo.spawnId })
+      console.log(`despawned ${despawnInfo.pokemonSpecies} from ${despawnInfo.city} city`)
     }
   }
 
@@ -83,6 +103,6 @@ export class SpawnsService {
   }
 
   async despawnEveryPokemon() {
-    await this.SpawnRepository.deleteMany({ 'location.city': 'blazeville' })
+    await this.SpawnRepository.deleteMany({ 'location.city': 'solace' })
   }
 }
