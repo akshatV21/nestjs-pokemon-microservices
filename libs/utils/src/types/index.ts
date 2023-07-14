@@ -20,4 +20,5 @@ export type DespawnInfo = {
   city: City
   pokemonSpecies: string
   despawnsIn: number
+  block: Block
 }

@@ -7,6 +7,7 @@ import {
   EVOLUTION_STAGES,
   INITIAL_SPAWN_SIZE,
   MAX_LEVEL_IN_WILD,
+  NEW_SPAWN_DELAY,
   SPAWN_TIME,
   TOTAL_SPAWN_RATE,
 } from '@utils/utils'
@@ -30,6 +31,7 @@ export class SpawnsService {
       { _id: 1, species: 1, evolution: 1, pokedexNo: 1 },
       { populate: { path: 'evolution.line' }, sort: { pokedexNo: 1 } },
     )
+
     const cities = Object.values(CITIES)
     const promises: Promise<SpawnDocument>[] = []
 
@@ -73,7 +75,13 @@ export class SpawnsService {
         emptyBlocks.splice(randomBlockIndex, 1)
 
         this.spawnsManager.addNewSpawn(city, randomBlock, spawnObjectId)
-        this.scheduleDespawningPokemon({ spawnId: spawnObjectId, city, pokemonSpecies: randomPokemon.species, despawnsIn })
+        this.scheduleDespawningPokemon({
+          spawnId: spawnObjectId,
+          city,
+          pokemonSpecies: randomPokemon.species,
+          despawnsIn,
+          block: randomBlock,
+        })
         console.log(`spawned ${randomPokemon.species} in ${city} city`)
       }
     }
@@ -83,14 +91,74 @@ export class SpawnsService {
 
   scheduleDespawningPokemon(despawnInfo: DespawnInfo) {
     const callback = this.despawnPokemon(despawnInfo)
-    const timeout = setTimeout(callback, despawnInfo.despawnsIn)
-    this.schedulerRegistry.addTimeout(despawnInfo.spawnId.toString(), timeout)
+    setTimeout(callback, despawnInfo.despawnsIn)
   }
 
   despawnPokemon(despawnInfo: DespawnInfo) {
     return async () => {
       await this.SpawnRepository.delete({ _id: despawnInfo.spawnId })
+      this.spawnsManager.removeSpawn(despawnInfo.city, despawnInfo.block)
       console.log(`despawned ${despawnInfo.pokemonSpecies} from ${despawnInfo.city} city`)
+
+      const newSpawnDelay = Math.floor(Math.random() * (NEW_SPAWN_DELAY.MAX - NEW_SPAWN_DELAY.MIN + 1)) + NEW_SPAWN_DELAY.MIN
+      this.scheduleSpawningNewPokemon(despawnInfo.city, newSpawnDelay)
+    }
+  }
+
+  scheduleSpawningNewPokemon(city: City, newSpawnDelay: number) {
+    const callback = this.generateNewSpawn(city)
+    setTimeout(callback, newSpawnDelay)
+  }
+
+  generateNewSpawn(city: City) {
+    return async () => {
+      const pokemonList = await this.BasePokemonRepository.find(
+        {},
+        { _id: 1, species: 1, evolution: 1, pokedexNo: 1 },
+        { populate: { path: 'evolution.line' }, sort: { pokedexNo: 1 } },
+      )
+
+      const emptyBlocks = this.spawnsManager.getEmptyBlocksByCity(city)
+      const randomBlock = emptyBlocks[Math.floor(Math.random() * emptyBlocks.length)]
+
+      let randomPokemon: BasePokemonDocument
+      let cumulativeSpawnRate = 0
+      const randomSpawnRate = Math.random() * TOTAL_SPAWN_RATE
+
+      for (const pokemon of pokemonList) {
+        cumulativeSpawnRate += SPAWN_RATES[pokemon.pokedexNo]
+        if (randomSpawnRate <= cumulativeSpawnRate) {
+          randomPokemon = pokemon
+          break
+        }
+      }
+
+      const pokemonEovultionLine = randomPokemon.evolution.line as unknown as EvolutionLineDocument
+      const stage = randomPokemon.evolution.currentStage === 1 ? 1 : randomPokemon.evolution.currentStage - 1
+      const minLevel = pokemonEovultionLine.stages[EVOLUTION_STAGES[stage]].evolvesAtLevel
+
+      const spawnObjectId = new Types.ObjectId()
+      const despawnsIn = Math.floor(Math.random() * (SPAWN_TIME.MAX - SPAWN_TIME.MIN + 1)) + SPAWN_TIME.MIN
+
+      await this.SpawnRepository.create(
+        {
+          pokemon: randomPokemon._id,
+          level: Math.floor(Math.random() * (MAX_LEVEL_IN_WILD - minLevel + 1)) + minLevel,
+          location: { city, block: randomBlock },
+          despawnsAt: new Date(Date.now() + despawnsIn),
+        },
+        spawnObjectId,
+      )
+
+      this.spawnsManager.addNewSpawn(city, randomBlock, spawnObjectId)
+      this.scheduleDespawningPokemon({
+        spawnId: spawnObjectId,
+        city,
+        pokemonSpecies: randomPokemon.species,
+        despawnsIn,
+        block: randomBlock,
+      })
+      console.log(`spawned ${randomPokemon.species} in ${city} city`)
     }
   }
 

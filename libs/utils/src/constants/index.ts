@@ -83,3 +83,8 @@ export const SPAWN_TIME = {
 export const MAX_LEVEL_IN_WILD = 24
 
 export const TOTAL_SPAWN_RATE = 100
+
+export const NEW_SPAWN_DELAY = {
+  MIN: 20000,
+  MAX: 40000,
+} as const
