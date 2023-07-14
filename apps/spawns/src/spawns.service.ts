@@ -5,6 +5,7 @@ import {
   CITIES,
   City,
   DespawnInfo,
+  EVENTS,
   EVOLUTION_STAGES,
   INITIAL_SPAWN_SIZE,
   MAX_LEVEL_IN_WILD,
@@ -14,8 +15,9 @@ import {
 } from '@utils/utils'
 import { SpawnsManager } from './spawns-manager.servier'
 import { Types } from 'mongoose'
-import { SchedulerRegistry } from '@nestjs/schedule'
 import { SPAWN_RATES } from './spawn-rates'
+import { EventEmitter2 } from '@nestjs/event-emitter'
+import { basename } from 'path'
 
 @Injectable()
 export class SpawnsService {
@@ -23,13 +25,13 @@ export class SpawnsService {
     private readonly BasePokemonRepository: BasePokemonRepository,
     private readonly SpawnRepository: SpawnRepository,
     private readonly spawnsManager: SpawnsManager,
-    private schedulerRegistry: SchedulerRegistry,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async generateSpawns(spawnRates: typeof SPAWN_RATES) {
     const pokemonList = await this.BasePokemonRepository.find(
       {},
-      { _id: 1, species: 1, evolution: 1, pokedexNo: 1 },
+      { stats: 0 },
       { populate: { path: 'evolution.line' }, sort: { pokedexNo: 1 } },
     )
 
@@ -61,14 +63,17 @@ export class SpawnsService {
     return async () => {
       const pokemonList = await this.BasePokemonRepository.find(
         {},
-        { _id: 1, species: 1, evolution: 1, pokedexNo: 1 },
+        { stats: 0 },
         { populate: { path: 'evolution.line' }, sort: { pokedexNo: 1 } },
       )
 
       const emptyBlocks = this.spawnsManager.getEmptyBlocksByCity(city)
       const randomBlock = emptyBlocks[Math.floor(Math.random() * emptyBlocks.length)]
 
-      await this.createSpawn(pokemonList, city, randomBlock)
+      const spawn = await this.createSpawn(pokemonList, city, randomBlock)
+      spawn.pokemon = pokemonList.find(pokemon => spawn.pokemon.equals(pokemon._id))
+
+      this.eventEmitter.emit(EVENTS.POKEMON_SPAWNED, spawn)
     }
   }
 
@@ -82,6 +87,7 @@ export class SpawnsService {
       await this.SpawnRepository.delete({ _id: despawnInfo.spawnId })
       this.spawnsManager.removeSpawn(despawnInfo.city, despawnInfo.block)
       console.log(`despawned ${despawnInfo.pokemonSpecies} from ${despawnInfo.city} city`)
+      this.eventEmitter.emit(EVENTS.POKEMON_DESPAWNED, despawnInfo)
 
       const newSpawnDelay = Math.floor(Math.random() * (NEW_SPAWN_DELAY.MAX - NEW_SPAWN_DELAY.MIN + 1)) + NEW_SPAWN_DELAY.MIN
       this.scheduleSpawningNewPokemon(despawnInfo.city, newSpawnDelay)

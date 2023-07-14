@@ -23,6 +23,8 @@ export const SERVICES = {
 
 export const EVENTS = {
   AUTHORIZE: 'authorize',
+  POKEMON_SPAWNED: 'pokemon-spawned',
+  POKEMON_DESPAWNED: 'pokemon-despawned',
 } as const
 
 export const POKEMON_TYPINGS = {
@@ -86,6 +88,6 @@ export const MAX_LEVEL_IN_WILD = 24
 export const TOTAL_SPAWN_RATE = 100
 
 export const NEW_SPAWN_DELAY = {
-  MIN: 20000,
-  MAX: 40000,
+  MIN: 10000,
+  MAX: 20000,
 } as const

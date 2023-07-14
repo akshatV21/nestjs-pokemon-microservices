@@ -24,6 +24,7 @@ import { SERVICES } from '@utils/utils'
 import { SpawnsManager } from './spawns-manager.servier'
 import { APP_GUARD } from '@nestjs/core'
 import { SpawnsGateway } from './spawns.gateway'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { SpawnsGateway } from './spawns.gateway'
     ]),
     RmqModule.register([SERVICES.AUTH_SERVICE]),
     RedisModule.register(),
+    EventEmitterModule.forRoot({ global: true }),
   ],
   controllers: [SpawnsController],
   providers: [
