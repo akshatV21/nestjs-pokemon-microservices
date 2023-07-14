@@ -18,10 +18,11 @@ import {
   User,
   UserRepository,
   UserSchema,
+  Authorize,
 } from '@lib/common'
 import { SERVICES } from '@utils/utils'
 import { SpawnsManager } from './spawns-manager.servier'
-import { ScheduleModule } from '@nestjs/schedule'
+import { APP_GUARD } from '@nestjs/core'
 
 @Module({
   imports: [
@@ -45,9 +46,15 @@ import { ScheduleModule } from '@nestjs/schedule'
     ]),
     RmqModule.register([SERVICES.AUTH_SERVICE]),
     RedisModule.register(),
-    ScheduleModule.forRoot(),
   ],
   controllers: [SpawnsController],
-  providers: [SpawnsService, UserRepository, BasePokemonRepository, SpawnRepository, SpawnsManager],
+  providers: [
+    SpawnsService,
+    UserRepository,
+    BasePokemonRepository,
+    SpawnRepository,
+    SpawnsManager,
+    { provide: APP_GUARD, useClass: Authorize },
+  ],
 })
 export class SpawnsModule {}
