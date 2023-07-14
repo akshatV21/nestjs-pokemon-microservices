@@ -16,7 +16,7 @@ class SpawnLocationSchema {
 
 @Schema({ timestamps: true })
 export class Spawn {
-  @Prop({ required: true, ref: 'BasePokemon' })
+  @Prop({ required: true, ref: 'BasePokemon', type: Types.ObjectId })
   pokemon: Types.ObjectId | BasePokemonDocument
 
   @Prop({ required: true })

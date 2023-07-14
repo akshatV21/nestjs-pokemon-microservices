@@ -33,6 +33,7 @@ services:
     command: npm run start:dev spawns
     ports:
       - '8082:8082'
+      - '8083:8083'
     volumes:
       - .:/app
     env_file:
