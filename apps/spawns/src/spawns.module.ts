@@ -23,6 +23,7 @@ import {
 import { SERVICES } from '@utils/utils'
 import { SpawnsManager } from './spawns-manager.servier'
 import { APP_GUARD } from '@nestjs/core'
+import { SpawnsGateway } from './spawns.gateway'
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { APP_GUARD } from '@nestjs/core'
     SpawnRepository,
     SpawnsManager,
     { provide: APP_GUARD, useClass: Authorize },
+    SpawnsGateway,
   ],
 })
 export class SpawnsModule {}

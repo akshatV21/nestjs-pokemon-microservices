@@ -1,3 +1,5 @@
+import { Socket } from 'socket.io'
+
 export interface HttpSuccessResponse {
   success: boolean
   message: string
@@ -7,4 +9,8 @@ export interface HttpSuccessResponse {
 export interface AuthOptions {
   isLive?: boolean
   isOpen?: boolean
+}
+
+export interface AuthenticatedSocket extends Socket {
+  entityId?: string
 }

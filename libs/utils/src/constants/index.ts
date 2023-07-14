@@ -12,6 +12,7 @@ export const EXCEPTION_MSGS = {
   UNAUTHORIZED: 'UnauthorizedAccess',
   JWT_EXPIRED: 'JwtExpired',
   INVALID_JWT: 'InvalidJwt',
+  NULL_TOKEN: 'NullToken',
 } as const
 
 export const SERVICES = {
