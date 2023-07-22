@@ -5,6 +5,7 @@ export const DEFAULT_VALUES = {
   MIN_BASE_STAT: 10,
   MAX_BASE_STAT: 100,
   INVENTORY_STORAGE_LIMIT: 200,
+  ACTIVE_POKEMON_LIMIT: 6,
 } as const
 
 export const REQUEST_TYPES = ['http', 'rpc', 'ws'] as const

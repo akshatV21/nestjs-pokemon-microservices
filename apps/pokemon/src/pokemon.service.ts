@@ -1,18 +1,28 @@
-import { BasePokemonDocument, BasePokemonRepository, EvolutionLine, EvolutionLineDocument, EvolutionLineRepository } from '@lib/common'
-import { Inject, Injectable } from '@nestjs/common'
+import {
+  BasePokemonDocument,
+  BasePokemonRepository,
+  EvolutionLine,
+  EvolutionLineDocument,
+  EvolutionLineRepository,
+  UserDocument,
+  UserRepository,
+} from '@lib/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { Types } from 'mongoose'
 import { CreatePokemonDto } from './dtos/create-pokemon.dto'
 import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import { Cache } from 'cache-manager'
-import { CACHE_KEYS, EVENTS, SERVICES } from '@utils/utils'
+import { CACHE_KEYS, DEFAULT_VALUES, EVENTS, SERVICES } from '@utils/utils'
 import { ClientProxy } from '@nestjs/microservices'
+import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
 
 @Injectable()
 export class PokemonService {
   constructor(
     private readonly BasePokemonRepository: BasePokemonRepository,
     private readonly EvolutionLineRepository: EvolutionLineRepository,
+    private readonly UserRepository: UserRepository,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(SERVICES.SPAWNS_SERVICE) private readonly spawnsService: ClientProxy,
   ) {}
@@ -90,5 +100,19 @@ export class PokemonService {
     console.log('evolution-line-cached')
     if (evolutionLine) await this.cacheManager.set(`${CACHE_KEYS.EVOLUTION_LINE}-${basePokemonId}`, evolutionLine, { ttl: 20 })
     return evolutionLine
+  }
+
+  async addActivePokemon({ pokemon }: AddActivePokemonDto, user: UserDocument) {
+    const noOfCurrentActivePokemon = user.pokemon.active.length
+    const noOfRemainingSlots = DEFAULT_VALUES.ACTIVE_POKEMON_LIMIT - noOfCurrentActivePokemon
+
+    if (noOfCurrentActivePokemon >= DEFAULT_VALUES.ACTIVE_POKEMON_LIMIT)
+      throw new BadRequestException(`Cannot have more than ${DEFAULT_VALUES.ACTIVE_POKEMON_LIMIT} active pokemon.`)
+
+    if (pokemon.length > noOfRemainingSlots)
+      throw new BadRequestException(`You can only add ${noOfRemainingSlots} additional active pokemon.`)
+
+    const userUpdated = await this.UserRepository.update(user._id, { $push: { 'pokemon.active': pokemon } })
+    return userUpdated.pokemon.active
   }
 }

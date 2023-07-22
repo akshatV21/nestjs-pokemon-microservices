@@ -30,7 +30,7 @@ export class EvolutionStageDto {
   @ArrayMinSize(1)
   @Transform(({ key, value }) =>
     value.map((stringId: string) => {
-      if (!Types.ObjectId.isValid(stringId)) throw new BadRequestException(`${key} should be valid object id.`)
+      if (!Types.ObjectId.isValid(stringId)) throw new BadRequestException(`${key} should contain valid object id.`)
       return new Types.ObjectId(stringId)
     }),
   )
