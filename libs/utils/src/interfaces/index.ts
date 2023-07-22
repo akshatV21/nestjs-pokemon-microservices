@@ -1,4 +1,6 @@
 import { Socket } from 'socket.io'
+import { Block, City } from '../types'
+import { Types } from 'mongoose'
 
 export interface HttpSuccessResponse {
   success: boolean
@@ -13,4 +15,12 @@ export interface AuthOptions {
 
 export interface AuthenticatedSocket extends Socket {
   entityId?: string
+}
+
+export interface SpawnedPokemonInfo {
+  location: {
+    city: City
+    block: Block
+  }
+  caughtBy: Types.ObjectId[]
 }

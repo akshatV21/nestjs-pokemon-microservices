@@ -21,7 +21,7 @@ import {
   Authorize,
 } from '@lib/common'
 import { SERVICES } from '@utils/utils'
-import { SpawnsManager } from './spawns-manager.servier'
+import { SpawnsManager } from './spawns-manager.service'
 import { APP_GUARD } from '@nestjs/core'
 import { SpawnsGateway } from './spawns.gateway'
 import { EventEmitterModule } from '@nestjs/event-emitter'

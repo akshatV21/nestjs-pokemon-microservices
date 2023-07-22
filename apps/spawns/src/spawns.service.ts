@@ -13,9 +13,9 @@ import {
   SPAWN_TIME,
   TOTAL_SPAWN_RATE,
 } from '@utils/utils'
-import { SpawnsManager } from './spawns-manager.servier'
+import { SpawnsManager } from './spawns-manager.service'
 import { Types } from 'mongoose'
-import { SPAWN_RATES } from './spawn-rates'
+import { SPAWN_RATES } from './rates/spawn-rates'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { basename } from 'path'
 
@@ -76,7 +76,7 @@ export class SpawnsService {
     return async () => {
       await this.SpawnRepository.delete({ _id: despawnInfo.spawnId })
 
-      this.spawnsManager.removeSpawn(despawnInfo.city, despawnInfo.block)
+      this.spawnsManager.removeSpawn(despawnInfo.spawnId)
       this.eventEmitter.emit(EVENTS.POKEMON_DESPAWNED, despawnInfo)
 
       const newSpawnDelay = Math.floor(Math.random() * (NEW_SPAWN_DELAY.MAX - NEW_SPAWN_DELAY.MIN + 1)) + NEW_SPAWN_DELAY.MIN
@@ -114,7 +114,7 @@ export class SpawnsService {
       spawnObjectId,
     )
 
-    this.spawnsManager.addNewSpawn(city, block, spawnObjectId)
+    this.spawnsManager.addNewSpawn(spawnObjectId, city, block)
     this.scheduleDespawningPokemon({
       spawnId: spawnObjectId,
       city,
