@@ -1,4 +1,12 @@
-import { BasePokemonDocument, BasePokemonRepository, EvolutionLineDocument, Spawn, SpawnDocument, SpawnRepository } from '@lib/common'
+import {
+  BasePokemonDocument,
+  BasePokemonRepository,
+  EvolutionLineDocument,
+  Spawn,
+  SpawnDocument,
+  SpawnRepository,
+  UserDocument,
+} from '@lib/common'
 import { Injectable } from '@nestjs/common'
 import {
   Block,
@@ -126,8 +134,13 @@ export class SpawnsService {
     return createSpawnPromise
   }
 
-  async getCitySpawns(city: City) {
-    return this.SpawnRepository.find({ 'location.city': city })
+  async getCitySpawns(city: City, user: UserDocument) {
+    const citySpawns = await this.SpawnRepository.find({ 'location.city': city })
+    
+    const caughtSpawnIds = this.spawnsManager.getUserCaughtSpawnIdsByCity(city, user._id)
+    const uncaughtSpawns = citySpawns.filter(spawn => !caughtSpawnIds.includes(spawn._id))
+
+    return uncaughtSpawns
   }
 
   async despawnEveryPokemon() {

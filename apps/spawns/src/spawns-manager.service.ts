@@ -11,7 +11,7 @@ export class SpawnsManager {
   }
 
   addNewSpawn(spawnId: Types.ObjectId, city: City, block: Block) {
-    this.spawns.set(spawnId, { location: { city, block }, caughtBy: [] })
+    this.spawns.set(spawnId, { id: spawnId, location: { city, block }, caughtBy: [] })
   }
 
   removeSpawn(spawnId: Types.ObjectId) {
@@ -30,5 +30,10 @@ export class SpawnsManager {
     }
 
     return emptyBlocks
+  }
+
+  getUserCaughtSpawnIdsByCity(city: City, userId: Types.ObjectId) {
+    const spawnsArray = [...this.spawns.values()]
+    return spawnsArray.filter(spawn => spawn.location.city === city && !spawn.caughtBy.includes(userId)).map(spawn => spawn.id)
   }
 }

@@ -18,6 +18,7 @@ export interface AuthenticatedSocket extends Socket {
 }
 
 export interface SpawnedPokemonInfo {
+  id: Types.ObjectId
   location: {
     city: City
     block: Block
