@@ -76,7 +76,7 @@ export const BLOCKS_VALUE = {
 
 export const MAX_SPAWNS_PER_BLOCK = 1
 
-export const INITIAL_SPAWN_SIZE = 2
+export const INITIAL_SPAWN_SIZE = 8
 
 export const SPAWN_TIME = {
   MIN: 30000,
