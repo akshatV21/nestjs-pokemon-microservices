@@ -23,8 +23,10 @@ async function bootstrap() {
   app.use(helmet())
   app.use(morgan('dev'))
 
+  // await spawnsService.updateBasePokemonList()
   // await spawnsService.generateInitialSpawns()
   // await spawnsService.despawnEveryPokemon()
+  
   await app.startAllMicroservices()
   await app.listen(PORT, () => console.log(`Spawns service is listening to requests on port: ${PORT}`))
 }

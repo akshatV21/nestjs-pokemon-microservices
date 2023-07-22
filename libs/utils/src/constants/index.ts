@@ -25,6 +25,7 @@ export const EVENTS = {
   AUTHORIZE: 'authorize',
   POKEMON_SPAWNED: 'pokemon-spawned',
   POKEMON_DESPAWNED: 'pokemon-despawned',
+  BASE_POKEMON_LIST_UPDATED: 'base-pokemon-list-updated',
 } as const
 
 export const POKEMON_TYPINGS = {

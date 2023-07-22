@@ -5,7 +5,8 @@ import { CreatePokemonDto } from './dtos/create-pokemon.dto'
 import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import { Cache } from 'cache-manager'
-import { CACHE_KEYS } from '@utils/utils'
+import { CACHE_KEYS, EVENTS, SERVICES } from '@utils/utils'
+import { ClientProxy } from '@nestjs/microservices'
 
 @Injectable()
 export class PokemonService {
@@ -13,10 +14,13 @@ export class PokemonService {
     private readonly BasePokemonRepository: BasePokemonRepository,
     private readonly EvolutionLineRepository: EvolutionLineRepository,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(SERVICES.SPAWNS_SERVICE) private readonly spawnsService: ClientProxy,
   ) {}
 
   async create(createPokemonDto: CreatePokemonDto) {
     const pokemon = await this.BasePokemonRepository.create(createPokemonDto)
+
+    this.spawnsService.emit(EVENTS.BASE_POKEMON_LIST_UPDATED, {})
     return pokemon
   }
 
@@ -25,7 +29,6 @@ export class PokemonService {
     if (cachedPokemon) return cachedPokemon
 
     const pokemon = await this.BasePokemonRepository.find({})
-    console.log('cached-base-pokemon-list')
     if (pokemon.length > 0) await this.cacheManager.set(`${CACHE_KEYS.BASE_POKEMON_LIST}`, pokemon, { ttl: 20 })
 
     return pokemon
@@ -36,7 +39,6 @@ export class PokemonService {
     if (cachedPokemon) return cachedPokemon
 
     const pokemon = await this.BasePokemonRepository.findById(basePokemonId)
-    console.log('base-pokemon-cached')
     if (pokemon) await this.cacheManager.set(`${CACHE_KEYS.BASE_POKEMON}-${basePokemonId}`, pokemon, { ttl: 20 })
 
     return pokemon
