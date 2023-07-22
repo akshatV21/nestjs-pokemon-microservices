@@ -19,8 +19,41 @@ class PokemonSchema {
   @Prop({ default: new PokemonCaughtSchema() })
   caught?: PokemonCaughtSchema
 
+  @Prop({ default: [], ref: 'Pokemon' })
+  active?: Types.ObjectId[]
+
   @Prop({ default: DEFAULT_VALUES.POKEMON_STORAGE_LIMIT })
   storageLimit?: number
+}
+
+@Schema({ _id: false })
+class ItemSchema {
+  @Prop({ default: 0 })
+  pokeballs: number
+
+  @Prop({ default: 0 })
+  greatballs: number
+
+  @Prop({ default: 0 })
+  ultreballs: number
+
+  @Prop({ default: 0 })
+  razzBeryy: number
+
+  @Prop({ default: 0 })
+  pinapBerry: number
+
+  @Prop({ default: 0 })
+  goldenRazzBerry: number
+}
+
+@Schema({ _id: false })
+class InventorySchema {
+  @Prop({ default: new ItemSchema() })
+  items?: ItemSchema
+
+  @Prop({ default: DEFAULT_VALUES.INVENTORY_STORAGE_LIMIT })
+  storageLimit: number
 }
 
 @Schema({ timestamps: true })
