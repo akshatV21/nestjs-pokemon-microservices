@@ -27,6 +27,9 @@ export class Spawn {
 
   @Prop({ required: true })
   despawnsAt: Date
+
+  @Prop({ required: true })
+  isShiny: boolean
 }
 
 export const SpawnSchema = SchemaFactory.createForClass(Spawn)

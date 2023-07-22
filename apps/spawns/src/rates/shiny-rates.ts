@@ -1,4 +1,4 @@
-export const SHINY_RATES: Record<string, number> = {
+export const SHINY_RATES = {
   '1': 0.1, // Bulbasaur
   '2': 0.1, // Ivysaur
   '3': 0.08, // Venusaur

@@ -26,6 +26,7 @@ import { Types } from 'mongoose'
 import { SPAWN_RATES } from './rates/spawn-rates'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { basename } from 'path'
+import { SHINY_RATES } from './rates/shiny-rates'
 
 @Injectable()
 export class SpawnsService {
@@ -109,6 +110,9 @@ export class SpawnsService {
     const stage = randomPokemon.evolution.currentStage === 1 ? 1 : randomPokemon.evolution.currentStage - 1
     const minLevel = pokemonEvolutionLine.stages[EVOLUTION_STAGES[stage]].evolvesAtLevel
 
+    const shinyRate = SHINY_RATES[randomPokemon.pokedexNo]
+    const isShiny = Math.random() < shinyRate
+
     const spawnObjectId = new Types.ObjectId()
     const despawnsIn = Math.floor(Math.random() * (SPAWN_TIME.MAX - SPAWN_TIME.MIN + 1)) + SPAWN_TIME.MIN
 
@@ -118,6 +122,7 @@ export class SpawnsService {
         level: Math.floor(Math.random() * (MAX_LEVEL_IN_WILD - minLevel + 1)) + minLevel,
         location: { city, block },
         despawnsAt: new Date(Date.now() + despawnsIn),
+        isShiny,
       },
       spawnObjectId,
     )
@@ -136,7 +141,7 @@ export class SpawnsService {
 
   async getCitySpawns(city: City, user: UserDocument) {
     const citySpawns = await this.SpawnRepository.find({ 'location.city': city })
-    
+
     const caughtSpawnIds = this.spawnsManager.getUserCaughtSpawnIdsByCity(city, user._id)
     const uncaughtSpawns = citySpawns.filter(spawn => !caughtSpawnIds.includes(spawn._id))
 
