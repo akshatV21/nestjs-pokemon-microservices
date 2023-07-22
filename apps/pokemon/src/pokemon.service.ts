@@ -16,6 +16,7 @@ import { Cache } from 'cache-manager'
 import { CACHE_KEYS, DEFAULT_VALUES, EVENTS, SERVICES } from '@utils/utils'
 import { ClientProxy } from '@nestjs/microservices'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
+import { RemoveActivePokemonDto } from './dtos/remove-active-pokemon.dto'
 
 @Injectable()
 export class PokemonService {
@@ -113,6 +114,16 @@ export class PokemonService {
       throw new BadRequestException(`You can only add ${noOfRemainingSlots} additional active pokemon.`)
 
     const userUpdated = await this.UserRepository.update(user._id, { $push: { 'pokemon.active': pokemon } })
+    return userUpdated.pokemon.active
+  }
+
+  async removeActivePokemon({ pokemon }: RemoveActivePokemonDto, user: UserDocument) {
+    const currentActivePokemon = user.pokemon.active
+    pokemon.forEach(pokemon => {
+      if (!currentActivePokemon.includes(pokemon)) throw new BadRequestException("You can't remove a pokemon which is not active.")
+    })
+
+    const userUpdated = await this.UserRepository.update(user._id, { $pull: { 'pokemon.active': pokemon } })
     return userUpdated.pokemon.active
   }
 }
