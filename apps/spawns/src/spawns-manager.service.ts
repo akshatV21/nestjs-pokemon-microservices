@@ -18,6 +18,12 @@ export class SpawnsManager {
     this.spawns.delete(spawnId)
   }
 
+  addCaughtBy(spawnId: Types.ObjectId, userId: Types.ObjectId) {
+    const spawn = this.spawns.get(spawnId)
+    spawn.caughtBy.push(userId)
+    this.spawns.set(spawnId, spawn)
+  }
+
   getEmptyBlocksByCity(city: City): Block[] {
     const emptyBlocks: Block[] = []
     const spawnsArray = [...this.spawns.values()]
