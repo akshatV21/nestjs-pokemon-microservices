@@ -21,6 +21,7 @@ export const SERVICES = {
   AUTH_SERVICE: 'AUTH',
   POKEMON_SERVICE: 'POKEMON',
   SPAWNS_SERVICE: 'SPAWNS',
+  INVENTORY_SERVICE: 'INVENTORY',
 } as const
 
 export const EVENTS = {

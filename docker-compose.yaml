@@ -39,6 +39,19 @@ services:
     env_file:
       - ./apps/spawns/.env
 
+  inventory:
+    build:
+      context: .
+      dockerfile: ./apps/inventory/Dockerfile
+      target: development
+    command: npm run start:dev inventory
+    ports:
+      - '8084:8084'
+    volumes:
+      - .:/app
+    env_file:
+      - ./apps/inventory/.env
+
   mongo-server:
     image: mongo
     logging:
