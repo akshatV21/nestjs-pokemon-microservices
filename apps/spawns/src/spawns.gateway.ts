@@ -18,8 +18,8 @@ export class SpawnsGateway {
     const token = socket.handshake.auth.token || socket.handshake.headers.token
     if (!token) throw new WsException(EXCEPTION_MSGS.NULL_TOKEN)
 
-    await lastValueFrom(this.authService.send<any, AuthorizeDto>(EVENTS.AUTHORIZE, { token, requestType: 'ws' })).catch(err =>
-      catchAuthErrors(err, 'ws'),
+    await lastValueFrom(this.authService.send<any, AuthorizeDto>(EVENTS.AUTHORIZE, { token, requestType: 'ws', cached: false })).catch(
+      err => catchAuthErrors(err, 'ws'),
     )
   }
 

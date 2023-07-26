@@ -1,6 +1,6 @@
 import { ContextType } from '@nestjs/common'
 import { REQUEST_TYPES } from '@utils/utils'
-import { IsEnum, IsJWT, IsNotEmpty } from 'class-validator'
+import { IsBoolean, IsEnum, IsJWT, IsNotEmpty } from 'class-validator'
 
 export class AuthorizeDto {
   @IsNotEmpty()
@@ -10,6 +10,10 @@ export class AuthorizeDto {
   @IsNotEmpty()
   @IsEnum(REQUEST_TYPES)
   requestType: ContextType
+
+  @IsNotEmpty()
+  @IsBoolean()
+  cached: boolean
 
   user?: any
 }

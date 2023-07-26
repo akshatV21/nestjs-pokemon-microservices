@@ -40,7 +40,7 @@ import { SERVICES } from '@utils/utils'
       { name: BasePokemon.name, schema: BasePokemonSchema },
       { name: EvolutionLine.name, schema: EvolutionLineSchema },
     ]),
-    RmqModule.register([SERVICES.AUTH_SERVICE]),
+    RmqModule.register([SERVICES.AUTH_SERVICE, SERVICES.SPAWNS_SERVICE]),
     RedisModule.register(),
   ],
   controllers: [PokemonController],

@@ -11,6 +11,7 @@ export interface HttpSuccessResponse {
 export interface AuthOptions {
   isLive?: boolean
   isOpen?: boolean
+  cached?: boolean
 }
 
 export interface AuthenticatedSocket extends Socket {

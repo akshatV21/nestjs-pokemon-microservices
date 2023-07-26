@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common'
 import { SpawnsService } from './spawns.service'
-import { Auth } from '@lib/common'
+import { Auth, AuthUser, UserDocument } from '@lib/common'
 import { City, EVENTS, HttpSuccessResponse } from '@utils/utils'
 import { MessagePattern } from '@nestjs/microservices'
 
@@ -10,8 +10,8 @@ export class SpawnsController {
 
   @Get(':city')
   @Auth()
-  async httpGetCitySpawns(@Param('city') city: City): Promise<HttpSuccessResponse> {
-    const spawns = await this.spawnsService.getCitySpawns(city)
+  async httpGetCitySpawns(@Param('city') city: City, @AuthUser() user: UserDocument): Promise<HttpSuccessResponse> {
+    const spawns = await this.spawnsService.getCitySpawns(city, user)
     return { success: true, message: `Fetched ${city} spawns successfully.`, data: { spawns } }
   }
 

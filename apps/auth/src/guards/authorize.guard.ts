@@ -1,15 +1,29 @@
-import { AuthorizeDto, UserRepository } from '@lib/common'
-import { CanActivate, ContextType, ExecutionContext, Injectable, UnauthorizedException, UsePipes, ValidationPipe } from '@nestjs/common'
+import { AuthorizeDto, UserDocument, UserRepository } from '@lib/common'
+import { CACHE_MANAGER } from '@nestjs/cache-manager'
+import { Cache } from 'cache-manager'
+import {
+  CanActivate,
+  ContextType,
+  ExecutionContext,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RpcException } from '@nestjs/microservices'
 import { EXCEPTION_MSGS } from '@utils/utils'
 import { verify } from 'jsonwebtoken'
-import { Observable } from 'rxjs'
 
 @Injectable()
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class Authorize implements CanActivate {
-  constructor(private readonly configService: ConfigService, private readonly UserRepository: UserRepository) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly UserRepository: UserRepository,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const data = context.switchToRpc().getData<AuthorizeDto>()
@@ -25,7 +39,24 @@ export class Authorize implements CanActivate {
       return true
     }
 
-    data.user = await this.UserRepository.findById(id)
+    let user: UserDocument
+
+    if (data.cached) {
+      const cachedUser = await this.cacheManager.get<UserDocument>(id)
+
+      if (cachedUser) user = cachedUser
+      else {
+        user = await this.UserRepository.findById(id)
+        await this.cacheManager.set(id, user, { ttl: 3600 })
+      }
+    }
+
+    if (!data.cached) {
+      user = await this.UserRepository.findById(id)
+      await this.cacheManager.set(id, user, { ttl: 3600 })
+    }
+
+    data.user = user
     return true
   }
 
