@@ -3,8 +3,9 @@ import { InventoryController } from './inventory.controller'
 import { InventoryService } from './inventory.service'
 import { ConfigModule } from '@nestjs/config'
 import * as Joi from 'joi'
-import { DatabaseModule, RmqModule, User, UserSchema } from '@lib/common'
+import { Authorize, DatabaseModule, RmqModule, User, UserRepository, UserSchema } from '@lib/common'
 import { SERVICES } from '@utils/utils'
+import { APP_GUARD } from '@nestjs/core'
 
 @Module({
   imports: [
@@ -24,6 +25,6 @@ import { SERVICES } from '@utils/utils'
     RmqModule.register([SERVICES.AUTH_SERVICE, SERVICES.INVENTORY_SERVICE]),
   ],
   controllers: [InventoryController],
-  providers: [InventoryService],
+  providers: [InventoryService, UserRepository, { provide: APP_GUARD, useClass: Authorize }],
 })
 export class InventoryModule {}

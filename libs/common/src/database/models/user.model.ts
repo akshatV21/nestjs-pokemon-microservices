@@ -35,10 +35,10 @@ class ItemSchema {
   greatballs: number
 
   @Prop({ default: 0 })
-  ultreballs: number
+  ultraballs: number
 
   @Prop({ default: 0 })
-  razzBeryy: number
+  razzBerry: number
 
   @Prop({ default: 0 })
   pinapBerry: number
@@ -66,6 +66,9 @@ export class User {
 
   @Prop({ default: new PokemonSchema() })
   pokemon?: PokemonSchema
+
+  @Prop({ default: new InventorySchema() })
+  inventory?: InventorySchema
 }
 
 const UserSchema = SchemaFactory.createForClass(User)

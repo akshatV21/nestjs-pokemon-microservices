@@ -95,3 +95,10 @@ export const NEW_SPAWN_DELAY = {
   MIN: 10000,
   MAX: 16000,
 } as const
+
+export const DROPPED_ITEMS_QUANTITY = {
+  MIN: 6,
+  MAX: 14,
+} as const
+
+export const ITEMS = ['pokeballs', 'greatballs', 'ultraballs', 'razzBerry', 'pinapBerry', 'goldenRazzBerry'] as const
