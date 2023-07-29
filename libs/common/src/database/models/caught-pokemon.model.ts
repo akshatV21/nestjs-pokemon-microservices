@@ -8,7 +8,7 @@ export type CaughtPokemonDocument = CaughtPokemon & Document
 @Schema()
 export class CaughtPokemon {
   @Prop({ default: null })
-  nickname: string
+  nickname?: string
 
   @Prop({ required: true, ref: 'BasePokemon', type: Types.ObjectId })
   pokemon: Types.ObjectId | BasePokemonDocument

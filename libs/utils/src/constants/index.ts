@@ -102,3 +102,58 @@ export const DROPPED_ITEMS_QUANTITY = {
 } as const
 
 export const ITEMS = ['pokeballs', 'greatballs', 'ultraballs', 'razzBerry', 'pinapBerry', 'goldenRazzBerry'] as const
+
+export const BALLS = ['pokeballs', 'greatballs', 'ultraballs'] as const
+
+export const BERRIES = ['razzBerry', 'pinapBerry', 'goldenRazzBerry'] as const
+
+export const CATCH_RATE_MODIFIERS = {
+  POKEBALLS: 0,
+  GREATBALLS: 0.1,
+  ULTRABALLS: 0.2,
+  RAZZBERRY: 0.05,
+  GOLDENRAZZBERRY: 0.1,
+} as const
+
+export const POKEMON_XP_TO_LEVEL_UP = {
+  1: 100,
+  2: 353,
+  3: 607,
+  4: 861,
+  5: 1115,
+  6: 1369,
+  7: 1623,
+  8: 1876,
+  9: 2130,
+  10: 2384,
+  11: 2638,
+  12: 2892,
+  13: 3146,
+  14: 3400,
+  15: 3653,
+  16: 3907,
+  17: 4161,
+  18: 4415,
+  19: 4669,
+  20: 4923,
+  21: 5176,
+  22: 5430,
+  23: 5684,
+  24: 5938,
+  25: 6192,
+  26: 6446,
+  27: 6700,
+  28: 6953,
+  29: 7207,
+  30: 7461,
+  31: 7715,
+  32: 7969,
+  33: 8223,
+  34: 8476,
+  35: 8730,
+  36: 8984,
+  37: 9238,
+  38: 9492,
+  39: 9746,
+  40: 10000,
+} as const

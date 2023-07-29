@@ -1,15 +1,18 @@
 import {
   BasePokemonDocument,
   BasePokemonRepository,
+  CaughtPokemonRepository,
   EvolutionLineDocument,
   Spawn,
   SpawnDocument,
   SpawnRepository,
   UserDocument,
+  UserRepository,
 } from '@lib/common'
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import {
   Block,
+  CATCH_RATE_MODIFIERS,
   CITIES,
   City,
   DespawnInfo,
@@ -18,6 +21,7 @@ import {
   INITIAL_SPAWN_SIZE,
   MAX_LEVEL_IN_WILD,
   NEW_SPAWN_DELAY,
+  POKEMON_XP_TO_LEVEL_UP,
   SPAWN_TIME,
   TOTAL_SPAWN_RATE,
 } from '@utils/utils'
@@ -27,6 +31,8 @@ import { SPAWN_RATES } from './rates/spawn-rates'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { basename } from 'path'
 import { SHINY_RATES } from './rates/shiny-rates'
+import { CatchSpawnDto } from './dtos/catch-spawn.dto'
+import { CATCH_RATES } from './rates/catch-rates'
 
 @Injectable()
 export class SpawnsService {
@@ -35,6 +41,8 @@ export class SpawnsService {
   constructor(
     private readonly BasePokemonRepository: BasePokemonRepository,
     private readonly SpawnRepository: SpawnRepository,
+    private readonly CaughtPokemonRepository: CaughtPokemonRepository,
+    private readonly UserRepository: UserRepository,
     private readonly spawnsManager: SpawnsManager,
     private readonly eventEmitter: EventEmitter2,
   ) {}
@@ -150,6 +158,53 @@ export class SpawnsService {
 
   async despawnEveryPokemon() {
     await this.SpawnRepository.deleteMany({})
+  }
+
+  async catch(catchSpawnDto: CatchSpawnDto, user: UserDocument) {
+    const pokemonInStorage = user.pokemon.caught.inStorage.length
+    if (pokemonInStorage >= user.pokemon.storageLimit) throw new BadRequestException('No more space for pokemon to store.')
+
+    const spawn = await this.SpawnRepository.findById(catchSpawnDto.spawn)
+    if (!spawn) throw new BadRequestException('Invalid spawn.')
+
+    const pokemon = this.basePokemonList.find(pokemon => pokemon._id.equals(spawn.pokemon))
+
+    let baseCatchRate = CATCH_RATES[pokemon.pokedexNo]
+    baseCatchRate += baseCatchRate * CATCH_RATE_MODIFIERS[catchSpawnDto.ball.toUpperCase()]
+    if (catchSpawnDto.berry) baseCatchRate += baseCatchRate * CATCH_RATE_MODIFIERS[catchSpawnDto.berry.toUpperCase()]
+
+    const randomCatchRate = Math.random()
+    if (randomCatchRate > baseCatchRate) throw new BadRequestException('Did not catch pokemon.')
+
+    const caughtPokemonObjectId = new Types.ObjectId()
+    const session = await this.CaughtPokemonRepository.startTransaction()
+
+    try {
+      const updateUserPromise = this.UserRepository.update(user._id, {
+        $push: {
+          'pokemon.caught.inStorage': caughtPokemonObjectId,
+        },
+      })
+
+      const createCaughtPokemonPromise = this.CaughtPokemonRepository.create(
+        {
+          pokemon: pokemon._id,
+          location: spawn.location,
+          level: spawn.level,
+          isShiny: spawn.isShiny,
+          xp: POKEMON_XP_TO_LEVEL_UP[spawn.level],
+        },
+        caughtPokemonObjectId,
+      )
+
+      const [caughtPokemon] = await Promise.all([createCaughtPokemonPromise, updateUserPromise])
+      await session.commitTransaction()
+
+      return caughtPokemon
+    } catch (error) {
+      await session.abortTransaction()
+      throw error
+    }
   }
 
   async updateBasePokemonList() {

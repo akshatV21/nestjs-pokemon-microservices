@@ -19,6 +19,9 @@ import {
   UserRepository,
   UserSchema,
   Authorize,
+  CaughtPokemon,
+  CaughtPokemonSchema,
+  CaughtPokemonRepository,
 } from '@lib/common'
 import { SERVICES } from '@utils/utils'
 import { SpawnsManager } from './spawns-manager.service'
@@ -46,6 +49,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
       { name: BasePokemon.name, schema: BasePokemonSchema },
       { name: EvolutionLine.name, schema: EvolutionLineSchema },
       { name: Spawn.name, schema: SpawnSchema },
+      { name: CaughtPokemon.name, schema: CaughtPokemonSchema },
     ]),
     RmqModule.register([SERVICES.AUTH_SERVICE, SERVICES.INVENTORY_SERVICE]),
     RedisModule.register(),
@@ -57,6 +61,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
     UserRepository,
     BasePokemonRepository,
     SpawnRepository,
+    CaughtPokemonRepository,
     SpawnsManager,
     { provide: APP_GUARD, useClass: Authorize },
     SpawnsGateway,
