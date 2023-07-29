@@ -1,21 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Block, City } from '@utils/utils'
 import { Types, Document } from 'mongoose'
 import { BasePokemonDocument } from './base-pokemon.model'
+import { SpawnLocationSchema } from './spawn.model'
 
-export type SpawnDocument = Spawn & Document
+export type CaughtPokemonDocument = CaughtPokemon & Document
 
-@Schema({ _id: false })
-export class SpawnLocationSchema {
-  @Prop({ required: true, type: String })
-  city: City
+@Schema()
+export class CaughtPokemon {
+  @Prop({ default: null })
+  nickname: string
 
-  @Prop({ required: true, type: String })
-  block: Block
-}
-
-@Schema({ timestamps: true })
-export class Spawn {
   @Prop({ required: true, ref: 'BasePokemon', type: Types.ObjectId })
   pokemon: Types.ObjectId | BasePokemonDocument
 
@@ -26,10 +20,10 @@ export class Spawn {
   location: SpawnLocationSchema
 
   @Prop({ required: true })
-  despawnsAt: Date
+  isShiny: boolean
 
   @Prop({ required: true })
-  isShiny: boolean
+  xp: number
 }
 
-export const SpawnSchema = SchemaFactory.createForClass(Spawn)
+export const CaughtPokemonSchema = SchemaFactory.createForClass(CaughtPokemon)
