@@ -47,6 +47,7 @@ export class SpawnsService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
+  // Generates initial spawns for each city.
   async generateInitialSpawns() {
     const cities = Object.values(CITIES)
     const promises: Promise<SpawnDocument>[] = []
@@ -55,11 +56,15 @@ export class SpawnsService {
       const emptyBlocks = this.spawnsManager.getEmptyBlocksByCity(city)
 
       for (let i = 0; i < INITIAL_SPAWN_SIZE; i++) {
+        // Generates a random block index and creates a spawn on the chosen block.
         const randomBlockIndex = Math.floor(Math.random() * emptyBlocks.length)
         const randomBlock = emptyBlocks[randomBlockIndex]
 
+        // Creates a new spawn and adds the promise to the list.
         const spawnPromise = this.createSpawn(city, randomBlock)
         promises.push(spawnPromise)
+
+        // Removes the chosen block to avoid duplicates.
         emptyBlocks.splice(randomBlockIndex, 1)
       }
     }
@@ -67,63 +72,85 @@ export class SpawnsService {
     await Promise.all(promises)
   }
 
+  // Schedules the spawning of a new Pokémon in the given city after a specified delay.
   scheduleSpawningNewPokemon(city: City, newSpawnDelay: number) {
     const callback = this.generateNewSpawn(city)
     setTimeout(callback, newSpawnDelay)
   }
 
+  // Generates a callback function for spawning a new Pokémon.
   generateNewSpawn(city: City) {
     return async () => {
       const emptyBlocks = this.spawnsManager.getEmptyBlocksByCity(city)
       const randomBlock = emptyBlocks[Math.floor(Math.random() * emptyBlocks.length)]
 
+      // Create a new spawn and associate pokémon details
       const spawn = await this.createSpawn(city, randomBlock)
       spawn.pokemon = this.basePokemonList.find(pokemon => spawn.pokemon.equals(pokemon._id))
 
+      // Emit an event to notify that a new Pokémon has spawned
       this.eventEmitter.emit(EVENTS.POKEMON_SPAWNED, spawn)
     }
   }
 
+  // Schedules the despawning of a Pokémon after a specified delay.
   scheduleDespawningPokemon(despawnInfo: DespawnInfo) {
     const callback = this.despawnPokemon(despawnInfo)
     setTimeout(callback, despawnInfo.despawnsIn)
   }
 
+  // Generates a callback function for despawning a Pokémon.
   despawnPokemon(despawnInfo: DespawnInfo) {
     return async () => {
+      // Delete the spawn from the database.
       await this.SpawnRepository.delete({ _id: despawnInfo.spawnId })
 
+      // Remove the spawn from the spawnsManager.
       this.spawnsManager.removeSpawn(despawnInfo.spawnId)
+
+      // Emit an event to notify that the Pokémon has despawned.
       this.eventEmitter.emit(EVENTS.POKEMON_DESPAWNED, despawnInfo)
 
+      // Calculate a new spawn delay and schedule a new Pokémon spawn.
       const newSpawnDelay = Math.floor(Math.random() * (NEW_SPAWN_DELAY.MAX - NEW_SPAWN_DELAY.MIN + 1)) + NEW_SPAWN_DELAY.MIN
       this.scheduleSpawningNewPokemon(despawnInfo.city, newSpawnDelay)
     }
   }
 
+  // Creates a new spawn for a Pokémon in the specified city and block.
   async createSpawn(city: City, block: Block) {
     let randomPokemon: BasePokemonDocument
     let cumulativeSpawnRate = 0
+
+    // Generate a random spawn rate between 0 and the total spawn rate.
     const randomSpawnRate = Math.random() * TOTAL_SPAWN_RATE
 
+    // Select a random Pokémon based on the cumulative spawn rates.
     for (const pokemon of this.basePokemonList) {
       cumulativeSpawnRate += SPAWN_RATES[pokemon.pokedexNo]
+
+      // If the random spawn rate is within the cumulative spawn rate,
+      // choose this Pokémon for spawning.
       if (randomSpawnRate <= cumulativeSpawnRate) {
         randomPokemon = pokemon
         break
       }
     }
 
+    // Get the evolution line and stage information for the selected Pokémon.
     const pokemonEvolutionLine = randomPokemon.evolution.line as unknown as EvolutionLineDocument
     const stage = randomPokemon.evolution.currentStage === 1 ? 1 : randomPokemon.evolution.currentStage - 1
     const minLevel = pokemonEvolutionLine.stages[EVOLUTION_STAGES[stage]].evolvesAtLevel
 
+    // Determine if the spawned Pokémon is shiny based on the shiny rate.
     const shinyRate = SHINY_RATES[randomPokemon.pokedexNo]
     const isShiny = Math.random() < shinyRate
 
+    // Generate a unique spawn object ID and calculate the despawn time.
     const spawnObjectId = new Types.ObjectId()
     const despawnsIn = Math.floor(Math.random() * (SPAWN_TIME.MAX - SPAWN_TIME.MIN + 1)) + SPAWN_TIME.MIN
 
+    // Create a new spawn entry in the database.
     const createSpawnPromise = this.SpawnRepository.create(
       {
         pokemon: randomPokemon._id,
@@ -135,7 +162,10 @@ export class SpawnsService {
       spawnObjectId,
     )
 
+    // Add the new spawn to the spawnsManager for tracking.
     this.spawnsManager.addNewSpawn(spawnObjectId, city, block)
+
+    // Schedule the despawning of the Pokémon after a specified time.
     this.scheduleDespawningPokemon({
       spawnId: spawnObjectId,
       city,
@@ -147,12 +177,16 @@ export class SpawnsService {
     return createSpawnPromise
   }
 
+  // Retrieves a list of uncaught Pokémon spawns for the specified city.
   async getCitySpawns(city: City, user: UserDocument) {
+    // Fetch all spawns for the given city from the database.
     const citySpawns = await this.SpawnRepository.find({ 'location.city': city })
 
+    // Get the spawn IDs of the Pokémon caught by the user in the city.
     const caughtSpawnIds = this.spawnsManager.getUserCaughtSpawnIdsByCity(city, user._id)
-    const uncaughtSpawns = citySpawns.filter(spawn => !caughtSpawnIds.includes(spawn._id))
 
+    // Filter the city spawns to include only those that the user hasn't caught.
+    const uncaughtSpawns = citySpawns.filter(spawn => !caughtSpawnIds.includes(spawn._id))
     return uncaughtSpawns
   }
 
@@ -160,32 +194,49 @@ export class SpawnsService {
     await this.SpawnRepository.deleteMany({})
   }
 
+  // Attempts to catch a Pokémon based on the provided spawn information and user data.
   async catch(catchSpawnDto: CatchSpawnDto, user: UserDocument) {
+    // Check if the user's storage is full before attempting to catch.
     const pokemonInStorage = user.pokemon.caught.inStorage.length
-    if (pokemonInStorage >= user.pokemon.storageLimit) throw new BadRequestException('No more space for pokemon to store.')
+    if (pokemonInStorage >= user.pokemon.storageLimit) {
+      throw new BadRequestException('No more space for pokemon to store.')
+    }
 
+    // Retrieve the spawn details based on the provided spawn ID.
     const spawn = await this.SpawnRepository.findById(catchSpawnDto.spawn)
-    if (!spawn) throw new BadRequestException('Invalid spawn.')
+    if (!spawn) {
+      throw new BadRequestException('Invalid spawn.')
+    }
 
+    // Find the corresponding base Pokémon for the spawn.
     const pokemon = this.basePokemonList.find(pokemon => pokemon._id.equals(spawn.pokemon))
 
+    // Calculate the base catch rate and modify it based on items.
     let baseCatchRate = CATCH_RATES[pokemon.pokedexNo]
     baseCatchRate += baseCatchRate * CATCH_RATE_MODIFIERS[catchSpawnDto.ball.toUpperCase()]
-    if (catchSpawnDto.berry) baseCatchRate += baseCatchRate * CATCH_RATE_MODIFIERS[catchSpawnDto.berry.toUpperCase()]
+    if (catchSpawnDto.berry) {
+      baseCatchRate += baseCatchRate * CATCH_RATE_MODIFIERS[catchSpawnDto.berry.toUpperCase()]
+    }
 
+    // Generate a random catch rate and check if the catch attempt was successful.
     const randomCatchRate = Math.random()
-    if (randomCatchRate > baseCatchRate) throw new BadRequestException('Did not catch pokemon.')
+    if (randomCatchRate > baseCatchRate) {
+      throw new BadRequestException('Did not catch pokemon.')
+    }
 
+    // Start a transaction to update user and caught Pokémon data.
     const caughtPokemonObjectId = new Types.ObjectId()
     const session = await this.CaughtPokemonRepository.startTransaction()
 
     try {
+      // Update the user's caught Pokémon storage.
       const updateUserPromise = this.UserRepository.update(user._id, {
         $push: {
           'pokemon.caught.inStorage': caughtPokemonObjectId,
         },
       })
 
+      // Create a new caught Pokémon entry with relevant data.
       const createCaughtPokemonPromise = this.CaughtPokemonRepository.create(
         {
           pokemon: pokemon._id,
@@ -197,11 +248,13 @@ export class SpawnsService {
         caughtPokemonObjectId,
       )
 
+      // Execute promises to update user and caught Pokémon data.
       const [caughtPokemon] = await Promise.all([createCaughtPokemonPromise, updateUserPromise])
       await session.commitTransaction()
 
       return caughtPokemon
     } catch (error) {
+      // Rollback the transaction in case of an error and re-throw the error.
       await session.abortTransaction()
       throw error
     }
