@@ -1,4 +1,4 @@
-import { UserDocument, UserRepository } from '@lib/common'
+import { ItemUsedDto, UserDocument, UserRepository } from '@lib/common'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { DROPPED_ITEMS_QUANTITY, ITEMS, Item } from '@utils/utils'
 import { DROP_RATES } from './rates/drop-rates'
@@ -7,10 +7,15 @@ import { DROP_RATES } from './rates/drop-rates'
 export class InventoryService {
   constructor(private readonly UserRepository: UserRepository) {}
 
+  // Generates dropped items for a user's inventory.
   async drops(user: UserDocument) {
+    // Check if there's enough space in the user's inventory.
     const totalItems = Object.values(user.inventory.items).reduce((prev, curr) => prev + curr, 0)
-    if (totalItems >= user.inventory.storageLimit) throw new BadRequestException('No space left in your inventory.')
+    if (totalItems >= user.inventory.storageLimit) {
+      throw new BadRequestException('No space left in your inventory.')
+    }
 
+    // Initialize the dropped items object.
     const drops: Record<Item, number> = {
       pokeballs: 0,
       greatballs: 0,
@@ -20,15 +25,18 @@ export class InventoryService {
       goldenRazzBerry: 0,
     }
 
+    // Determine the quantity of dropped items.
     const dropQuantity =
       Math.floor(Math.random() * (DROPPED_ITEMS_QUANTITY.MAX - DROPPED_ITEMS_QUANTITY.MIN + 1)) + DROPPED_ITEMS_QUANTITY.MIN
 
+    // Generate dropped items based on drop rates.
     for (let i = 0; i < dropQuantity; i++) {
       const randomDropRate = Math.random()
       const item = this.getRandomItem(randomDropRate)
       drops[item] += 1
     }
 
+    // Update the user's inventory with the dropped items.
     await this.UserRepository.update(user._id, {
       $inc: {
         'inventory.items.pokeballs': drops['pokeballs'],
@@ -43,12 +51,22 @@ export class InventoryService {
     return drops
   }
 
-  getRandomItem(randomDropRate: number) {
+  // Decrements the count of the specified ball or berry item in the user's inventory.
+  async useItem({ user, ball, berry }: ItemUsedDto) {
+    await this.UserRepository.update(user, {
+      $inc: { [`inventory.items.${ball}`]: ball ? -1 : 0, [`inventory.items.${berry}`]: berry ? -1 : 0 },
+    })
+  }
+
+  // Returns a random item based on drop rates.
+  private getRandomItem(randomDropRate: number) {
     let cumulativeDropRate = 0
 
     for (let item of ITEMS) {
       cumulativeDropRate += DROP_RATES[item]
-      if (randomDropRate <= cumulativeDropRate) return item
+      if (randomDropRate <= cumulativeDropRate) {
+        return item
+      }
     }
   }
 }
