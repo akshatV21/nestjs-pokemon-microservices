@@ -3,11 +3,11 @@ import {
   BasePokemonRepository,
   CaughtPokemonRepository,
   EvolutionLineDocument,
-  Spawn,
   SpawnDocument,
   SpawnRepository,
   UserDocument,
   UserRepository,
+  ItemUsedDto
 } from '@lib/common'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import {
@@ -33,6 +33,7 @@ import { basename } from 'path'
 import { SHINY_RATES } from './rates/shiny-rates'
 import { CatchSpawnDto } from './dtos/catch-spawn.dto'
 import { CATCH_RATES } from './rates/catch-rates'
+import { ClientProxy } from '@nestjs/microservices'
 
 @Injectable()
 export class SpawnsService {
@@ -45,6 +46,7 @@ export class SpawnsService {
     private readonly UserRepository: UserRepository,
     private readonly spawnsManager: SpawnsManager,
     private readonly eventEmitter: EventEmitter2,
+    private readonly inventoryService: ClientProxy,
   ) {}
 
   // Generates initial spawns for each city.
@@ -207,6 +209,10 @@ export class SpawnsService {
     if (!spawn) {
       throw new BadRequestException('Invalid spawn.')
     }
+
+    // Prepare the payload for the RabbitMQ message and emitting it
+    const rpcPayload: ItemUsedDto = { user: user._id, ball: catchSpawnDto.ball, berry: catchSpawnDto.berry }
+    this.inventoryService.emit(EVENTS.ITEM_USED, rpcPayload)
 
     // Find the corresponding base Pokémon for the spawn.
     const pokemon = this.basePokemonList.find(pokemon => pokemon._id.equals(spawn.pokemon))

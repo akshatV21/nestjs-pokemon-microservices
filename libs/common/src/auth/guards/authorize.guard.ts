@@ -29,7 +29,7 @@ export class Authorize implements CanActivate {
   }
 
   private authorizeHttpRequest(context: ExecutionContext) {
-    const { isLive, isOpen, cached} = this.reflector.get<AuthOptions>('authOptions', context.getHandler())
+    const { isLive, isOpen, cached } = this.reflector.get<AuthOptions>('authOptions', context.getHandler())
 
     if (!isLive) throw new InternalServerErrorException('This endpoint is currently under maintainence.')
     if (isOpen) return true
@@ -43,7 +43,7 @@ export class Authorize implements CanActivate {
   }
 
   private authorizeRpcRequest(context: ExecutionContext) {
-    const { isLive, isOpen, cached} = this.reflector.get<AuthOptions>('authOptions', context.getHandler())
+    const { isLive, isOpen, cached } = this.reflector.get<AuthOptions>('authOptions', context.getHandler())
 
     if (!isLive) throw new RpcException('This endpoint is currently under maintainence.')
     if (isOpen) return true
@@ -55,7 +55,7 @@ export class Authorize implements CanActivate {
   }
 
   private authorizeWsRequest(context: ExecutionContext) {
-    const { isLive, isOpen, cached} = this.reflector.get<AuthOptions>('authOptions', context.getHandler())
+    const { isLive, isOpen, cached } = this.reflector.get<AuthOptions>('authOptions', context.getHandler())
 
     if (!isLive) throw new WsException('This endpoint is currently under maintainence.')
     if (isOpen) return true
@@ -70,7 +70,7 @@ export class Authorize implements CanActivate {
     const response = await lastValueFrom(this.authService.send<any, AuthorizeDto>(EVENTS.AUTHORIZE, authorizeDto)).catch(err => {
       catchAuthErrors(err, type)
     })
-    
+
     if (type === 'ws') request.entityId = response.user
     else if (type === 'http') {
       request.user = response.user

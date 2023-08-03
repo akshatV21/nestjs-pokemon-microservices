@@ -1,5 +1,3 @@
-import { ContextType } from '@nestjs/common'
-
 export const DEFAULT_VALUES = {
   POKEMON_STORAGE_LIMIT: 100,
   MIN_BASE_STAT: 10,
@@ -29,6 +27,7 @@ export const EVENTS = {
   POKEMON_SPAWNED: 'pokemon-spawned',
   POKEMON_DESPAWNED: 'pokemon-despawned',
   BASE_POKEMON_LIST_UPDATED: 'base-pokemon-list-updated',
+  ITEM_USED: 'item-used',
 } as const
 
 export const POKEMON_TYPINGS = {
