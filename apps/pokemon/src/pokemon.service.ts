@@ -98,28 +98,35 @@ export class PokemonService {
         },
       },
     )
-    console.log('evolution-line-cached')
+    
     if (evolutionLine) await this.cacheManager.set(`${CACHE_KEYS.EVOLUTION_LINE}-${basePokemonId}`, evolutionLine, { ttl: 20 })
     return evolutionLine
   }
 
+  // Adds a caught Pokémon to the user's active Pokémon list.
   async addActivePokemon({ pokemon }: AddActivePokemonDto, user: UserDocument) {
+    // Check if the Pokémon is caught by the user.
     const isCaughtByUser = user.pokemon.caught.inStorage.includes(pokemon)
+    if (!isCaughtByUser) throw new BadRequestException('You have not caught this pokemon.')
+
+    // Check the number of current active Pokémon.
     const noOfCurrentActivePokemon = user.pokemon.active.length
-
-    if (!isCaughtByUser) throw new BadRequestException(`You cannot add a Pokémon that you haven't caught.`)
-
     if (noOfCurrentActivePokemon >= DEFAULT_VALUES.ACTIVE_POKEMON_LIMIT)
       throw new BadRequestException(`Cannot have more than ${DEFAULT_VALUES.ACTIVE_POKEMON_LIMIT} active pokemon.`)
 
+    // Add the Pokémon to the active list and update the user.
     const userUpdated = await this.UserRepository.update(user._id, { $push: { 'pokemon.active': pokemon } })
     return userUpdated.pokemon.active
   }
 
+  // Removes an active Pokémon from the user's active Pokémon list.
   async removeActivePokemon({ pokemon }: RemoveActivePokemonDto, user: UserDocument) {
     const currentActivePokemon = user.pokemon.active
-    if (!currentActivePokemon.includes(pokemon)) throw new BadRequestException('The specified Pokémon is not currently active.')
 
+    // Check if the provided Pokémon is active.
+    if (!currentActivePokemon.includes(pokemon)) throw new BadRequestException('You cannot remove an inactive pokemon.')
+
+    // Remove the Pokémon from the active list and update the user.
     const userUpdated = await this.UserRepository.update(user._id, { $pull: { 'pokemon.active': pokemon } })
     return userUpdated.pokemon.active
   }
