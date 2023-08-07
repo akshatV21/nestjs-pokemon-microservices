@@ -21,7 +21,11 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const registeredUser = await this.UserRepository.findOne({ username: loginDto.username }, {}, { lean: true })
+    const registeredUser = await this.UserRepository.findOne(
+      { username: loginDto.username },
+      { pokemon: -1, inventory: -1 },
+      { lean: true },
+    )
     if (!registeredUser) throw new BadRequestException('No registered user with provided username.')
 
     const passwordMatches = compareSync(loginDto.password, registeredUser.password)
