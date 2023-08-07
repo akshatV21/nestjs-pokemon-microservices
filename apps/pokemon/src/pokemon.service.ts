@@ -107,7 +107,7 @@ export class PokemonService {
     const isCaughtByUser = user.pokemon.caught.inStorage.includes(pokemon)
     const noOfCurrentActivePokemon = user.pokemon.active.length
 
-    if (!isCaughtByUser) throw new BadRequestException('You have not caught this pokemon.')
+    if (!isCaughtByUser) throw new BadRequestException(`You cannot add a Pokémon that you haven't caught.`)
 
     if (noOfCurrentActivePokemon >= DEFAULT_VALUES.ACTIVE_POKEMON_LIMIT)
       throw new BadRequestException(`Cannot have more than ${DEFAULT_VALUES.ACTIVE_POKEMON_LIMIT} active pokemon.`)
@@ -118,7 +118,7 @@ export class PokemonService {
 
   async removeActivePokemon({ pokemon }: RemoveActivePokemonDto, user: UserDocument) {
     const currentActivePokemon = user.pokemon.active
-    if (!currentActivePokemon.includes(pokemon)) throw new BadRequestException('You cannot remove an inactive pokemon.')
+    if (!currentActivePokemon.includes(pokemon)) throw new BadRequestException('The specified Pokémon is not currently active.')
 
     const userUpdated = await this.UserRepository.update(user._id, { $pull: { 'pokemon.active': pokemon } })
     return userUpdated.pokemon.active
