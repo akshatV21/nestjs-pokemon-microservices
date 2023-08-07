@@ -7,6 +7,7 @@ import { HttpSuccessResponse, ParseObjectId } from '@utils/utils'
 import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
 import { RemoveActivePokemonDto } from './dtos/remove-active-pokemon.dto'
+import { TransferPokemonDto } from './dtos/transfer-pokemon.dto'
 
 @Controller('pokemon')
 export class PokemonController {
@@ -48,7 +49,7 @@ export class PokemonController {
   }
 
   @Patch('active/add')
-  @Auth()
+  @Auth({ cached: false })
   async httpAddActivePokemon(
     @Body() addActivePokemonDto: AddActivePokemonDto,
     @AuthUser() user: UserDocument,
@@ -58,9 +59,19 @@ export class PokemonController {
   }
 
   @Patch('active/remove')
-  @Auth()
-  async httpRemoveActivePokemon(@Body() removeActivePokemonDto: RemoveActivePokemonDto, @AuthUser() user: UserDocument) {
+  @Auth({ cached: false })
+  async httpRemoveActivePokemon(
+    @Body() removeActivePokemonDto: RemoveActivePokemonDto,
+    @AuthUser() user: UserDocument,
+  ): Promise<HttpSuccessResponse> {
     const activePokemon = await this.pokemonService.removeActivePokemon(removeActivePokemonDto, user)
     return { success: true, message: 'Removed active pokemon successfully.', data: { activePokemon } }
+  }
+
+  @Patch('transfer')
+  @Auth({ cached: false })
+  async httpTransferPokemon(@Body() transferPokemonDto: TransferPokemonDto, @AuthUser() user: UserDocument): Promise<HttpSuccessResponse> {
+    const transferredPokemon = await this.pokemonService.transfer(transferPokemonDto, user)
+    return { success: true, message: 'Pokemon transferred successfully.', data: transferredPokemon }
   }
 }

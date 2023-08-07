@@ -17,6 +17,7 @@ import { CACHE_KEYS, DEFAULT_VALUES, EVENTS, SERVICES } from '@utils/utils'
 import { ClientProxy } from '@nestjs/microservices'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
 import { RemoveActivePokemonDto } from './dtos/remove-active-pokemon.dto'
+import { TransferPokemonDto } from './dtos/transfer-pokemon.dto'
 
 @Injectable()
 export class PokemonService {
@@ -98,7 +99,7 @@ export class PokemonService {
         },
       },
     )
-    
+
     if (evolutionLine) await this.cacheManager.set(`${CACHE_KEYS.EVOLUTION_LINE}-${basePokemonId}`, evolutionLine, { ttl: 20 })
     return evolutionLine
   }
@@ -129,5 +130,26 @@ export class PokemonService {
     // Remove the Pokémon from the active list and update the user.
     const userUpdated = await this.UserRepository.update(user._id, { $pull: { 'pokemon.active': pokemon } })
     return userUpdated.pokemon.active
+  }
+
+  // Transfers selected Pokémon from caught Pokémon storage to the transferred list.
+  async transfer(transferPokemonDto: TransferPokemonDto, user: UserDocument) {
+    // Iterate through each Pokémon in the transfer request.
+    transferPokemonDto.pokemon.forEach(pokemonId => {
+      // Check if the user has caught the Pokémon before allowing the transfer.
+      const isCaughtByUser = user.pokemon.caught.inStorage.includes(pokemonId)
+      if (!isCaughtByUser) {
+        throw new BadRequestException(`You cannot transfer a Pokémon that you haven't caught.`)
+      }
+    })
+
+    // Update the user's document to perform the transfer.
+    const userUpdated = await this.UserRepository.update(user._id, {
+      $pull: { 'pokemon.caught.inStorage': { $in: transferPokemonDto.pokemon } },
+      $push: { 'pokemon.caught.transferred': { $each: transferPokemonDto.pokemon } },
+    })
+
+    // Return the transferred Pokémon IDs.
+    return { transferred: transferPokemonDto.pokemon }
   }
 }
