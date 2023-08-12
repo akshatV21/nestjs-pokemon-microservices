@@ -8,6 +8,7 @@ import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
 import { RemoveActivePokemonDto } from './dtos/remove-active-pokemon.dto'
 import { TransferPokemonDto } from './dtos/transfer-pokemon.dto'
+import { UpdateNicknameDto } from './dtos/update-nickname.dto'
 
 @Controller('pokemon')
 export class PokemonController {
@@ -73,5 +74,12 @@ export class PokemonController {
   async httpTransferPokemon(@Body() transferPokemonDto: TransferPokemonDto, @AuthUser() user: UserDocument): Promise<HttpSuccessResponse> {
     const transferredPokemon = await this.pokemonService.transfer(transferPokemonDto, user)
     return { success: true, message: 'Pokemon transferred successfully.', data: transferredPokemon }
+  }
+
+  @Patch('nickname')
+  @Auth({ cached: false })
+  async httpUpdateNickname(@Body() updateNicknameDto: UpdateNicknameDto, @AuthUser() user: UserDocument): Promise<HttpSuccessResponse> {
+    const nickname = await this.pokemonService.updateNickname(updateNicknameDto, user)
+    return { success: true, message: 'Nickname updated successfully.', data: { nickname } }
   }
 }

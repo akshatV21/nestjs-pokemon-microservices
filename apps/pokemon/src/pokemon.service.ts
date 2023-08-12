@@ -1,6 +1,7 @@
 import {
   BasePokemonDocument,
   BasePokemonRepository,
+  CaughtPokemonRepository,
   EvolutionLine,
   EvolutionLineDocument,
   EvolutionLineRepository,
@@ -18,6 +19,7 @@ import { ClientProxy } from '@nestjs/microservices'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
 import { RemoveActivePokemonDto } from './dtos/remove-active-pokemon.dto'
 import { TransferPokemonDto } from './dtos/transfer-pokemon.dto'
+import { UpdateNicknameDto } from './dtos/update-nickname.dto'
 
 @Injectable()
 export class PokemonService {
@@ -25,6 +27,7 @@ export class PokemonService {
     private readonly BasePokemonRepository: BasePokemonRepository,
     private readonly EvolutionLineRepository: EvolutionLineRepository,
     private readonly UserRepository: UserRepository,
+    private readonly CaughtPokemonRepository: CaughtPokemonRepository,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(SERVICES.SPAWNS_SERVICE) private readonly spawnsService: ClientProxy,
   ) {}
@@ -152,5 +155,13 @@ export class PokemonService {
 
     // Return the transferred Pokémon IDs.
     return { transferred: transferPokemonDto.pokemon }
+  }
+
+  async updateNickname({ pokemon, nickname }: UpdateNicknameDto, user: UserDocument) {
+    const isCaughtByUser = user.pokemon.caught.inStorage.includes(pokemon)
+    if (!isCaughtByUser) throw new BadRequestException('You have not caught this pokemon.')
+
+    await this.CaughtPokemonRepository.update(pokemon, { $set: { nickname } })
+    return nickname
   }
 }

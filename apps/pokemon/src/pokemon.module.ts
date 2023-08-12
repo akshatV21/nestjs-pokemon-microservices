@@ -8,6 +8,9 @@ import {
   BasePokemon,
   BasePokemonRepository,
   BasePokemonSchema,
+  CaughtPokemon,
+  CaughtPokemonRepository,
+  CaughtPokemonSchema,
   DatabaseModule,
   EvolutionLine,
   EvolutionLineRepository,
@@ -44,11 +47,12 @@ import { SERVICES } from '@utils/utils'
       { name: User.name, schema: UserSchema },
       { name: BasePokemon.name, schema: BasePokemonSchema },
       { name: EvolutionLine.name, schema: EvolutionLineSchema },
+      { name: CaughtPokemon.name, schema: CaughtPokemonSchema },
     ]),
     RmqModule.register([SERVICES.AUTH_SERVICE, SERVICES.SPAWNS_SERVICE]),
     RedisModule.register(),
   ],
   controllers: [PokemonController],
-  providers: [PokemonService, UserRepository, BasePokemonRepository, EvolutionLineRepository, { provide: APP_GUARD, useClass: Authorize }],
+  providers: [PokemonService, UserRepository, BasePokemonRepository, EvolutionLineRepository, CaughtPokemonRepository, { provide: APP_GUARD, useClass: Authorize }],
 })
 export class PokemonModule {}
