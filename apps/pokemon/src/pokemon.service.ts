@@ -157,7 +157,9 @@ export class PokemonService {
     return { transferred: transferPokemonDto.pokemon }
   }
 
+  // Updates the nickname of a caught Pokémon for the given user.
   async updateNickname({ pokemon, nickname }: UpdateNicknameDto, user: UserDocument) {
+    // Check if the Pokémon is caught by the user.
     const isCaughtByUser = user.pokemon.caught.inStorage.includes(pokemon)
     if (!isCaughtByUser) throw new BadRequestException('You have not caught this pokemon.')
 
