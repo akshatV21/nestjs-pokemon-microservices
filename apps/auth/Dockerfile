@@ -6,19 +6,15 @@ COPY /package*.json .
 RUN npm install
 
 COPY . .
-RUN npm run build
+RUN npm run build auth
 
 FROM node:19-alpine As production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
+WORKDIR /app
+
 COPY --from=development ./app/dist ./dist
 
-RUN ls /dist
-
-RUN ls /dist/apps
-
-RUN ls /dist/apps/auth
-
-CMD ["node", "dist/apps/auth/main.js"]
+CMD ["node", "dist/apps/auth/main"]
