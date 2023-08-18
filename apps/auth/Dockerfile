@@ -17,4 +17,6 @@ WORKDIR /app
 
 COPY --from=development ./app/dist ./dist
 
+RUN ls
+
 CMD ["node", "dist/apps/auth/main"]
