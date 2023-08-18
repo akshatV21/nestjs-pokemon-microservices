@@ -15,6 +15,10 @@ ENV NODE_ENV=${NODE_ENV}
 
 COPY --from=development ./app/dist ./dist
 
-RUN ls /
+RUN ls /dist
+
+RUN ls /dist/apps
+
+RUN ls /dist/apps/auth
 
 CMD ["node", "dist/apps/auth/main.js"]
