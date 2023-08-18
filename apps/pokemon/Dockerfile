@@ -6,7 +6,7 @@ COPY /package*.json .
 RUN npm install
 
 COPY . .
-RUN npm run build
+RUN npm run build pokemon
 
 FROM node:19-alpine As production
 
