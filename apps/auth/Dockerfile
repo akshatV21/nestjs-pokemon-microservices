@@ -13,8 +13,6 @@ FROM node:19-alpine As production
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-WORKDIR /app
-
 COPY --from=development ./app/dist ./dist
 
 RUN ls /
