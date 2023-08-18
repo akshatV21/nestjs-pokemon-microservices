@@ -17,6 +17,12 @@ WORKDIR /app
 
 COPY --from=development ./app/dist ./dist
 
+RUN cd ..
+
 RUN ls
 
-CMD ["node", "dist/apps/auth/main"]
+RUN cd /app/dist
+
+RUN ls
+
+CMD ["node", "dist/apps/auth/main.js"]
