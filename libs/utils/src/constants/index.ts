@@ -156,3 +156,5 @@ export const POKEMON_XP_TO_LEVEL_UP = {
   39: 9746,
   40: 10000,
 } as const
+
+export const BASE_POKEMON_PAGINATION_LIMIT = 10

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Req } from '@nestjs/common'
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Req } from '@nestjs/common'
 import { Types } from 'mongoose'
 import { PokemonService } from './pokemon.service'
 import { Auth, AuthUser, UserDocument } from '@lib/common'
@@ -22,8 +22,8 @@ export class PokemonController {
 
   @Get('list')
   @Auth()
-  async httpListPokemon(): Promise<HttpSuccessResponse> {
-    const pokemon = await this.pokemonService.list()
+  async httpListBasePokemon(@Query('page', ParseIntPipe) page: number): Promise<HttpSuccessResponse> {
+    const pokemon = await this.pokemonService.listBasePokemon(page)
     return { success: true, message: 'Pokemon fetched successfully.', data: { pokemon, total: pokemon.length } }
   }
 

@@ -13,7 +13,7 @@ import { CreatePokemonDto } from './dtos/create-pokemon.dto'
 import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import { Cache } from 'cache-manager'
-import { CACHE_KEYS, DEFAULT_VALUES, EVENTS, SERVICES } from '@utils/utils'
+import { BASE_POKEMON_PAGINATION_LIMIT, CACHE_KEYS, DEFAULT_VALUES, EVENTS, SERVICES } from '@utils/utils'
 import { ClientProxy } from '@nestjs/microservices'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
 import { RemoveActivePokemonDto } from './dtos/remove-active-pokemon.dto'
@@ -36,13 +36,14 @@ export class PokemonService {
     return pokemon
   }
 
-  async list() {
-    const cachedPokemon = await this.cacheManager.get<BasePokemonDocument[] | null>(`${CACHE_KEYS.BASE_POKEMON_LIST}`)
+  async listBasePokemon(page: number) {
+    const cachedPokemon = await this.cacheManager.get<BasePokemonDocument[] | null>(`${CACHE_KEYS.BASE_POKEMON_LIST}-${page}`)
     if (cachedPokemon) return cachedPokemon
 
-    const pokemon = await this.BasePokemonRepository.find({})
-    if (pokemon.length > 0) await this.cacheManager.set(`${CACHE_KEYS.BASE_POKEMON_LIST}`, pokemon, { ttl: 20 })
+    const skipCount = (page - 1) * BASE_POKEMON_PAGINATION_LIMIT
+    const pokemon = await this.BasePokemonRepository.find({}, {}, { skip: skipCount, limit: BASE_POKEMON_PAGINATION_LIMIT })
 
+    if (pokemon.length > 0) await this.cacheManager.set(`${CACHE_KEYS.BASE_POKEMON_LIST}`, pokemon, { ttl: 20 })
     return pokemon
   }
 
