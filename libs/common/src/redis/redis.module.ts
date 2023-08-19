@@ -7,8 +7,8 @@ export class RedisModule {
   static register() {
     return CacheModule.register({
       store: redisStore,
-      host: 'redis-server',
-      port: 6379,
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
       max: 1000,
       isGlobal: true,
     })
