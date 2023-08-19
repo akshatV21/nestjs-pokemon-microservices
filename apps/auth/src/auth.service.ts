@@ -23,7 +23,7 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const registeredUser = await this.UserRepository.findOne(
       { username: loginDto.username },
-      { pokemon: -1, inventory: -1 },
+      { pokemon: 0, inventory: 0 },
       { lean: true },
     )
     if (!registeredUser) throw new BadRequestException('No registered user with provided username.')
