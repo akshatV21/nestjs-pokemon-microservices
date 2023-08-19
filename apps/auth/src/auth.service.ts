@@ -27,7 +27,7 @@ export class AuthService {
       { lean: true },
     )
     if (!registeredUser) throw new BadRequestException('No registered user with provided username.')
-    console.log(registeredUser, loginDto)
+    
     const passwordMatches = compareSync(loginDto.password, registeredUser.password)
     if (!passwordMatches) throw new UnauthorizedException('Invalid password provided.')
 
