@@ -15,7 +15,7 @@ async function bootstrap() {
 
   const PORT = configService.get('PORT')
 
-  app.connectMicroservice(rmqService.getOptions(SERVICES.SPAWNS_SERVICE))
+  app.connectMicroservice(rmqService.getOptions(SERVICES.INVENTORY_SERVICE))
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
 
   app.use(helmet())
