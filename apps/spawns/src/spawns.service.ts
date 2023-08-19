@@ -9,7 +9,7 @@ import {
   UserRepository,
   ItemUsedDto
 } from '@lib/common'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import {
   Block,
   CATCH_RATE_MODIFIERS,
@@ -22,6 +22,7 @@ import {
   MAX_LEVEL_IN_WILD,
   NEW_SPAWN_DELAY,
   POKEMON_XP_TO_LEVEL_UP,
+  SERVICES,
   SPAWN_TIME,
   TOTAL_SPAWN_RATE,
 } from '@utils/utils'
@@ -29,7 +30,6 @@ import { SpawnsManager } from './spawns-manager.service'
 import { Types } from 'mongoose'
 import { SPAWN_RATES } from './rates/spawn-rates'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { basename } from 'path'
 import { SHINY_RATES } from './rates/shiny-rates'
 import { CatchSpawnDto } from './dtos/catch-spawn.dto'
 import { CATCH_RATES } from './rates/catch-rates'
@@ -46,7 +46,7 @@ export class SpawnsService {
     private readonly UserRepository: UserRepository,
     private readonly spawnsManager: SpawnsManager,
     private readonly eventEmitter: EventEmitter2,
-    private readonly inventoryService: ClientProxy,
+    @Inject(SERVICES.INVENTORY_SERVICE) private readonly inventoryService: ClientProxy,
   ) {}
 
   // Generates initial spawns for each city.
