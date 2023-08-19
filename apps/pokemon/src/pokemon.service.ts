@@ -43,7 +43,7 @@ export class PokemonService {
     const skipCount = (page - 1) * BASE_POKEMON_PAGINATION_LIMIT
     const pokemon = await this.BasePokemonRepository.find({}, {}, { skip: skipCount, limit: BASE_POKEMON_PAGINATION_LIMIT })
 
-    if (pokemon.length > 0) await this.cacheManager.set(`${CACHE_KEYS.BASE_POKEMON_LIST}`, pokemon, { ttl: 20 })
+    if (pokemon.length > 0) await this.cacheManager.set(`${CACHE_KEYS.BASE_POKEMON_LIST}-${page}`, pokemon, { ttl: 20 })
     return pokemon
   }
 
