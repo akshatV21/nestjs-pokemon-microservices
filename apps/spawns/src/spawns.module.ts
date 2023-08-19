@@ -35,6 +35,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
       isGlobal: true,
       validationSchema: Joi.object({
         PORT: Joi.number().required(),
+        // WS_PORT: Joi.number().required(),
         MONGO_URI: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         RMQ_URL: Joi.string().required(),
