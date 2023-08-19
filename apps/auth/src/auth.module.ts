@@ -19,6 +19,8 @@ import { SERVICES } from '@utils/utils'
         RMQ_AUTH_QUEUE: Joi.string().required(),
         REDIS_HOST: Joi.string().required(),
         REDIS_PORT: Joi.number().required(),
+        REDIS_USERNAME: Joi.string().required(),
+        REDIS_PASSWORD: Joi.string().required(),
       }),
     }),
     DatabaseModule,

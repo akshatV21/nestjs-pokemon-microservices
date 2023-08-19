@@ -11,6 +11,9 @@ export class RedisModule {
       port: process.env.REDIS_PORT,
       max: 1000,
       isGlobal: true,
+      username: process.env.REDIS_USERNAME,
+      password: process.env.REDIS_PASSWORD,
+      no_ready_check: true,
     })
   }
 }
