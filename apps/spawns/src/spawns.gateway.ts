@@ -7,7 +7,7 @@ import { lastValueFrom } from 'rxjs'
 import { Auth, AuthorizeDto, SpawnDocument } from '@lib/common'
 import { OnEvent } from '@nestjs/event-emitter'
 
-@WebSocketGateway(8083, { namespace: 'spawns', cors: { origin: '*' } })
+@WebSocketGateway(Number(process.env.PORT), { namespace: 'spawns', cors: { origin: '*' } })
 export class SpawnsGateway {
   constructor(@Inject(SERVICES.AUTH_SERVICE) private readonly authService: ClientProxy) {}
 
