@@ -21,6 +21,7 @@ export class SpawnsGateway {
     await lastValueFrom(this.authService.send<any, AuthorizeDto>(EVENTS.AUTHORIZE, { token, requestType: 'ws', cached: false })).catch(
       err => catchAuthErrors(err, 'ws'),
     )
+    console.log('NEW USER CONNECTED!')
   }
 
   @OnEvent(EVENTS.POKEMON_SPAWNED)
