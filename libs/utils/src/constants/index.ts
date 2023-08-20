@@ -83,11 +83,11 @@ export const BLOCKS_VALUE = {
 
 export const MAX_SPAWNS_PER_BLOCK = 1
 
-export const INITIAL_SPAWN_SIZE = 8
+export const INITIAL_SPAWN_SIZE = 4
 
 export const SPAWN_TIME = {
-  MIN: 30000,
-  MAX: 40000,
+  MIN: 60000,
+  MAX: 120000,
 } as const
 
 export const MAX_LEVEL_IN_WILD = 24
