@@ -143,9 +143,7 @@ export class SpawnsService {
 
     // Get the evolution line and stage information for the selected Pokémon.
     const pokemonEvolutionLine = randomPokemon.evolution.line as unknown as EvolutionLineDocument
-    console.log(pokemonEvolutionLine)
     const stage = randomPokemon.evolution.currentStage === 1 ? 1 : randomPokemon.evolution.currentStage - 1
-    console.log(stage)
     const minLevel = pokemonEvolutionLine.stages[EVOLUTION_STAGES[stage]].evolvesAtLevel
 
     // Determine if the spawned Pokémon is shiny based on the shiny rate.
@@ -276,6 +274,6 @@ export class SpawnsService {
   }
 
   async updateBasePokemonList() {
-    this.basePokemonList = await this.BasePokemonRepository.find({})
+    this.basePokemonList = await this.BasePokemonRepository.find({}, {}, { populate: { path: 'evolution.line' } })
   }
 }
