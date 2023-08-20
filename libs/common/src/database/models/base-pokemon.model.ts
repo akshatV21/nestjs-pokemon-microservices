@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Types, Document } from 'mongoose'
 import { DEFAULT_VALUES, PokemonTyping } from '@utils/utils'
+import { EvolutionLineDocument } from './evolution-line.model'
 
 export type BasePokemonDocument = BasePokemon & Document
 

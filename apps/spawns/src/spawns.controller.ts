@@ -25,6 +25,6 @@ export class SpawnsController {
 
   @MessagePattern(EVENTS.BASE_POKEMON_LIST_UPDATED)
   handleBasePokemonListUpdatedEvent() {
-    this.spawnsService.updateBasePokemonList()
+    this.spawnsService.updateBasePokemonData()
   }
 }

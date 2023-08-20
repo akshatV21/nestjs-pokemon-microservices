@@ -38,7 +38,8 @@ import { ClientProxy } from '@nestjs/microservices'
 
 @Injectable()
 export class SpawnsService {
-  private basePokemonList: BasePokemonDocument[]
+  private basePokemonObj: Record<string, BasePokemonDocument>
+  private evolutionLineObj: Record<string, EvolutionLineDocument>
 
   constructor(
     private readonly BasePokemonRepository: BasePokemonRepository,
@@ -90,7 +91,7 @@ export class SpawnsService {
 
       // Create a new spawn and associate pokémon details
       const spawn = await this.createSpawn(city, randomBlock)
-      spawn.pokemon = this.basePokemonList.find(pokemon => spawn.pokemon.equals(pokemon._id))
+      spawn.pokemon = this.basePokemonObj[spawn.pokemon.toString()]
 
       // Emit an event to notify that a new Pokémon has spawned
       this.eventEmitter.emit(EVENTS.POKEMON_SPAWNED, spawn)
@@ -130,7 +131,7 @@ export class SpawnsService {
     const randomSpawnRate = Math.random() * TOTAL_SPAWN_RATE
 
     // Select a random Pokémon based on the cumulative spawn rates.
-    for (const pokemon of this.basePokemonList) {
+    for (const pokemon of Object.values(this.basePokemonObj)) {
       cumulativeSpawnRate += SPAWN_RATES[pokemon.pokedexNo]
 
       // If the random spawn rate is within the cumulative spawn rate,
@@ -142,7 +143,7 @@ export class SpawnsService {
     }
 
     // Get the evolution line and stage information for the selected Pokémon.
-    const pokemonEvolutionLine = randomPokemon.evolution.line as unknown as EvolutionLineDocument
+    const pokemonEvolutionLine = this.evolutionLineObj[randomPokemon.id]
     const stage = randomPokemon.evolution.currentStage === 1 ? 1 : randomPokemon.evolution.currentStage - 1
     const minLevel = pokemonEvolutionLine.stages[EVOLUTION_STAGES[stage]].evolvesAtLevel
 
@@ -191,6 +192,11 @@ export class SpawnsService {
 
     // Filter the city spawns to include only those that the user hasn't caught.
     const uncaughtSpawns = citySpawns.filter(spawn => !caughtSpawnIds.includes(spawn._id))
+    const finalSpawns = uncaughtSpawns.map(spawn => {
+      spawn.pokemon = this.basePokemonObj[spawn.pokemon.toString()]
+      return spawn
+    })
+
     return uncaughtSpawns
   }
 
@@ -207,7 +213,7 @@ export class SpawnsService {
     }
 
     // Retrieve the spawn details based on the provided spawn ID.
-    const spawn = await this.SpawnRepository.findById(catchSpawnDto.spawn)
+    const spawn = await this.SpawnRepository.findById(catchSpawnDto.spawn, {}, { lean: true })
     if (!spawn) {
       throw new BadRequestException('Invalid spawn.')
     }
@@ -217,7 +223,7 @@ export class SpawnsService {
     this.inventoryService.emit(EVENTS.ITEM_USED, rpcPayload)
 
     // Find the corresponding base Pokémon for the spawn.
-    const pokemon = this.basePokemonList.find(pokemon => pokemon._id.equals(spawn.pokemon))
+    const pokemon = this.basePokemonObj[spawn.pokemon as unknown as string]
 
     // Calculate the base catch rate and modify it based on items.
     let baseCatchRate = CATCH_RATES[pokemon.pokedexNo]
@@ -273,7 +279,13 @@ export class SpawnsService {
     }
   }
 
-  async updateBasePokemonList() {
-    this.basePokemonList = await this.BasePokemonRepository.find({}, {}, { populate: { path: 'evolution.line' } })
+  async updateBasePokemonData() {
+    const basePokemonList = await this.BasePokemonRepository.find({}, {}, { populate: { path: 'evolution.line' } })
+    basePokemonList.forEach(pokemon => {
+      this.evolutionLineObj[pokemon.id] = pokemon.evolution.line as unknown as EvolutionLineDocument
+
+      pokemon.evolution.line = pokemon.evolution.line._id
+      this.basePokemonObj[pokemon.id] = pokemon
+    })
   }
 }

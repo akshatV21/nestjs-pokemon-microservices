@@ -23,7 +23,7 @@ async function bootstrap() {
   app.use(helmet())
   app.use(morgan('dev'))
 
-  await spawnsService.updateBasePokemonList()
+  await spawnsService.updateBasePokemonData()
   await spawnsService.despawnEveryPokemon()
   await spawnsService.generateInitialSpawns()
   
