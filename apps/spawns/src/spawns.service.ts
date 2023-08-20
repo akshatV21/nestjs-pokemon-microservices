@@ -197,7 +197,7 @@ export class SpawnsService {
       return spawn
     })
 
-    return uncaughtSpawns
+    return finalSpawns
   }
 
   async despawnEveryPokemon() {
@@ -211,6 +211,10 @@ export class SpawnsService {
     if (pokemonInStorage >= user.pokemon.storageLimit) {
       throw new BadRequestException('No more space for pokemon to store.')
     }
+
+    if (user.inventory.items[catchSpawnDto.ball] <= 0) throw new BadRequestException(`You do not have any ${catchSpawnDto.ball}`)
+    if (catchSpawnDto.berry && user.inventory.items[catchSpawnDto.ball] <= 0)
+      throw new BadRequestException(`You do not have any ${catchSpawnDto.berry}`)
 
     // Retrieve the spawn details based on the provided spawn ID.
     const spawn = await this.SpawnRepository.findById(catchSpawnDto.spawn, {}, { lean: true })
@@ -273,6 +277,7 @@ export class SpawnsService {
       }
       this.pokemonService.emit(EVENTS.POKEMON_CAUGHT, pokemonXpGainRpcPayload)
 
+      caughtPokemon.pokemon = pokemon
       return caughtPokemon
     } catch (error) {
       // Rollback the transaction in case of an error and re-throw the error.
