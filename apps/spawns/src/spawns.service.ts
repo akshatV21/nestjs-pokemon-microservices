@@ -289,6 +289,7 @@ export class SpawnsService {
   async updateBasePokemonData() {
     const basePokemonList = await this.BasePokemonRepository.find({}, {}, { populate: { path: 'evolution.line' } })
     basePokemonList.forEach(pokemon => {
+      console.log(pokemon)
       this.evolutionLineObj[pokemon.id] = pokemon.evolution.line as unknown as EvolutionLineDocument
 
       pokemon.evolution.line = pokemon.evolution.line._id
