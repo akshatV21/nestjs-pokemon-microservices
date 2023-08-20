@@ -23,6 +23,7 @@ import {
 } from '@lib/common'
 import { APP_GUARD } from '@nestjs/core'
 import { SERVICES } from '@utils/utils'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { SERVICES } from '@utils/utils'
     ]),
     RmqModule.register([SERVICES.AUTH_SERVICE, SERVICES.SPAWNS_SERVICE]),
     RedisModule.register(),
+    EventEmitterModule.forRoot()
   ],
   controllers: [PokemonController],
   providers: [PokemonService, UserRepository, BasePokemonRepository, EvolutionLineRepository, CaughtPokemonRepository, { provide: APP_GUARD, useClass: Authorize }],

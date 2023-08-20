@@ -3,13 +3,14 @@ import { Types } from 'mongoose'
 import { PokemonService } from './pokemon.service'
 import { Auth, AuthUser, PokemonXpGainDto, UserDocument } from '@lib/common'
 import { CreatePokemonDto } from './dtos/create-pokemon.dto'
-import { EVENTS, HttpSuccessResponse, ParseObjectId } from '@utils/utils'
+import { EVENTS, HttpSuccessResponse, ParseObjectId, PokemonLevelUp } from '@utils/utils'
 import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
 import { RemoveActivePokemonDto } from './dtos/remove-active-pokemon.dto'
 import { TransferPokemonDto } from './dtos/transfer-pokemon.dto'
 import { UpdateNicknameDto } from './dtos/update-nickname.dto'
 import { EventPattern, Payload } from '@nestjs/microservices'
+import { OnEvent } from '@nestjs/event-emitter'
 
 @Controller('pokemon')
 export class PokemonController {
@@ -87,5 +88,10 @@ export class PokemonController {
   @EventPattern(EVENTS.POKEMON_CAUGHT)
   handlePokemonCaughtEvent(@Payload() pokemonXpGainDto: PokemonXpGainDto) {
     this.pokemonService.distributeXpToActivePokemon(pokemonXpGainDto)
+  }
+
+  @OnEvent(EVENTS.POKEMON_XP_DISTRIBUTED)
+  handlePokemonXpDistributedEvent(payload: PokemonLevelUp) {
+    console.log(payload)
   }
 }
