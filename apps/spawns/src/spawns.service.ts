@@ -50,7 +50,10 @@ export class SpawnsService {
     private readonly eventEmitter: EventEmitter2,
     @Inject(SERVICES.INVENTORY_SERVICE) private readonly inventoryService: ClientProxy,
     @Inject(SERVICES.POKEMON_SERVICE) private readonly pokemonService: ClientProxy,
-  ) {}
+  ) {
+    this.basePokemonObj = {}
+    this.evolutionLineObj = {}
+  }
 
   // Generates initial spawns for each city.
   async generateInitialSpawns() {
@@ -289,7 +292,6 @@ export class SpawnsService {
   async updateBasePokemonData() {
     const basePokemonList = await this.BasePokemonRepository.find({}, {}, { populate: { path: 'evolution.line' } })
     basePokemonList.forEach(pokemon => {
-      console.log(pokemon)
       this.evolutionLineObj[pokemon.id] = pokemon.evolution.line as unknown as EvolutionLineDocument
 
       pokemon.evolution.line = pokemon.evolution.line._id

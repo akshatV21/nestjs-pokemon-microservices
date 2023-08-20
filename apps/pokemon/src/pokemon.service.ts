@@ -185,7 +185,7 @@ export class PokemonService {
   }
 
   async distributeXpToActivePokemon({ user, pokemon, xp }: PokemonXpGainDto) {
-    const xpPerPokemon = Math.floor(xp / pokemon.length)
+    const xpPerPokemon = Math.floor(xp / DEFAULT_VALUES.ACTIVE_POKEMON_LIMIT)
     const pokemonList = await this.CaughtPokemonRepository.find({ _id: { $in: pokemon } }, { xp: 1, level: 1 })
 
     const promises: Promise<CaughtPokemonDocument>[] = []
