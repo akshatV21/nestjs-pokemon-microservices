@@ -1,9 +1,12 @@
 import {
   BasePokemonDocument,
   BasePokemonRepository,
+  CaughtPokemonDocument,
+  CaughtPokemonRepository,
   EvolutionLine,
   EvolutionLineDocument,
   EvolutionLineRepository,
+  PokemonXpGainDto,
   UserDocument,
   UserRepository,
 } from '@lib/common'
@@ -13,11 +16,21 @@ import { CreatePokemonDto } from './dtos/create-pokemon.dto'
 import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import { Cache } from 'cache-manager'
-import { BASE_POKEMON_PAGINATION_LIMIT, CACHE_KEYS, DEFAULT_VALUES, EVENTS, SERVICES } from '@utils/utils'
+import {
+  CACHE_KEYS,
+  DEFAULT_VALUES,
+  EVENTS,
+  POKEMON_XP_TO_LEVEL_UP,
+  PokemonLevelUp,
+  SERVICES,
+  BASE_POKEMON_PAGINATION_LIMIT,
+} from '@utils/utils'
 import { ClientProxy } from '@nestjs/microservices'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
 import { RemoveActivePokemonDto } from './dtos/remove-active-pokemon.dto'
 import { TransferPokemonDto } from './dtos/transfer-pokemon.dto'
+import { UpdateNicknameDto } from './dtos/update-nickname.dto'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
 export class PokemonService {
@@ -25,6 +38,8 @@ export class PokemonService {
     private readonly BasePokemonRepository: BasePokemonRepository,
     private readonly EvolutionLineRepository: EvolutionLineRepository,
     private readonly UserRepository: UserRepository,
+    private readonly CaughtPokemonRepository: CaughtPokemonRepository,
+    private readonly eventEmitter: EventEmitter2,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(SERVICES.SPAWNS_SERVICE) private readonly spawnsService: ClientProxy,
   ) {}
@@ -152,5 +167,51 @@ export class PokemonService {
 
     // Return the transferred Pokémon IDs.
     return { transferred: transferPokemonDto.pokemon }
+  }
+
+  // Updates the nickname of a caught Pokémon for the given user.
+  async updateNickname({ pokemon, nickname }: UpdateNicknameDto, user: UserDocument) {
+    // Check if the Pokémon is caught by the user.
+    const isCaughtByUser = user.pokemon.caught.inStorage.includes(pokemon)
+    if (!isCaughtByUser) throw new BadRequestException('You have not caught this pokemon.')
+
+    await this.CaughtPokemonRepository.update(pokemon, { $set: { nickname } })
+    return nickname
+  }
+
+  async distributeXpToActivePokemon({ user, pokemon, xp }: PokemonXpGainDto) {
+    const xpPerPokemon = Math.floor(xp / pokemon.length)
+    const pokemonList = await this.CaughtPokemonRepository.find({ _id: { $in: pokemon } }, { xp: 1, level: 1 })
+
+    const promises: Promise<CaughtPokemonDocument>[] = []
+    const finalPokemonList: PokemonLevelUp[] = []
+    const session = await this.CaughtPokemonRepository.startTransaction()
+
+    try {
+      for (let activePokemon of pokemonList) {
+        let levelsGained = 0
+        let isMaxLevel = false
+        let minXpToLevelUp = POKEMON_XP_TO_LEVEL_UP[activePokemon.level + 1]
+
+        activePokemon.xp += xpPerPokemon
+        while (!isMaxLevel && minXpToLevelUp <= activePokemon.xp) {
+          activePokemon.level += 1
+          levelsGained += 1
+
+          isMaxLevel = activePokemon.level === DEFAULT_VALUES.MAX_LEVEL
+          if (!isMaxLevel) minXpToLevelUp = POKEMON_XP_TO_LEVEL_UP[activePokemon.level + 1]
+        }
+
+        promises.push(activePokemon.save())
+        finalPokemonList.push({ pokemon: activePokemon._id, levelsGained })
+      }
+
+      await Promise.all(promises)
+      await session.commitTransaction()
+
+      this.eventEmitter.emitAsync(EVENTS.POKEMON_XP_DISTRIBUTED, { user, finalPokemonList })
+    } catch (error) {
+      await session.abortTransaction()
+    }
   }
 }

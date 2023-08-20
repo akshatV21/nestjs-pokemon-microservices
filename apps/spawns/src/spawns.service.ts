@@ -7,7 +7,8 @@ import {
   SpawnRepository,
   UserDocument,
   UserRepository,
-  ItemUsedDto
+  ItemUsedDto,
+  PokemonXpGainDto,
 } from '@lib/common'
 import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import {
@@ -47,6 +48,7 @@ export class SpawnsService {
     private readonly spawnsManager: SpawnsManager,
     private readonly eventEmitter: EventEmitter2,
     @Inject(SERVICES.INVENTORY_SERVICE) private readonly inventoryService: ClientProxy,
+    @Inject(SERVICES.POKEMON_SERVICE) private readonly pokemonService: ClientProxy,
   ) {}
 
   // Generates initial spawns for each city.
@@ -226,9 +228,7 @@ export class SpawnsService {
 
     // Generate a random catch rate and check if the catch attempt was successful.
     const randomCatchRate = Math.random()
-    if (randomCatchRate > baseCatchRate) {
-      throw new BadRequestException('Did not catch pokemon.')
-    }
+    if (randomCatchRate > baseCatchRate) throw new BadRequestException('Did not catch pokemon.')
 
     // Start a transaction to update user and caught Pokémon data.
     const caughtPokemonObjectId = new Types.ObjectId()
@@ -257,6 +257,13 @@ export class SpawnsService {
       // Execute promises to update user and caught Pokémon data.
       const [caughtPokemon] = await Promise.all([createCaughtPokemonPromise, updateUserPromise])
       await session.commitTransaction()
+
+      const pokemonXpGainRpcPayload: PokemonXpGainDto = {
+        user: user._id,
+        pokemon: user.pokemon.active,
+        xp: POKEMON_XP_TO_LEVEL_UP[spawn.level],
+      }
+      this.pokemonService.emit(EVENTS.POKEMON_CAUGHT, pokemonXpGainRpcPayload)
 
       return caughtPokemon
     } catch (error) {

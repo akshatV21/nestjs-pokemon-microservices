@@ -4,6 +4,8 @@ export const DEFAULT_VALUES = {
   MAX_BASE_STAT: 100,
   INVENTORY_STORAGE_LIMIT: 200,
   ACTIVE_POKEMON_LIMIT: 6,
+  MIN_LEVEL: 1,
+  MAX_LEVEL: 40,
 } as const
 
 export const REQUEST_TYPES = ['http', 'rpc', 'ws'] as const
@@ -28,6 +30,8 @@ export const EVENTS = {
   POKEMON_DESPAWNED: 'pokemon-despawned',
   BASE_POKEMON_LIST_UPDATED: 'base-pokemon-list-updated',
   ITEM_USED: 'item-used',
+  POKEMON_CAUGHT: 'pokemon-caught',
+  POKEMON_XP_DISTRIBUTED: 'pokemon-xp-distributed',
 } as const
 
 export const POKEMON_TYPINGS = {
@@ -79,11 +83,11 @@ export const BLOCKS_VALUE = {
 
 export const MAX_SPAWNS_PER_BLOCK = 1
 
-export const INITIAL_SPAWN_SIZE = 8
+export const INITIAL_SPAWN_SIZE = 4
 
 export const SPAWN_TIME = {
-  MIN: 30000,
-  MAX: 40000,
+  MIN: 60000,
+  MAX: 120000,
 } as const
 
 export const MAX_LEVEL_IN_WILD = 24

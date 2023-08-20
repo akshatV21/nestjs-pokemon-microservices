@@ -23,7 +23,7 @@ import {
   CaughtPokemonSchema,
   CaughtPokemonRepository,
 } from '@lib/common'
-import { SERVICES } from '@utils/utils'
+import { SERVICES, SocketSessions } from '@utils/utils'
 import { SpawnsManager } from './spawns-manager.service'
 import { APP_GUARD } from '@nestjs/core'
 import { SpawnsGateway } from './spawns.gateway'
@@ -57,7 +57,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
       { name: Spawn.name, schema: SpawnSchema },
       { name: CaughtPokemon.name, schema: CaughtPokemonSchema },
     ]),
-    RmqModule.register([SERVICES.AUTH_SERVICE, SERVICES.INVENTORY_SERVICE]),
+    RmqModule.register([SERVICES.AUTH_SERVICE, SERVICES.INVENTORY_SERVICE, SERVICES.POKEMON_SERVICE]),
     RedisModule.register(),
     EventEmitterModule.forRoot({ global: true }),
   ],
@@ -71,6 +71,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
     SpawnsManager,
     { provide: APP_GUARD, useClass: Authorize },
     SpawnsGateway,
+    SocketSessions,
   ],
 })
 export class SpawnsModule {}
