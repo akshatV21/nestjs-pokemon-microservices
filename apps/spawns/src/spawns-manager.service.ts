@@ -31,7 +31,7 @@ export class SpawnsManager {
     for (let left = BLOCKS_VALUE.MIN_LEFT; left <= BLOCKS_VALUE.MAX_LEFT; left++) {
       for (let top = BLOCKS_VALUE.MIN_TOP; top <= BLOCKS_VALUE.MAX_TOP; top++) {
         const spawn = spawnsArray.find(spawn => spawn.location.city === city && spawn.location.block === `${left}:${top}`)
-        if (!spawn) emptyBlocks.push(spawn.location.block)
+        if (!spawn) emptyBlocks.push(`${left}:${top}`)
       }
     }
 
