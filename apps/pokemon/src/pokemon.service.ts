@@ -120,6 +120,11 @@ export class PokemonService {
     return evolutionLine
   }
 
+  async getCaughtPokemonList(user: UserDocument) {
+    const pokemon = await this.CaughtPokemonRepository.find({ user: user._id }, {}, { populate: { path: 'pokemon' } })
+    return pokemon
+  }
+
   // Adds a caught Pokémon to the user's active Pokémon list.
   async addActivePokemon({ pokemon }: AddActivePokemonDto, user: UserDocument) {
     // Check if the Pokémon is caught by the user.

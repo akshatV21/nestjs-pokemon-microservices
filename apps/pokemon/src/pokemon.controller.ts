@@ -23,18 +23,25 @@ export class PokemonController {
     return { success: true, message: 'New pokemon created successfully.', data: { pokemon } }
   }
 
-  @Get('list')
+  @Get('base/list')
   @Auth()
   async httpListBasePokemon(@Query('page', ParseIntPipe) page: number): Promise<HttpSuccessResponse> {
     const pokemon = await this.pokemonService.listBasePokemon(page)
     return { success: true, message: 'Pokemon fetched successfully.', data: { pokemon, total: pokemon.length } }
   }
 
-  @Get(':basePokemonId')
+  @Get('base/:basePokemonId')
   @Auth()
   async httpGetBasePokemon(@Param('basePokemonId', ParseObjectId) basePokemonId: Types.ObjectId): Promise<HttpSuccessResponse> {
     const pokemon = await this.pokemonService.getBasePokemon(basePokemonId)
     return { success: true, message: 'Base pokemon fetched successfully.', data: { pokemon } }
+  }
+
+  @Get('caught/list')
+  @Auth()
+  async httpListCaughtPokemon(@AuthUser() user: UserDocument): Promise<HttpSuccessResponse> {
+    const pokemon = await this.pokemonService.getCaughtPokemonList(user)
+    return { success: true, message: 'Pokemon fetched successfully.', data: { pokemon } }
   }
 
   @Post('evolution')

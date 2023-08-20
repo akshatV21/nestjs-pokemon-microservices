@@ -251,6 +251,8 @@ export class SpawnsService {
       // Create a new caught Pokémon entry with relevant data.
       const createCaughtPokemonPromise = this.CaughtPokemonRepository.create(
         {
+          user: user._id,
+          nickname: pokemon.species,
           pokemon: pokemon._id,
           location: spawn.location,
           level: spawn.level,
