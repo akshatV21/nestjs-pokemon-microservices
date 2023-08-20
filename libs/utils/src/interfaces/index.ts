@@ -26,3 +26,8 @@ export interface SpawnedPokemonInfo {
   }
   caughtBy: Types.ObjectId[]
 }
+
+export interface PokemonLevelUp {
+  pokemon: string
+  levelsGained: number
+}

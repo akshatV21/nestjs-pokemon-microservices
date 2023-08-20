@@ -1,14 +1,15 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Req } from '@nestjs/common'
 import { Types } from 'mongoose'
 import { PokemonService } from './pokemon.service'
-import { Auth, AuthUser, UserDocument } from '@lib/common'
+import { Auth, AuthUser, PokemonXpGainDto, UserDocument } from '@lib/common'
 import { CreatePokemonDto } from './dtos/create-pokemon.dto'
-import { HttpSuccessResponse, ParseObjectId } from '@utils/utils'
+import { EVENTS, HttpSuccessResponse, ParseObjectId } from '@utils/utils'
 import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
 import { RemoveActivePokemonDto } from './dtos/remove-active-pokemon.dto'
 import { TransferPokemonDto } from './dtos/transfer-pokemon.dto'
 import { UpdateNicknameDto } from './dtos/update-nickname.dto'
+import { EventPattern, Payload } from '@nestjs/microservices'
 
 @Controller('pokemon')
 export class PokemonController {
@@ -81,5 +82,10 @@ export class PokemonController {
   async httpUpdateNickname(@Body() updateNicknameDto: UpdateNicknameDto, @AuthUser() user: UserDocument): Promise<HttpSuccessResponse> {
     const nickname = await this.pokemonService.updateNickname(updateNicknameDto, user)
     return { success: true, message: 'Nickname updated successfully.', data: { nickname } }
+  }
+
+  @EventPattern(EVENTS.POKEMON_CAUGHT)
+  handlePokemonCaughtEvent(@Payload() pokemonXpGainDto: PokemonXpGainDto) {
+    this.pokemonService.distributeXpToActivePokemon(pokemonXpGainDto)
   }
 }
