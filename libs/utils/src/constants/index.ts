@@ -77,8 +77,8 @@ export const CITIES = {
 export const BLOCKS_VALUE = {
   MIN_LEFT: 1,
   MIN_TOP: 1,
-  MAX_LEFT: 5,
-  MAX_TOP: 5,
+  MAX_LEFT: 10,
+  MAX_TOP: 10,
 } as const
 
 export const MAX_SPAWNS_PER_BLOCK = 1
