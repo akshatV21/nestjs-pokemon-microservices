@@ -40,6 +40,7 @@ import { ClientProxy } from '@nestjs/microservices'
 export class SpawnsService {
   private basePokemonObj: Record<string, BasePokemonDocument>
   private evolutionLineObj: Record<string, EvolutionLineDocument>
+  private noOfPokemonSpawned: number
 
   constructor(
     private readonly BasePokemonRepository: BasePokemonRepository,
@@ -53,6 +54,7 @@ export class SpawnsService {
   ) {
     this.basePokemonObj = {}
     this.evolutionLineObj = {}
+    this.noOfPokemonSpawned = 0
   }
 
   // Generates initial spawns for each city.
@@ -112,6 +114,8 @@ export class SpawnsService {
     return async () => {
       // Delete the spawn from the database.
       await this.SpawnRepository.delete({ _id: despawnInfo.spawnId })
+
+      console.log(`DESPAWNED ${despawnInfo.pokemonSpecies} at ${despawnInfo.block} in ${despawnInfo.city}`)
 
       // Remove the spawn from the spawnsManager.
       this.spawnsManager.removeSpawn(despawnInfo.spawnId)
@@ -181,6 +185,9 @@ export class SpawnsService {
       despawnsIn,
       block,
     })
+
+    this.noOfPokemonSpawned += 1
+    console.log(`SPAWNED ${randomPokemon.species} at ${block} in ${city} - [${this.noOfPokemonSpawned}]`)
 
     return createSpawnPromise
   }
