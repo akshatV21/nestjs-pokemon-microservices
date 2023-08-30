@@ -5,17 +5,39 @@ import { BLOCKS_VALUE, Block, City, SpawnedPokemonInfo, SpawnsManagerKey } from 
 @Injectable()
 export class SpawnsManager {
   private spawns: Map<Types.ObjectId, SpawnedPokemonInfo>
+  private spawnsPool: SpawnedPokemonInfo[]
 
   constructor() {
     this.spawns = new Map()
+    this.spawnsPool = []
+  }
+
+  private getSpawnInfoFromPool(): SpawnedPokemonInfo {
+    if (this.spawnsPool.length > 0) return this.spawnsPool.pop()!
+    return { id: '' as unknown as Types.ObjectId, location: { city: 'aurora', block: '0:0' }, caughtBy: [] }
+  }
+
+  private returnSpawnInfoToPool(spawnInfo: SpawnedPokemonInfo) {
+    spawnInfo.caughtBy = []
+    this.spawnsPool.push(spawnInfo)
   }
 
   addNewSpawn(spawnId: Types.ObjectId, city: City, block: Block) {
+    const spawn = this.getSpawnInfoFromPool()
+
+    spawn.id = spawnId
+    spawn.location.city = city
+    spawn.location.block = block
+
     this.spawns.set(spawnId, { id: spawnId, location: { city, block }, caughtBy: [] })
   }
 
   removeSpawn(spawnId: Types.ObjectId) {
-    this.spawns.delete(spawnId)
+    const spawn = this.spawns.get(spawnId)
+    if (spawn) {
+      this.spawns.delete(spawnId)
+      this.returnSpawnInfoToPool(spawn)
+    }
   }
 
   addCaughtBy(spawnId: Types.ObjectId, userId: Types.ObjectId) {
