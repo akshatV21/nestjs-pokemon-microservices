@@ -24,6 +24,7 @@ import {
   PokemonLevelUp,
   SERVICES,
   BASE_POKEMON_PAGINATION_LIMIT,
+  STAT_INCREMENT_VALUES,
 } from '@utils/utils'
 import { ClientProxy } from '@nestjs/microservices'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
@@ -202,6 +203,11 @@ export class PokemonService {
         while (!isMaxLevel && minXpToLevelUp <= activePokemon.xp) {
           activePokemon.level += 1
           levelsGained += 1
+
+          activePokemon.stats.attack += STAT_INCREMENT_VALUES.ATTACK
+          activePokemon.stats.defence += STAT_INCREMENT_VALUES.DEFENCE
+          activePokemon.stats.hp += STAT_INCREMENT_VALUES.HP
+          activePokemon.stats.speed += STAT_INCREMENT_VALUES.SPEED
 
           isMaxLevel = activePokemon.level === DEFAULT_VALUES.MAX_LEVEL
           if (!isMaxLevel) minXpToLevelUp = POKEMON_XP_TO_LEVEL_UP[activePokemon.level + 1]

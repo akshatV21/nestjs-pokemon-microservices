@@ -25,6 +25,7 @@ import {
   POKEMON_XP_TO_LEVEL_UP,
   SERVICES,
   SPAWN_TIME,
+  STAT_INCREMENT_VALUES,
   TOTAL_SPAWN_RATE,
 } from '@utils/utils'
 import { SpawnsManager } from './spawns-manager.service'
@@ -254,6 +255,13 @@ export class SpawnsService {
     const randomCatchRate = Math.random()
     if (randomCatchRate > baseCatchRate) throw new BadRequestException('Did not catch pokemon.')
 
+    const stats = {
+      attack: pokemon.stats.attack + spawn.level * STAT_INCREMENT_VALUES.ATTACK,
+      defence: pokemon.stats.defence + spawn.level * STAT_INCREMENT_VALUES.DEFENCE,
+      hp: pokemon.stats.hp + spawn.level * STAT_INCREMENT_VALUES.HP,
+      speed: pokemon.stats.speed + spawn.level * STAT_INCREMENT_VALUES.SPEED,
+    }
+
     // Start a transaction to update user and caught Pokémon data.
     const caughtPokemonObjectId = new Types.ObjectId()
     const session = await this.CaughtPokemonRepository.startTransaction()
@@ -276,6 +284,7 @@ export class SpawnsService {
           level: spawn.level,
           isShiny: spawn.isShiny,
           xp: POKEMON_XP_TO_LEVEL_UP[spawn.level],
+          stats,
         },
         caughtPokemonObjectId,
       )

@@ -24,7 +24,7 @@ class EvolutionSchema {
 }
 
 @Schema({ _id: false })
-class PokemonStatsSchema {
+export class PokemonStatsSchema {
   @Prop({ required: true, min: DEFAULT_VALUES.MIN_BASE_STAT, max: DEFAULT_VALUES.MAX_BASE_STAT })
   attack: number
 

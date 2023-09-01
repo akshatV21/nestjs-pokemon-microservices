@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Types, Document } from 'mongoose'
-import { BasePokemonDocument } from './base-pokemon.model'
+import { BasePokemonDocument, PokemonStatsSchema } from './base-pokemon.model'
 import { SpawnLocationSchema } from './spawn.model'
 
 export type CaughtPokemonDocument = CaughtPokemon & Document
@@ -27,6 +27,9 @@ export class CaughtPokemon {
 
   @Prop({ required: true })
   xp: number
+
+  @Prop({ required: true })
+  stats: PokemonStatsSchema
 }
 
 export const CaughtPokemonSchema = SchemaFactory.createForClass(CaughtPokemon)
