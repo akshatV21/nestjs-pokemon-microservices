@@ -1,8 +1,9 @@
-import { Controller, Get } from '@nestjs/common'
+import { Body, Controller, Delete, Get } from '@nestjs/common'
 import { InventoryService } from './inventory.service'
 import { Auth, AuthUser, ItemUsedDto, UserDocument } from '@lib/common'
 import { EVENTS, HttpSuccessResponse } from '@utils/utils'
 import { EventPattern, Payload } from '@nestjs/microservices'
+import { DiscardItemsDto } from './dtos/discard-items.dto'
 
 @Controller('inventory')
 export class InventoryController {
@@ -13,6 +14,13 @@ export class InventoryController {
   async httpGetDrops(@AuthUser() user: UserDocument): Promise<HttpSuccessResponse> {
     const drops = await this.inventoryService.drops(user)
     return { success: true, message: 'Fetch drops successfully.', data: { drops } }
+  }
+
+  @Delete('discard')
+  @Auth({ cached: false })
+  async httpDiscardItems(@Body() discardItemsDto: DiscardItemsDto, @AuthUser() user: UserDocument): Promise<HttpSuccessResponse> {
+    const items = await this.inventoryService.discard(discardItemsDto, user)
+    return { success: true, message: 'Items discarded successfully.', data: { items } }
   }
 
   @EventPattern(EVENTS.ITEM_USED)

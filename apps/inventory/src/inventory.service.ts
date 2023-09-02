@@ -1,7 +1,9 @@
 import { ItemUsedDto, UserDocument, UserRepository } from '@lib/common'
 import { BadRequestException, Injectable } from '@nestjs/common'
+import { UpdateQuery } from 'mongoose'
 import { DROPPED_ITEMS_QUANTITY, ITEMS, Item } from '@utils/utils'
 import { DROP_RATES } from './rates/drop-rates'
+import { DiscardItemsDto } from './dtos/discard-items.dto'
 
 @Injectable()
 export class InventoryService {
@@ -56,6 +58,20 @@ export class InventoryService {
     await this.UserRepository.update(user, {
       $inc: { [`inventory.items.${ball}`]: ball ? -1 : 0, [`inventory.items.${berry}`]: berry ? -1 : 0 },
     })
+  }
+
+  async discard(discardItemsDto: DiscardItemsDto, user: UserDocument) {
+    const items = Object.keys(discardItemsDto)
+    const updateQuery: UpdateQuery<UserDocument> = {}
+
+    for (const item of items) {
+      const currentCount = -user.inventory.items[item]
+      const decrementValue = currentCount <= discardItemsDto[item] ? discardItemsDto[item] : currentCount
+      updateQuery.$inc[`inventory.items${item}`] = decrementValue
+    }
+
+    const updatedUser = await this.UserRepository.update(user._id, updateQuery)
+    return updatedUser.inventory.items
   }
 
   // Returns a random item based on drop rates.
