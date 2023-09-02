@@ -185,43 +185,67 @@ export class PokemonService {
     return nickname
   }
 
+  // Distribute XP to active Pokémon for a user
   async distributeXpToActivePokemon({ user, pokemon, xp }: PokemonXpGainDto) {
+    // Calculate the XP to be distributed per Pokémon based on the limit
     const xpPerPokemon = Math.floor(xp / DEFAULT_VALUES.ACTIVE_POKEMON_LIMIT)
+
+    // Fetch the Pokémon from the database by their IDs, retrieving only 'xp' and 'level' fields
     const pokemonList = await this.CaughtPokemonRepository.find({ _id: { $in: pokemon } }, { xp: 1, level: 1 })
 
+    // Initialize arrays to store promises and final Pokémon leveling information
     const promises: Promise<CaughtPokemonDocument>[] = []
     const finalPokemonList: PokemonLevelUp[] = []
+
+    // Start a MongoDB session for the transaction
     const session = await this.CaughtPokemonRepository.startTransaction()
 
     try {
       for (let activePokemon of pokemonList) {
         let levelsGained = 0
         let isMaxLevel = false
+
+        // Calculate the minimum XP required to level up
         let minXpToLevelUp = POKEMON_XP_TO_LEVEL_UP[activePokemon.level + 1]
 
+        // Add the calculated XP to the Pokémon's XP
         activePokemon.xp += xpPerPokemon
+
+        // While the Pokémon hasn't reached the max level and has enough XP to level up
         while (!isMaxLevel && minXpToLevelUp <= activePokemon.xp) {
           activePokemon.level += 1
           levelsGained += 1
 
+          // Increase the Pokémon's stats based on predefined increment values
           activePokemon.stats.attack += STAT_INCREMENT_VALUES.ATTACK
           activePokemon.stats.defence += STAT_INCREMENT_VALUES.DEFENCE
           activePokemon.stats.hp += STAT_INCREMENT_VALUES.HP
           activePokemon.stats.speed += STAT_INCREMENT_VALUES.SPEED
 
+          // Check if the Pokémon has reached the max level
           isMaxLevel = activePokemon.level === DEFAULT_VALUES.MAX_LEVEL
+
+          // Calculate the minimum XP required for the next level
           if (!isMaxLevel) minXpToLevelUp = POKEMON_XP_TO_LEVEL_UP[activePokemon.level + 1]
         }
 
+        // Push the updated Pokémon to the promises array
         promises.push(activePokemon.save())
+
+        // Store information about the Pokémon's level gain
         finalPokemonList.push({ pokemon: activePokemon._id, levelsGained })
       }
 
+      // Wait for all Pokémon updates to complete
       await Promise.all(promises)
+
+      // Commit the transaction
       await session.commitTransaction()
 
+      // Emit an event to signal that Pokémon XP has been distributed
       this.eventEmitter.emitAsync(EVENTS.POKEMON_XP_DISTRIBUTED, { user, finalPokemonList })
     } catch (error) {
+      // Rollback the transaction in case of an error
       await session.abortTransaction()
     }
   }

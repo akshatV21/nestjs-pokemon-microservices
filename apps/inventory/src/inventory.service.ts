@@ -70,7 +70,7 @@ export class InventoryService {
       updateQuery.$inc[`inventory.items${item}`] = decrementValue
     }
 
-    const updatedUser = await this.UserRepository.update(user._id, updateQuery)
+    const updatedUser = await this.UserRepository.update(user._id, updateQuery, { new: true, projection: { 'inventory.items': 1 } })
     return updatedUser.inventory.items
   }
 

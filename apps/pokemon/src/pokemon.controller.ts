@@ -92,6 +92,10 @@ export class PokemonController {
     return { success: true, message: 'Nickname updated successfully.', data: { nickname } }
   }
 
+  @Patch('evolve')
+  @Auth({ cached: false })
+  async httpEvolvePokemon(@Body() evolvePokemonDto: any, @AuthUser() user: UserDocument) {}
+
   @EventPattern(EVENTS.POKEMON_CAUGHT)
   handlePokemonCaughtEvent(@Payload() pokemonXpGainDto: PokemonXpGainDto) {
     this.pokemonService.distributeXpToActivePokemon(pokemonXpGainDto)
