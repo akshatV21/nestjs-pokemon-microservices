@@ -20,7 +20,7 @@ class EvolutionSchema {
   currentStage: number
 
   @Prop({ default: null, ref: 'EvolutionLine' })
-  line?: Types.ObjectId
+  line?: Types.ObjectId | EvolutionLineDocument
 }
 
 @Schema({ _id: false })

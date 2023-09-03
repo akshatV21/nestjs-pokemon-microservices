@@ -94,7 +94,10 @@ export class PokemonController {
 
   @Patch('evolve')
   @Auth({ cached: false })
-  async httpEvolvePokemon(@Body() evolvePokemonDto: any, @AuthUser() user: UserDocument) {}
+  async httpEvolvePokemon(@Body() evolvePokemonDto: any, @AuthUser() user: UserDocument): Promise<HttpSuccessResponse> {
+    const pokemon = await this.pokemonService.evolve(evolvePokemonDto, user)
+    return { success: true, message: 'Pokemon evolved successfully.', data: { pokemon } }
+  }
 
   @EventPattern(EVENTS.POKEMON_CAUGHT)
   handlePokemonCaughtEvent(@Payload() pokemonXpGainDto: PokemonXpGainDto) {

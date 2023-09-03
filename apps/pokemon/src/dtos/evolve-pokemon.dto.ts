@@ -6,5 +6,10 @@ export class EvolvePokemonDto {
   @IsNotEmpty()
   @IsMongoId()
   @Type(() => Types.ObjectId)
-  pokemon: Types.ObjectId
+  caughtPokemonId: Types.ObjectId
+
+  @IsNotEmpty()
+  @IsMongoId()
+  @Type(() => Types.ObjectId)
+  basePokemonId: Types.ObjectId
 }

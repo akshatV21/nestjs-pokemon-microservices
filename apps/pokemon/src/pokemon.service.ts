@@ -25,6 +25,7 @@ import {
   SERVICES,
   BASE_POKEMON_PAGINATION_LIMIT,
   STAT_INCREMENT_VALUES,
+  EVOLUTION_STAGES,
 } from '@utils/utils'
 import { ClientProxy } from '@nestjs/microservices'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
@@ -32,6 +33,7 @@ import { RemoveActivePokemonDto } from './dtos/remove-active-pokemon.dto'
 import { TransferPokemonDto } from './dtos/transfer-pokemon.dto'
 import { UpdateNicknameDto } from './dtos/update-nickname.dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
+import { EvolvePokemonDto } from './dtos/evolve-pokemon.dto'
 
 @Injectable()
 export class PokemonService {
@@ -248,5 +250,45 @@ export class PokemonService {
       // Rollback the transaction in case of an error
       await session.abortTransaction()
     }
+  }
+
+  async evolve({ caughtPokemonId, basePokemonId }: EvolvePokemonDto, user: UserDocument) {
+    const isCaughtByUser = user.pokemon.caught.inStorage.includes(caughtPokemonId)
+    if (!isCaughtByUser) throw new BadRequestException('You have not caught this pokemon.')
+
+    const fetchCaughtPokemonPromise = this.CaughtPokemonRepository.findOne(
+      { _id: caughtPokemonId, pokemon: basePokemonId },
+      { pokemon: 1, stats: 1, level: 1 },
+    )
+
+    const fetchBasePokemonPromise = this.BasePokemonRepository.findById(
+      basePokemonId,
+      { stats: 1, evolution: 1 },
+      { populate: { path: 'evolution.line' } },
+    )
+
+    const [basePokemon, caughtPokemon] = await Promise.all([fetchBasePokemonPromise, fetchCaughtPokemonPromise])
+
+    const evolutionLine = basePokemon.evolution.line as EvolutionLineDocument
+    const currentStageInfo = evolutionLine.stages[EVOLUTION_STAGES[basePokemon.evolution.currentStage]]
+
+    if (caughtPokemon.level < currentStageInfo.evolvesAtLevel)
+      throw new BadRequestException(`This pokemon needs to be atleast of level ${currentStageInfo.evolvesAtLevel} to evolves.`)
+
+    const nextStageInfo = evolutionLine.stages[EVOLUTION_STAGES[basePokemon.evolution.currentStage + 1]]
+    if (!nextStageInfo) throw new BadRequestException('This pokemon cannot evolve further.')
+
+    const pokemonToEvolveInto = await this.BasePokemonRepository.findById(nextStageInfo.pokemon, { stats: 1 })
+
+    caughtPokemon.pokemon = pokemonToEvolveInto._id
+    caughtPokemon.stats = {
+      attack: pokemonToEvolveInto.stats.attack + caughtPokemon.level * STAT_INCREMENT_VALUES.ATTACK,
+      defence: pokemonToEvolveInto.stats.defence + caughtPokemon.level * STAT_INCREMENT_VALUES.DEFENCE,
+      hp: pokemonToEvolveInto.stats.hp + caughtPokemon.level * STAT_INCREMENT_VALUES.HP,
+      speed: pokemonToEvolveInto.stats.speed + caughtPokemon.level * STAT_INCREMENT_VALUES.SPEED,
+    }
+
+    await caughtPokemon.save()
+    return caughtPokemon
   }
 }
