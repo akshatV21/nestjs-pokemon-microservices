@@ -124,13 +124,9 @@ export class SpawnsService {
       // Emit an event to notify that the Pokémon has despawned.
       this.eventEmitter.emit(EVENTS.POKEMON_DESPAWNED, despawnInfo)
 
-      if (this.noOfPokemonSpawned <= 10000) {
-        // Calculate a new spawn delay and schedule a new Pokémon spawn.
-        const newSpawnDelay = Math.floor(Math.random() * (NEW_SPAWN_DELAY.MAX - NEW_SPAWN_DELAY.MIN + 1)) + NEW_SPAWN_DELAY.MIN
-        this.scheduleSpawningNewPokemon(despawnInfo.city, newSpawnDelay)
-      } else {
-        console.log('----- REACHED LIMIT OF SPAWNING 10,000 SPAWNS -----')
-      }
+      // Calculate a new spawn delay and schedule a new Pokémon spawn.
+      const newSpawnDelay = Math.floor(Math.random() * (NEW_SPAWN_DELAY.MAX - NEW_SPAWN_DELAY.MIN + 1)) + NEW_SPAWN_DELAY.MIN
+      this.scheduleSpawningNewPokemon(despawnInfo.city, newSpawnDelay)
     }
   }
 
