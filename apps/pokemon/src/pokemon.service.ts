@@ -193,7 +193,7 @@ export class PokemonService {
     const xpPerPokemon = Math.floor(xp / DEFAULT_VALUES.ACTIVE_POKEMON_LIMIT)
 
     // Fetch the Pokémon from the database by their IDs, retrieving only 'xp' and 'level' fields
-    const pokemonList = await this.CaughtPokemonRepository.find({ _id: { $in: pokemon } }, { xp: 1, level: 1 })
+    const pokemonList = await this.CaughtPokemonRepository.find({ _id: { $in: pokemon } }, { xp: 1, level: 1, stats: 1 })
 
     // Initialize arrays to store promises and final Pokémon leveling information
     const promises: Promise<CaughtPokemonDocument>[] = []
@@ -249,7 +249,7 @@ export class PokemonService {
     } catch (error) {
       // Rollback the transaction in case of an error
       await session.abortTransaction()
-      throw error
+      console.error(error)
     }
   }
 

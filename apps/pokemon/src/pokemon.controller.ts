@@ -101,7 +101,6 @@ export class PokemonController {
 
   @EventPattern(EVENTS.POKEMON_CAUGHT)
   handlePokemonCaughtEvent(@Payload() pokemonXpGainDto: PokemonXpGainDto) {
-    console.log(pokemonXpGainDto)
     this.pokemonService.distributeXpToActivePokemon(pokemonXpGainDto)
   }
 
