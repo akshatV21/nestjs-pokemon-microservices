@@ -249,6 +249,7 @@ export class PokemonService {
     } catch (error) {
       // Rollback the transaction in case of an error
       await session.abortTransaction()
+      throw error
     }
   }
 
