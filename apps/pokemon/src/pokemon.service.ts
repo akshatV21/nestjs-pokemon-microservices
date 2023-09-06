@@ -274,7 +274,7 @@ export class PokemonService {
 
     const nextStageInfo = evolutionLine.stages[EVOLUTION_STAGES[basePokemon.evolution.currentStage + 1]]
     if (!nextStageInfo) throw new BadRequestException('This pokemon cannot evolve further.')
-
+    console.log(nextStageInfo)
     const pokemonToEvolveInto = await this.BasePokemonRepository.findById(nextStageInfo.pokemon, { stats: 1 })
 
     caughtPokemon.pokemon = pokemonToEvolveInto._id
@@ -284,7 +284,7 @@ export class PokemonService {
       hp: pokemonToEvolveInto.stats.hp + caughtPokemon.level * STAT_INCREMENT_VALUES.HP,
       speed: pokemonToEvolveInto.stats.speed + caughtPokemon.level * STAT_INCREMENT_VALUES.SPEED,
     }
-
+    console.log(caughtPokemon)
     await caughtPokemon.save()
     return caughtPokemon
   }
