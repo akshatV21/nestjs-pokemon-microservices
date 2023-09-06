@@ -256,10 +256,7 @@ export class PokemonService {
     const isCaughtByUser = user.pokemon.caught.inStorage.includes(caughtPokemonId)
     if (!isCaughtByUser) throw new BadRequestException('You have not caught this pokemon.')
 
-    const fetchCaughtPokemonPromise = this.CaughtPokemonRepository.findOne(
-      { _id: caughtPokemonId, pokemon: basePokemonId },
-      { pokemon: 1, stats: 1, level: 1 },
-    )
+    const fetchCaughtPokemonPromise = this.CaughtPokemonRepository.findById(caughtPokemonId, { pokemon: 1, stats: 1, level: 1 })
 
     const fetchBasePokemonPromise = this.BasePokemonRepository.findById(
       basePokemonId,
@@ -268,7 +265,7 @@ export class PokemonService {
     )
 
     const [basePokemon, caughtPokemon] = await Promise.all([fetchBasePokemonPromise, fetchCaughtPokemonPromise])
-    console.log(basePokemon, caughtPokemon)
+
     const evolutionLine = basePokemon.evolution.line as EvolutionLineDocument
     const currentStageInfo = evolutionLine.stages[EVOLUTION_STAGES[basePokemon.evolution.currentStage]]
 
