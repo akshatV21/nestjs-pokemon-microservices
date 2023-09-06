@@ -268,7 +268,7 @@ export class PokemonService {
     )
 
     const [basePokemon, caughtPokemon] = await Promise.all([fetchBasePokemonPromise, fetchCaughtPokemonPromise])
-
+    console.log(basePokemon, caughtPokemon)
     const evolutionLine = basePokemon.evolution.line as EvolutionLineDocument
     const currentStageInfo = evolutionLine.stages[EVOLUTION_STAGES[basePokemon.evolution.currentStage]]
 
@@ -279,7 +279,7 @@ export class PokemonService {
     if (!nextStageInfo) throw new BadRequestException('This pokemon cannot evolve further.')
 
     const pokemonToEvolveInto = await this.BasePokemonRepository.findById(nextStageInfo.pokemon, { stats: 1 })
-    console.log(basePokemon, caughtPokemon, pokemonToEvolveInto)
+
     caughtPokemon.pokemon = pokemonToEvolveInto._id
     caughtPokemon.stats = {
       attack: pokemonToEvolveInto.stats.attack + caughtPokemon.level * STAT_INCREMENT_VALUES.ATTACK,
