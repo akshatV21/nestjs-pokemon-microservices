@@ -169,3 +169,8 @@ export const STAT_INCREMENT_VALUES = {
   HP: 1.8,
   SPEED: 1.4,
 } as const
+
+export const EARN_CREDITS = {
+  MIN: 2,
+  MAX: 5,
+} as const

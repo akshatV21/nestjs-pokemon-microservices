@@ -17,6 +17,7 @@ import {
   CITIES,
   City,
   DespawnInfo,
+  EARN_CREDITS,
   EVENTS,
   EVOLUTION_STAGES,
   INITIAL_SPAWN_SIZE,
@@ -258,6 +259,8 @@ export class SpawnsService {
       speed: pokemon.stats.speed + spawn.level * STAT_INCREMENT_VALUES.SPEED,
     }
 
+    const creditsEarned = Math.floor(Math.random() * (EARN_CREDITS.MAX - EARN_CREDITS.MIN + 1)) + EARN_CREDITS.MIN
+
     // Start a transaction to update user and caught Pokémon data.
     const caughtPokemonObjectId = new Types.ObjectId()
     const session = await this.CaughtPokemonRepository.startTransaction()
@@ -265,9 +268,8 @@ export class SpawnsService {
     try {
       // Update the user's caught Pokémon storage.
       const updateUserPromise = this.UserRepository.update(user._id, {
-        $push: {
-          'pokemon.caught.inStorage': caughtPokemonObjectId,
-        },
+        $push: { 'pokemon.caught.inStorage': caughtPokemonObjectId },
+        $inc: { credits: creditsEarned },
       })
 
       // Create a new caught Pokémon entry with relevant data.

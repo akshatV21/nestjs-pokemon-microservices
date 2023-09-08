@@ -67,6 +67,9 @@ export class User {
   @Prop({ default: new PokemonSchema() })
   pokemon?: PokemonSchema
 
+  @Prop({ default: 0 })
+  credits?: number
+
   @Prop({ default: new InventorySchema() })
   inventory?: InventorySchema
 }
