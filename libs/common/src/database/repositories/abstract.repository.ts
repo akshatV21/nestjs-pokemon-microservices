@@ -8,7 +8,7 @@ type ProjectionKeysUninon<T extends ProjectionType<any>, S extends Record<string
     : keyof T
   : never
 
-type FindDocResult<Doc extends Document, Projection extends ProjectionType<Doc>, S extends Record<string, any>> = Omit<
+export type FindDocResult<Doc extends Document, Projection extends ProjectionType<Doc>, S extends Record<string, any>> = Omit<
   Doc,
   ProjectionKeysUninon<Projection, S>
 >
@@ -21,7 +21,7 @@ export class AbstractRepository<T extends Document, S extends Record<string, any
     return entity.save()
   }
 
-  async find<Props extends ProjectionType<T>>(
+  async find<Props extends ProjectionType<T> = {}>(
     query: FilterQuery<T>,
     projection?: Props,
     options?: QueryOptions<T>,
@@ -29,7 +29,7 @@ export class AbstractRepository<T extends Document, S extends Record<string, any
     return await this.AbstractModel.find(query, projection, options)
   }
 
-  async findOne<Props extends ProjectionType<T>>(
+  async findOne<Props extends ProjectionType<T> = {}>(
     query: FilterQuery<T>,
     projection?: Props,
     options?: QueryOptions<T>,
@@ -37,7 +37,7 @@ export class AbstractRepository<T extends Document, S extends Record<string, any
     return this.AbstractModel.findOne(query, projection, options)
   }
 
-  async findById<Props extends ProjectionType<T>>(
+  async findById<Props extends ProjectionType<T> = {}>(
     id: string | Types.ObjectId,
     projection?: Props,
     options?: QueryOptions<T>,
