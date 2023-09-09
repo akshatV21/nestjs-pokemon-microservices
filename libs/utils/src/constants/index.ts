@@ -174,3 +174,12 @@ export const EARN_CREDITS = {
   MIN: 2,
   MAX: 5,
 } as const
+
+export const PER_ITEM_COSTS = {
+  pokeballs: 0.5,
+  greatballs: 0.8,
+  ultraballs: 0.9,
+  razzBerry: 0.4,
+  pinapBerry: 0.5,
+  goldenRazzBerry: 0.8,
+} as const

@@ -1,9 +1,10 @@
 import { ItemUsedDto, UserDocument, UserRepository } from '@lib/common'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { UpdateQuery } from 'mongoose'
-import { DROPPED_ITEMS_QUANTITY, ITEMS, Item } from '@utils/utils'
+import { DROPPED_ITEMS_QUANTITY, ITEMS, Item, PER_ITEM_COSTS } from '@utils/utils'
 import { DROP_RATES } from './rates/drop-rates'
 import { DiscardItemsDto } from './dtos/discard-items.dto'
+import { BuyItemsDto } from './dtos/buy-items.dto'
 
 @Injectable()
 export class InventoryService {
@@ -84,5 +85,13 @@ export class InventoryService {
         return item
       }
     }
+  }
+
+  async buyItems({ item, quantity }: BuyItemsDto, user: UserDocument) {
+    const totalCost = PER_ITEM_COSTS[item] * quantity
+    if (user.credits < totalCost) throw new BadRequestException('You do not have enough credits.')
+
+    await this.UserRepository.update(user._id, { $inc: { [`inventory.items.${item}`]: quantity, credits: -totalCost } })
+    return { item, quantity, credits: user.credits - totalCost }
   }
 }
