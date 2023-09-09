@@ -1,4 +1,17 @@
-import { Connection, Document, FilterQuery, Model, PopulateOptions, ProjectionType, QueryOptions, Types, UpdateQuery } from 'mongoose'
+import { Connection, Document, FilterQuery, Model, QueryOptions, Types, UpdateQuery } from 'mongoose'
+
+type ProjectionType<T> = Partial<Record<keyof T, 0 | 1>>
+
+type ProjectionKeysUninon<T extends ProjectionType<any>, S extends Record<string, any>> = T extends Record<string, infer V>
+  ? V extends 1
+    ? Exclude<keyof S, keyof T>
+    : keyof T
+  : never
+
+type FindByIdResult<Doc extends Document, Projection extends ProjectionType<Doc>, S extends Record<string, any>> = Omit<
+  Doc,
+  ProjectionKeysUninon<Projection, S>
+>
 
 export class AbstractRepository<T extends Document, S extends Record<string, any>> {
   constructor(protected readonly AbstractModel: Model<T>, private readonly connection: Connection) {}
@@ -8,15 +21,27 @@ export class AbstractRepository<T extends Document, S extends Record<string, any
     return entity.save()
   }
 
-  async find(query: FilterQuery<T>, projection?: ProjectionType<T>, options?: QueryOptions<T>): Promise<T[]> {
+  async find<Props extends ProjectionType<T>>(
+    query: FilterQuery<T>,
+    projection?: Props,
+    options?: QueryOptions<T>,
+  ): Promise<FindByIdResult<T, Props, S>[]> {
     return await this.AbstractModel.find(query, projection, options)
   }
 
-  async findOne(query: FilterQuery<T>, projection?: ProjectionType<T>, options?: QueryOptions<T>): Promise<T> {
+  async findOne<Props extends ProjectionType<T>>(
+    query: FilterQuery<T>,
+    projection?: Props,
+    options?: QueryOptions<T>,
+  ): Promise<FindByIdResult<T, Props, S> | undefined> {
     return this.AbstractModel.findOne(query, projection, options)
   }
 
-  async findById(id: string | Types.ObjectId, projection?: ProjectionType<T>, options?: QueryOptions<T>) {
+  async findById<Props extends ProjectionType<T>>(
+    id: string | Types.ObjectId,
+    projection?: Props,
+    options?: QueryOptions<T>,
+  ): Promise<FindByIdResult<T, Props, S>> {
     return this.AbstractModel.findById(new Types.ObjectId(id), projection, options)
   }
 
