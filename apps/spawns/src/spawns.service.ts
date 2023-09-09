@@ -203,7 +203,7 @@ export class SpawnsService {
     const caughtSpawnIds = this.spawnsManager.getUserCaughtSpawnIdsByCity(city, user._id)
 
     // Filter the city spawns to include only those that the user hasn't caught.
-    const uncaughtSpawns = citySpawns.filter(spawn => !caughtSpawnIds.includes(spawn.po))
+    const uncaughtSpawns = citySpawns.filter(spawn => !caughtSpawnIds.includes(spawn._id))
     const finalSpawns = uncaughtSpawns.map(spawn => {
       spawn.pokemon = this.basePokemonObj[spawn.pokemon.toString()]
       return spawn
