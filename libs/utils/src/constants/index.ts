@@ -32,6 +32,9 @@ export const EVENTS = {
   ITEM_USED: 'item-used',
   POKEMON_CAUGHT: 'pokemon-caught',
   POKEMON_XP_DISTRIBUTED: 'pokemon-xp-distributed',
+  INITIALIZE_TRADE: 'initialize-trade',
+  JOIN_TRADE: 'join-trade',
+  JOINED_TRADE: 'joined-trade',
 } as const
 
 export const POKEMON_TYPINGS = {

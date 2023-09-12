@@ -31,3 +31,15 @@ export interface PokemonLevelUp {
   pokemon: string
   levelsGained: number
 }
+
+export interface TradeInfo {
+  userOne: {
+    id: Types.ObjectId
+    pokemon: Types.ObjectId | null
+  }
+  userTwo: {
+    id: Types.ObjectId
+    pokemon: Types.ObjectId | null
+  } | null
+  code: `${number}`
+}

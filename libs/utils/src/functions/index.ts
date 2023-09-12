@@ -22,3 +22,14 @@ export function catchAuthErrors(err: any, type: ContextType) {
       throw type === 'http' ? new UnauthorizedException('Invalid Jwt.') : new RpcException('Invalid Jwt.')
   }
 }
+
+export function generateTradeCode(): `${number}` {
+  const min = 100000 // Smallest 6-digit number
+  const max = 999999 // Largest 6-digit number
+
+  // Generate a random integer between min and max (inclusive)
+  const tradeCode = Math.floor(Math.random() * (max - min + 1)) + min
+
+  // Convert the trade code to a string and pad with leading zeros if necessary
+  return `${tradeCode}`
+}
