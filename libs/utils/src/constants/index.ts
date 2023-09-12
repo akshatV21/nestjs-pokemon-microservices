@@ -35,6 +35,12 @@ export const EVENTS = {
   INITIALIZE_TRADE: 'initialize-trade',
   JOIN_TRADE: 'join-trade',
   JOINED_TRADE: 'joined-trade',
+  SELECT_POKEMON: 'select-pokemon',
+  POKEMON_SELECTED: 'pokemon-selected',
+  USER_DISCONNECTED: 'user-disconnected',
+  CONFIRM_TRADE: 'confirm-trade',
+  TRADE_CONFIRMED: 'trade-confirmed',
+  TRADE_COMPLETED: 'trade-completed',
 } as const
 
 export const POKEMON_TYPINGS = {

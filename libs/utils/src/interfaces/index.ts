@@ -36,10 +36,12 @@ export interface TradeInfo {
   userOne: {
     id: Types.ObjectId
     pokemon: Types.ObjectId | null
+    confirm: boolean
   }
   userTwo: {
     id: Types.ObjectId
     pokemon: Types.ObjectId | null
+    confirm: boolean
   } | null
   code: `${number}`
 }

@@ -26,6 +26,7 @@ import {
   BASE_POKEMON_PAGINATION_LIMIT,
   STAT_INCREMENT_VALUES,
   EVOLUTION_STAGES,
+  TradeInfo,
 } from '@utils/utils'
 import { ClientProxy } from '@nestjs/microservices'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
@@ -288,5 +289,33 @@ export class PokemonService {
 
     await caughtPokemon.save()
     return caughtPokemon
+  }
+
+  async tradePokemon(tradeInfo: TradeInfo) {
+    const userOneId = tradeInfo.userOne.id
+    const userTwoId = tradeInfo.userTwo.id
+
+    const userOnePokemonId = tradeInfo.userOne.pokemon
+    const userTwoPokemonId = tradeInfo.userTwo.pokemon
+
+    const userOneUpdatePromise = this.UserRepository.update(userOneId, {
+      $push: { 'pokemon.caught.inStorage': userTwoPokemonId },
+      $pull: { 'pokemon.caught.inStorage': userOnePokemonId },
+    })
+
+    const userTwoUpdatePromise = this.UserRepository.update(userTwoId, {
+      $push: { 'pokemon.caught.inStorage': userOnePokemonId },
+      $pull: { 'pokemon.caught.inStorage': userTwoPokemonId },
+    })
+
+    const userOnePokemonUpdatePromise = this.CaughtPokemonRepository.update(userOnePokemonId, { $set: { user: userTwoId } })
+    const userTwoPokemonUpdatePromise = this.CaughtPokemonRepository.update(userTwoPokemonId, { $set: { user: userOneId } })
+
+    await Promise.all([userOneUpdatePromise, userTwoUpdatePromise, userOnePokemonUpdatePromise, userTwoPokemonUpdatePromise])
+
+    tradeInfo.userOne.pokemon = userTwoPokemonId
+    tradeInfo.userTwo.pokemon = userOnePokemonId
+
+    return tradeInfo
   }
 }
