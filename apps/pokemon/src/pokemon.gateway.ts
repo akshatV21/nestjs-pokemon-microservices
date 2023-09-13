@@ -13,6 +13,7 @@ import {
   generateTradeCode,
 } from '@utils/utils'
 import { lastValueFrom } from 'rxjs'
+import { Types } from 'mongoose'
 import { AuthorizeDto } from '@lib/common'
 import { TradePokemonDto } from './dtos/trade-pokemon.dto'
 import { PokemonService } from './pokemon.service'
@@ -59,10 +60,9 @@ export class PokemonGateway {
 
   @SubscribeMessage(EVENTS.INITIALIZE_TRADE)
   async handleInitializeTradeEvent(@MessageBody() payload: TradePokemonDto) {
-    const userTradeInfo = { userId: payload.userId }
     const code = generateTradeCode()
 
-    this.trades.set(code, { code, userOne: { id: payload.userId, pokemon: null, confirm: false }, userTwo: null })
+    this.trades.set(code, { code, userOne: { id: new Types.ObjectId(payload.userId), pokemon: null, confirm: false }, userTwo: null })
     console.log(this.trades.entries())
     return { code }
   }
@@ -71,7 +71,7 @@ export class PokemonGateway {
   async handleTradeJoinEvent(@MessageBody() payload: TradePokemonDto) {
     console.log(this.trades.entries())
     const trade = this.trades.get(payload.code)
-    console.log(payload, trade)
+    console.log(typeof payload, trade)
     if (!trade) throw new WsException('Invalid trade code.')
     if (trade.userTwo) throw new WsException('Two users are already connected.')
     console.log('in-join-trade')
