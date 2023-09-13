@@ -87,7 +87,7 @@ export class PokemonGateway {
   @SubscribeMessage(EVENTS.SELECT_POKEMON)
   async handleSelectPokemonEvent(@MessageBody() payload: TradePokemonDto) {
     const trade = this.trades.get(payload.code)
-
+    console.log(trade)
     this.canTrade(payload, trade)
 
     if (trade.userOne.id.equals(payload.userId)) trade.userOne.pokemon = payload.pokemonId
