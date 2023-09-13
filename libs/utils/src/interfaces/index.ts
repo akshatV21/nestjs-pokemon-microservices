@@ -47,6 +47,7 @@ export interface TradeInfo {
 }
 
 export interface Move {
+  id: string
   name: string
   typing: PokemonTyping[]
   power: number
@@ -74,4 +75,12 @@ export interface Move {
     speed?: number // no of stages to increase or decrease speed
     hp?: number // no of stages to increase or decrease hp
   }
+}
+
+export interface MovePool {
+  pokemonId: string
+  moves: {
+    moveId: string
+    level: number
+  }[]
 }
