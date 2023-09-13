@@ -22,7 +22,7 @@ import {
   UserSchema,
 } from '@lib/common'
 import { APP_GUARD } from '@nestjs/core'
-import { SERVICES } from '@utils/utils'
+import { SERVICES, SocketSessions } from '@utils/utils'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { PokemonGateway } from './pokemon.gateway'
 
@@ -53,9 +53,18 @@ import { PokemonGateway } from './pokemon.gateway'
     ]),
     RmqModule.register([SERVICES.AUTH_SERVICE, SERVICES.SPAWNS_SERVICE]),
     RedisModule.register(),
-    EventEmitterModule.forRoot()
+    EventEmitterModule.forRoot(),
   ],
   controllers: [PokemonController],
-  providers: [PokemonService, UserRepository, BasePokemonRepository, EvolutionLineRepository, CaughtPokemonRepository, { provide: APP_GUARD, useClass: Authorize }, PokemonGateway],
+  providers: [
+    PokemonService,
+    UserRepository,
+    BasePokemonRepository,
+    EvolutionLineRepository,
+    CaughtPokemonRepository,
+    { provide: APP_GUARD, useClass: Authorize },
+    SocketSessions,
+    PokemonGateway,
+  ],
 })
 export class PokemonModule {}
