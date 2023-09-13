@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
-import { WebSocketGateway, WebSocketServer, WsException, SubscribeMessage } from '@nestjs/websockets'
+import { WebSocketGateway, WebSocketServer, WsException, SubscribeMessage, MessageBody } from '@nestjs/websockets'
 import { Server } from 'socket.io'
 import {
   AuthenticatedSocket,
@@ -40,7 +40,7 @@ export class PokemonGateway {
       this.authService.send<any, AuthorizeDto>(EVENTS.AUTHORIZE, { token, requestType: 'ws', cached: false }),
     ).catch(err => catchAuthErrors(err, 'ws'))
 
-    this.socketSessions.setSocket(response.userId, socket)
+    this.socketSessions.setSocket(response.user, socket)
   }
 
   async handleDisconnect(socket: AuthenticatedSocket) {
@@ -59,7 +59,7 @@ export class PokemonGateway {
   }
 
   @SubscribeMessage(EVENTS.INITIALIZE_TRADE)
-  async handleInitializeTradeEvent(payload: TradePokemonDto) {
+  async handleInitializeTradeEvent(@MessageBody() payload: TradePokemonDto) {
     const userTradeInfo = { userId: payload.userId }
     const code = generateTradeCode()
 
@@ -68,7 +68,7 @@ export class PokemonGateway {
   }
 
   @SubscribeMessage(EVENTS.JOIN_TRADE)
-  async handleTradeJoinEvent(payload: TradePokemonDto) {
+  async handleTradeJoinEvent(@MessageBody() payload: TradePokemonDto) {
     const trade = this.trades.get(payload.code)
 
     if (!trade) throw new WsException('Invalid trade code.')
@@ -85,7 +85,7 @@ export class PokemonGateway {
   }
 
   @SubscribeMessage(EVENTS.SELECT_POKEMON)
-  async handleSelectPokemonEvent(payload: TradePokemonDto) {
+  async handleSelectPokemonEvent(@MessageBody() payload: TradePokemonDto) {
     const trade = this.trades.get(payload.code)
 
     this.canTrade(payload, trade)
@@ -103,7 +103,7 @@ export class PokemonGateway {
   }
 
   @SubscribeMessage(EVENTS.CONFIRM_TRADE)
-  async handleConfirmTradeEvent(payload: TradePokemonDto) {
+  async handleConfirmTradeEvent(@MessageBody() payload: TradePokemonDto) {
     const trade = this.trades.get(payload.code)
 
     this.canTrade(payload, trade)
@@ -128,7 +128,7 @@ export class PokemonGateway {
   }
 
   @SubscribeMessage(EVENTS.CANCEL_TRADE)
-  async handleCancelTradeEvent(payload: TradePokemonDto) {
+  async handleCancelTradeEvent(@MessageBody() payload: TradePokemonDto) {
     const trade = this.trades.get(payload.code)
 
     this.canTrade(payload, trade)
