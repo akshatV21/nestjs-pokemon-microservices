@@ -74,7 +74,7 @@ export class PokemonGateway {
     if (!trade) throw new WsException('Invalid trade code.')
     if (trade.userTwo) throw new WsException('Two users are already connected.')
 
-    trade.userTwo = { id: payload.userId, pokemon: null, confirm: false }
+    trade.userTwo = { id: new Types.ObjectId(payload.userId), pokemon: null, confirm: false }
     this.trades.set(payload.code, trade)
 
     const userOneSocket = this.socketSessions.getSocket(trade.userOne.id.toString())
@@ -145,6 +145,7 @@ export class PokemonGateway {
   private canTrade(payload: TradePokemonDto, trade: TradeInfo) {
     if (!trade) throw new WsException('Invalid trade code.')
     if (!trade.userTwo) throw new WsException('Only one user is connected.')
-    if (trade.userOne.id.equals(payload.userId) && trade.userTwo.id.equals(payload.userId)) throw new WsException('You are not part of this trade.')
+    if (trade.userOne.id.equals(payload.userId) && trade.userTwo.id.equals(payload.userId))
+      throw new WsException('You are not part of this trade.')
   }
 }
