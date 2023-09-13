@@ -19,15 +19,13 @@ import { PokemonService } from './pokemon.service'
 
 @WebSocketGateway({ namespace: 'pokemon', cors: { origin: '*' } })
 export class PokemonGateway {
-  private trades: Map<`${number}`, TradeInfo>
+  private trades: Map<`${number}`, TradeInfo> = new Map()
 
   constructor(
     private socketSessions: SocketSessions,
     @Inject(SERVICES.AUTH_SERVICE) private readonly authService: ClientProxy,
     private readonly pokemonService: PokemonService,
-  ) {
-    this.trades = new Map()
-  }
+  ) {}
 
   @WebSocketServer()
   server: Server
@@ -74,7 +72,7 @@ export class PokemonGateway {
     console.log(payload, trade)
     if (!trade) throw new WsException('Invalid trade code.')
     if (trade.userTwo) throw new WsException('Two users are already connected.')
-
+    console.log('in-join-trade')
     trade.userTwo = { id: payload.userId, pokemon: null, confirm: false }
     this.trades.set(payload.code, trade)
 
