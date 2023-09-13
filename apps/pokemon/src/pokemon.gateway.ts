@@ -63,11 +63,13 @@ export class PokemonGateway {
     const code = generateTradeCode()
 
     this.trades.set(code, { code, userOne: { id: payload.userId, pokemon: null, confirm: false }, userTwo: null })
+    console.log(this.trades.entries())
     return { code }
   }
-
+  
   @SubscribeMessage(EVENTS.JOIN_TRADE)
   async handleTradeJoinEvent(@MessageBody() payload: TradePokemonDto) {
+    console.log(this.trades.entries())
     const trade = this.trades.get(payload.code)
     console.log(payload, trade)
     if (!trade) throw new WsException('Invalid trade code.')
