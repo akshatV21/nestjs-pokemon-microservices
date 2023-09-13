@@ -29,6 +29,7 @@
     "@nestjs/mongoose": "^10.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/platform-socket.io": "^9.4.2",
+    "@nestjs/schedule": "^3.0.3",
     "@nestjs/websockets": "^9.4.2",
     "amqp-connection-manager": "^4.1.12",
     "amqplib": "^0.10.3",

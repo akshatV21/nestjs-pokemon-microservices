@@ -28,6 +28,7 @@ import {
   STAT_INCREMENT_VALUES,
   EVOLUTION_STAGES,
   TradeInfo,
+  RANKING_TYPES,
 } from '@utils/utils'
 import { ClientProxy } from '@nestjs/microservices'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
@@ -36,6 +37,8 @@ import { TransferPokemonDto } from './dtos/transfer-pokemon.dto'
 import { UpdateNicknameDto } from './dtos/update-nickname.dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { EvolvePokemonDto } from './dtos/evolve-pokemon.dto'
+import { Cron } from '@nestjs/schedule'
+import { RankingRepository } from '@lib/common'
 
 @Injectable()
 export class PokemonService {
@@ -44,6 +47,7 @@ export class PokemonService {
     private readonly EvolutionLineRepository: EvolutionLineRepository,
     private readonly UserRepository: UserRepository,
     private readonly CaughtPokemonRepository: CaughtPokemonRepository,
+    private readonly RankingRepository: RankingRepository,
     private readonly eventEmitter: EventEmitter2,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(SERVICES.SPAWNS_SERVICE) private readonly spawnsService: ClientProxy,
@@ -308,27 +312,54 @@ export class PokemonService {
       const userOnePushPromise = this.UserRepository.update(userOneId, {
         $push: { 'pokemon.caught.inStorage': userTwoPokemonId },
       })
-  
+
       const userTwoPullPromise = this.UserRepository.update(userTwoId, {
         $pull: { 'pokemon.caught.inStorage': userTwoPokemonId },
       })
       const userTwoPushPromise = this.UserRepository.update(userTwoId, {
         $push: { 'pokemon.caught.inStorage': userOnePokemonId },
       })
-  
+
       const userOnePokemonUpdatePromise = this.CaughtPokemonRepository.update(userOnePokemonId, { $set: { user: userTwoId } })
       const userTwoPokemonUpdatePromise = this.CaughtPokemonRepository.update(userTwoPokemonId, { $set: { user: userOneId } })
-  
-      await Promise.all([userOnePullPromise, userOnePushPromise, userTwoPullPromise, userTwoPushPromise, userOnePokemonUpdatePromise, userTwoPokemonUpdatePromise])
-  
+
+      await Promise.all([
+        userOnePullPromise,
+        userOnePushPromise,
+        userTwoPullPromise,
+        userTwoPushPromise,
+        userOnePokemonUpdatePromise,
+        userTwoPokemonUpdatePromise,
+      ])
+
       tradeInfo.userOne.pokemon = userTwoPokemonId
       tradeInfo.userTwo.pokemon = userOnePokemonId
-  
+
       await session.commitTransaction()
       return tradeInfo
     } catch (error) {
       await session.abortTransaction()
       throw new WsException('Something went wrong while trading pokemon.')
     }
+  }
+
+  @Cron('0 0 0 * * *')
+  async updateMostCaughtPokemonRankings() {
+    const mostCaughtPokemonRanking = await this.RankingRepository.findOne({ type: RANKING_TYPES.MOST_CAUGHT_POKEMON })
+    const users = await this.UserRepository.aggregate([
+      { $project: { username: 1, pokemon: 1 } },
+      { $addFields: { totalPokemon: { $size: { $concatArrays: ['$pokemon.caught.inStorage', '$pokemon.caught.transferred'] } } } },
+      { $sort: { totalPokemon: -1 } },
+      { $limit: 10 },
+    ])
+
+    const newRankings = users.map(user => {
+      const totalPokemon = user.pokemon.caught.inStorage.length + user.pokemon.caught.transferred.length
+      return { _id: user._id, username: user.username, amount: totalPokemon }
+    })
+
+    await this.RankingRepository.update(mostCaughtPokemonRanking._id, {
+      $set: { users: newRankings },
+    })
   }
 }
