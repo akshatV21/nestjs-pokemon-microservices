@@ -71,7 +71,7 @@ export class PokemonGateway {
   @SubscribeMessage(EVENTS.JOIN_TRADE)
   async handleTradeJoinEvent(@MessageBody() payload: TradePokemonDto) {
     const trade = this.trades.get(payload.code)
-
+    console.log(payload, trade)
     if (!trade) throw new WsException('Invalid trade code.')
     if (trade.userTwo) throw new WsException('Two users are already connected.')
 
