@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common'
+import { Inject, UsePipes, ValidationPipe } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { WebSocketGateway, WebSocketServer, WsException, SubscribeMessage, MessageBody } from '@nestjs/websockets'
 import { Server } from 'socket.io'
@@ -17,6 +17,7 @@ import { AuthorizeDto } from '@lib/common'
 import { TradePokemonDto } from './dtos/trade-pokemon.dto'
 import { PokemonService } from './pokemon.service'
 
+@UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 @WebSocketGateway({ namespace: 'pokemon', cors: { origin: '*' } })
 export class PokemonGateway {
   private trades: Map<`${number}`, TradeInfo>
@@ -132,7 +133,7 @@ export class PokemonGateway {
     const trade = this.trades.get(payload.code)
 
     this.canTrade(payload, trade)
-    
+
     const userOneSocket = this.socketSessions.getSocket(trade.userOne.id.toString())
     const userTwoSocket = this.socketSessions.getSocket(trade.userTwo.id.toString())
 
