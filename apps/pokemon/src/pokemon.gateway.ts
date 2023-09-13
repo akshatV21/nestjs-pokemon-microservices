@@ -41,6 +41,7 @@ export class PokemonGateway {
     ).catch(err => catchAuthErrors(err, 'ws'))
 
     this.socketSessions.setSocket(response.user, socket)
+    console.log(response)
   }
 
   async handleDisconnect(socket: AuthenticatedSocket) {
@@ -77,8 +78,10 @@ export class PokemonGateway {
     trade.userTwo = { id: payload.userId, pokemon: null, confirm: false }
     this.trades.set(payload.code, trade)
 
-    const userOneSocket = this.socketSessions.getSocket(trade.userOne.id.toString())
-    const userTwoSocket = this.socketSessions.getSocket(trade.userTwo.id.toString())
+    const userOneSocket = this.socketSessions.getSocket(trade.userOne.id)
+    const userTwoSocket = this.socketSessions.getSocket(trade.userTwo.id)
+
+    console.log(userOneSocket, userTwoSocket)
 
     userOneSocket.emit(EVENTS.JOINED_TRADE, trade)
     userTwoSocket.emit(EVENTS.JOINED_TRADE, trade)
