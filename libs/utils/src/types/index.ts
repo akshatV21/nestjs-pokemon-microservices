@@ -1,4 +1,4 @@
-import { BALLS, BERRIES, BLOCKS_VALUE, CITIES, EVOLUTION_STAGES, ITEMS, POKEMON_TYPINGS, SERVICES } from '../constants'
+import { BALLS, BERRIES, BLOCKS_VALUE, CITIES, EVOLUTION_STAGES, ITEMS, POKEMON_TYPINGS, RANKING_TYPES, SERVICES } from '../constants'
 import { Types } from 'mongoose'
 
 type ObjectValuesUnion<T extends Record<string, string>> = T extends Record<string, infer U> ? U : never
@@ -28,3 +28,5 @@ export type Item = (typeof ITEMS)[number]
 export type Ball = (typeof BALLS)[number]
 
 export type Berry = (typeof BERRIES)[number]
+
+export type RankingType = ObjectValuesUnion<typeof RANKING_TYPES>
