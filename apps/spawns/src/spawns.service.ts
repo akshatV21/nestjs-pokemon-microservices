@@ -22,6 +22,7 @@ import {
   EVOLUTION_STAGES,
   INITIAL_SPAWN_SIZE,
   MAX_LEVEL_IN_WILD,
+  MovesManager,
   NEW_SPAWN_DELAY,
   POKEMON_XP_TO_LEVEL_UP,
   SERVICES,
@@ -51,6 +52,7 @@ export class SpawnsService {
     private readonly UserRepository: UserRepository,
     private readonly spawnsManager: SpawnsManager,
     private readonly eventEmitter: EventEmitter2,
+    private readonly movesManager: MovesManager,
     @Inject(SERVICES.INVENTORY_SERVICE) private readonly inventoryService: ClientProxy,
     @Inject(SERVICES.POKEMON_SERVICE) private readonly pokemonService: ClientProxy,
   ) {
@@ -172,6 +174,7 @@ export class SpawnsService {
         location: { city, block },
         despawnsAt: new Date(Date.now() + despawnsIn),
         isShiny,
+        moveset: this.movesManager.getPokemonRandomMoveset(randomPokemon.pokedexNo),
       },
       spawnObjectId,
     )
