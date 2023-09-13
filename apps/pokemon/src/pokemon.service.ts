@@ -11,6 +11,7 @@ import {
   UserRepository,
 } from '@lib/common'
 import { BadRequestException, Inject, Injectable } from '@nestjs/common'
+import { WsException } from '@nestjs/websockets'
 import { Types } from 'mongoose'
 import { CreatePokemonDto } from './dtos/create-pokemon.dto'
 import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
@@ -298,24 +299,36 @@ export class PokemonService {
     const userOnePokemonId = tradeInfo.userOne.pokemon
     const userTwoPokemonId = tradeInfo.userTwo.pokemon
 
-    const userOneUpdatePromise = this.UserRepository.update(userOneId, {
-      $push: { 'pokemon.caught.inStorage': userTwoPokemonId },
-      $pull: { 'pokemon.caught.inStorage': userOnePokemonId },
-    })
+    const session = await this.UserRepository.startTransaction()
 
-    const userTwoUpdatePromise = this.UserRepository.update(userTwoId, {
-      $push: { 'pokemon.caught.inStorage': userOnePokemonId },
-      $pull: { 'pokemon.caught.inStorage': userTwoPokemonId },
-    })
-
-    const userOnePokemonUpdatePromise = this.CaughtPokemonRepository.update(userOnePokemonId, { $set: { user: userTwoId } })
-    const userTwoPokemonUpdatePromise = this.CaughtPokemonRepository.update(userTwoPokemonId, { $set: { user: userOneId } })
-
-    await Promise.all([userOneUpdatePromise, userTwoUpdatePromise, userOnePokemonUpdatePromise, userTwoPokemonUpdatePromise])
-
-    tradeInfo.userOne.pokemon = userTwoPokemonId
-    tradeInfo.userTwo.pokemon = userOnePokemonId
-
-    return tradeInfo
+    try {
+      const userOnePullPromise = this.UserRepository.update(userOneId, {
+        $pull: { 'pokemon.caught.inStorage': userOnePokemonId },
+      })
+      const userOnePushPromise = this.UserRepository.update(userOneId, {
+        $push: { 'pokemon.caught.inStorage': userTwoPokemonId },
+      })
+  
+      const userTwoPullPromise = this.UserRepository.update(userTwoId, {
+        $pull: { 'pokemon.caught.inStorage': userTwoPokemonId },
+      })
+      const userTwoPushPromise = this.UserRepository.update(userTwoId, {
+        $push: { 'pokemon.caught.inStorage': userOnePokemonId },
+      })
+  
+      const userOnePokemonUpdatePromise = this.CaughtPokemonRepository.update(userOnePokemonId, { $set: { user: userTwoId } })
+      const userTwoPokemonUpdatePromise = this.CaughtPokemonRepository.update(userTwoPokemonId, { $set: { user: userOneId } })
+  
+      await Promise.all([userOnePullPromise, userOnePushPromise, userTwoPullPromise, userTwoPushPromise, userOnePokemonUpdatePromise, userTwoPokemonUpdatePromise])
+  
+      tradeInfo.userOne.pokemon = userTwoPokemonId
+      tradeInfo.userTwo.pokemon = userOnePokemonId
+  
+      await session.commitTransaction()
+      return tradeInfo
+    } catch (error) {
+      await session.abortTransaction()
+      throw new WsException('Something went wrong while trading pokemon.')
+    }
   }
 }
