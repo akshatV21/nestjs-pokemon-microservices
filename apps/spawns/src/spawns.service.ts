@@ -286,6 +286,7 @@ export class SpawnsService {
           isShiny: spawn.isShiny,
           xp: POKEMON_XP_TO_LEVEL_UP[spawn.level],
           stats,
+          moveset: spawn.moveset,
         },
         caughtPokemonObjectId,
       )

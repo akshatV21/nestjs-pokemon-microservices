@@ -30,6 +30,9 @@ export class CaughtPokemon {
 
   @Prop({ required: true })
   stats: PokemonStatsSchema
+
+  @Prop({ required: true })
+  moveset: string[]
 }
 
 export const CaughtPokemonSchema = SchemaFactory.createForClass(CaughtPokemon)

@@ -49,6 +49,7 @@ export interface TradeInfo {
 export interface Move {
   id: string
   name: string
+  description: string
   typing: PokemonTyping[]
   power: number
   accuracy: number

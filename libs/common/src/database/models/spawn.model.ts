@@ -32,7 +32,7 @@ export class Spawn {
   isShiny: boolean
 
   @Prop({ required: true })
-  moveset: Move[]
+  moveset: string[]
 }
 
 export const SpawnSchema = SchemaFactory.createForClass(Spawn)
