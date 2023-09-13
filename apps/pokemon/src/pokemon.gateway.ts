@@ -2,6 +2,7 @@ import { Inject, UsePipes, ValidationPipe } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { WebSocketGateway, WebSocketServer, WsException, SubscribeMessage, MessageBody } from '@nestjs/websockets'
 import { Server } from 'socket.io'
+import { Types } from 'mongoose'
 import {
   AuthenticatedSocket,
   EVENTS,
@@ -13,20 +14,21 @@ import {
   generateTradeCode,
 } from '@utils/utils'
 import { lastValueFrom } from 'rxjs'
-import { Types } from 'mongoose'
 import { AuthorizeDto } from '@lib/common'
 import { TradePokemonDto } from './dtos/trade-pokemon.dto'
 import { PokemonService } from './pokemon.service'
 
 @WebSocketGateway({ namespace: 'pokemon', cors: { origin: '*' } })
 export class PokemonGateway {
-  private trades: Map<`${number}`, TradeInfo> = new Map()
+  private trades: Map<`${number}`, TradeInfo>
 
   constructor(
     private socketSessions: SocketSessions,
     @Inject(SERVICES.AUTH_SERVICE) private readonly authService: ClientProxy,
     private readonly pokemonService: PokemonService,
-  ) {}
+  ) {
+    this.trades = new Map()
+  }
 
   @WebSocketServer()
   server: Server
@@ -40,7 +42,6 @@ export class PokemonGateway {
     ).catch(err => catchAuthErrors(err, 'ws'))
 
     this.socketSessions.setSocket(response.user, socket)
-    console.log(response)
   }
 
   async handleDisconnect(socket: AuthenticatedSocket) {
@@ -63,25 +64,21 @@ export class PokemonGateway {
     const code = generateTradeCode()
 
     this.trades.set(code, { code, userOne: { id: new Types.ObjectId(payload.userId), pokemon: null, confirm: false }, userTwo: null })
-    console.log(this.trades.entries())
     return { code }
   }
-  
+
   @SubscribeMessage(EVENTS.JOIN_TRADE)
   async handleTradeJoinEvent(@MessageBody() payload: TradePokemonDto) {
-    console.log(this.trades.entries())
     const trade = this.trades.get(payload.code)
-    console.log(typeof payload, trade)
+
     if (!trade) throw new WsException('Invalid trade code.')
     if (trade.userTwo) throw new WsException('Two users are already connected.')
-    console.log('in-join-trade')
+
     trade.userTwo = { id: payload.userId, pokemon: null, confirm: false }
     this.trades.set(payload.code, trade)
 
-    const userOneSocket = this.socketSessions.getSocket(trade.userOne.id)
-    const userTwoSocket = this.socketSessions.getSocket(trade.userTwo.id)
-
-    console.log(userOneSocket, userTwoSocket)
+    const userOneSocket = this.socketSessions.getSocket(trade.userOne.id.toString())
+    const userTwoSocket = this.socketSessions.getSocket(trade.userTwo.id.toString())
 
     userOneSocket.emit(EVENTS.JOINED_TRADE, trade)
     userTwoSocket.emit(EVENTS.JOINED_TRADE, trade)
