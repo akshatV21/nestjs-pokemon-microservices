@@ -17,7 +17,6 @@ import { AuthorizeDto } from '@lib/common'
 import { TradePokemonDto } from './dtos/trade-pokemon.dto'
 import { PokemonService } from './pokemon.service'
 
-@UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 @WebSocketGateway({ namespace: 'pokemon', cors: { origin: '*' } })
 export class PokemonGateway {
   private trades: Map<`${number}`, TradeInfo>
