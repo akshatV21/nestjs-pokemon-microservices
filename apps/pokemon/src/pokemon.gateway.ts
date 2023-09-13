@@ -90,7 +90,7 @@ export class PokemonGateway {
 
     this.canTrade(payload, trade)
 
-    if (trade.userOne.id === payload.userId) trade.userOne.pokemon = payload.pokemonId
+    if (trade.userOne.id.equals(payload.userId)) trade.userOne.pokemon = payload.pokemonId
     else trade.userTwo.pokemon = payload.pokemonId
 
     this.trades.set(payload.code, trade)
@@ -108,7 +108,7 @@ export class PokemonGateway {
 
     this.canTrade(payload, trade)
 
-    if (trade.userOne.id === payload.userId) trade.userOne.confirm = true
+    if (trade.userOne.id.equals(payload.userId)) trade.userOne.confirm = true
     else trade.userTwo.confirm = true
 
     this.trades.set(payload.code, trade)
@@ -145,6 +145,6 @@ export class PokemonGateway {
   private canTrade(payload: TradePokemonDto, trade: TradeInfo) {
     if (!trade) throw new WsException('Invalid trade code.')
     if (!trade.userTwo) throw new WsException('Only one user is connected.')
-    if (trade.userOne.id !== payload.userId && trade.userTwo.id !== payload.userId) throw new WsException('You are not part of this trade.')
+    if (trade.userOne.id.equals(payload.userId) && trade.userTwo.id.equals(payload.userId)) throw new WsException('You are not part of this trade.')
   }
 }
