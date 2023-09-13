@@ -199,3 +199,8 @@ export const RANKING_TYPES = {
   MOST_CAUGHT_POKEMON: 'most-caught-pokemon',
   MOST_XP: 'most-xp',
 } as const
+
+export const MOVE_TYPES = {
+  DAMAGE: 'damage',
+  STATUS: 'status',
+} as const

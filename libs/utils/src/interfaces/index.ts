@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io'
-import { Block, City } from '../types'
+import { Block, City, MoveType, PokemonTyping } from '../types'
 import { Types } from 'mongoose'
 
 export interface HttpSuccessResponse {
@@ -44,4 +44,34 @@ export interface TradeInfo {
     confirm: boolean
   } | null
   code: `${number}`
+}
+
+export interface Move {
+  name: string
+  typing: PokemonTyping[]
+  power: number
+  accuracy: number
+  pp: number
+  priority: number
+  type: MoveType
+  burn?: number // chance to burn
+  sleep?: number // chance to sleep
+  poison?: number // chance to poison
+  freeze?: number // chance to freeze
+  paralyze?: number // chance to paralyze
+  flinch?: number // chance to flinch
+  recoil?: number // fraction of damage to be taken as recoil
+  heal?: number // fraction of damage to be healed
+  user?: {
+    attack?: number // no of stages to increase or decrease attack
+    defense?: number // no of stages to increase or decrease defense
+    speed?: number // no of stages to increase or decrease speed
+    hp?: number // no of stages to increase or decrease hp
+  }
+  opponent?: {
+    attack?: number // no of stages to increase or decrease attack
+    defense?: number // no of stages to increase or decrease defense
+    speed?: number // no of stages to increase or decrease speed
+    hp?: number // no of stages to increase or decrease hp
+  }
 }

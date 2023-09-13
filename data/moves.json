@@ -1,0 +1,126 @@
+[
+  {
+    "name": "Tackle",
+    "typing": ["normal"],
+    "power": 40,
+    "accuracy": 100,
+    "pp": 35,
+    "priority": 0,
+    "type": "damage"
+  },
+  {
+    "name": "Growl",
+    "typing": ["normal"],
+    "power": 0,
+    "accuracy": 100,
+    "pp": 40,
+    "priority": 0,
+    "type": "status",
+    "opponent": {
+      "attack": -1
+    }
+  },
+  {
+    "name": "Ember",
+    "typing": ["fire"],
+    "power": 40,
+    "accuracy": 100,
+    "pp": 25,
+    "priority": 0,
+    "type": "damage",
+    "burn": 10
+  },
+  {
+    "name": "Water Gun",
+    "typing": ["water"],
+    "power": 40,
+    "accuracy": 100,
+    "pp": 25,
+    "priority": 0,
+    "type": "damage"
+  },
+  {
+    "name": "Vine Whip",
+    "typing": ["grass"],
+    "power": 45,
+    "accuracy": 100,
+    "pp": 25,
+    "priority": 0,
+    "type": "damage"
+  },
+  {
+    "name": "Thunderbolt",
+    "typing": ["electric"],
+    "power": 90,
+    "accuracy": 100,
+    "pp": 15,
+    "priority": 0,
+    "type": "damage",
+    "paralyze": 10
+  },
+  {
+    "name": "Ice Beam",
+    "typing": ["ice"],
+    "power": 90,
+    "accuracy": 100,
+    "pp": 10,
+    "priority": 0,
+    "type": "damage",
+    "freeze": 10
+  },
+  {
+    "name": "Psychic",
+    "typing": ["psychic"],
+    "power": 90,
+    "accuracy": 100,
+    "pp": 10,
+    "priority": 0,
+    "type": "damage",
+    "opponent": {
+      "defense": -1
+    }
+  },
+  {
+    "name": "Shadow Ball",
+    "typing": ["ghost"],
+    "power": 80,
+    "accuracy": 100,
+    "pp": 15,
+    "priority": 0,
+    "type": "damage",
+    "opponent": {
+      "defense": -1
+    }
+  },
+  {
+    "name": "Dragon Claw",
+    "typing": ["dragon"],
+    "power": 80,
+    "accuracy": 100,
+    "pp": 15,
+    "priority": 0,
+    "type": "damage"
+  },
+  {
+    "name": "Dark Pulse",
+    "typing": ["dark"],
+    "power": 80,
+    "accuracy": 100,
+    "pp": 15,
+    "priority": 0,
+    "type": "damage",
+    "flinch": 20
+  },
+  {
+    "name": "Moonblast",
+    "typing": ["fairy"],
+    "power": 95,
+    "accuracy": 100,
+    "pp": 15,
+    "priority": 0,
+    "type": "damage",
+    "opponent": {
+      "attack": -1
+    }
+  }
+]
