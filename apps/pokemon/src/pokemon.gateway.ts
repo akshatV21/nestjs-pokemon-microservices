@@ -127,6 +127,21 @@ export class PokemonGateway {
     }
   }
 
+  @SubscribeMessage(EVENTS.CANCEL_TRADE)
+  async handleCancelTradeEvent(payload: TradePokemonDto) {
+    const trade = this.trades.get(payload.code)
+
+    this.canTrade(payload, trade)
+    
+    const userOneSocket = this.socketSessions.getSocket(trade.userOne.id.toString())
+    const userTwoSocket = this.socketSessions.getSocket(trade.userTwo.id.toString())
+
+    userOneSocket.emit(EVENTS.TRADE_CANCELED, { message: 'The other user cancelled the trade.' })
+    userTwoSocket.emit(EVENTS.TRADE_CANCELED, { message: 'The other user cancelled the trade.' })
+
+    this.trades.delete(payload.code)
+  }
+
   private canTrade(payload: TradePokemonDto, trade: TradeInfo) {
     if (!trade) throw new WsException('Invalid trade code.')
     if (!trade.userTwo) throw new WsException('Only one user is connected.')

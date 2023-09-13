@@ -41,6 +41,8 @@ export const EVENTS = {
   CONFIRM_TRADE: 'confirm-trade',
   TRADE_CONFIRMED: 'trade-confirmed',
   TRADE_COMPLETED: 'trade-completed',
+  CANCEL_TRADE: 'cancel-trade',
+  TRADE_CANCELED: 'trade-canceled',
 } as const
 
 export const POKEMON_TYPINGS = {
