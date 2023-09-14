@@ -11,6 +11,7 @@ import { TransferPokemonDto } from './dtos/transfer-pokemon.dto'
 import { UpdateNicknameDto } from './dtos/update-nickname.dto'
 import { EventPattern, Payload } from '@nestjs/microservices'
 import { OnEvent } from '@nestjs/event-emitter'
+import { ChangeMoveDto } from './dtos/change-move.dto'
 
 @Controller('pokemon')
 export class PokemonController {
@@ -107,5 +108,12 @@ export class PokemonController {
   @OnEvent(EVENTS.POKEMON_XP_DISTRIBUTED)
   handlePokemonXpDistributedEvent(payload: PokemonLevelUp) {
     console.log(payload)
+  }
+
+  @Patch('move')
+  @Auth({ cached: false })
+  async httpChangeMove(@Body() changeMoveDto: ChangeMoveDto, @AuthUser() user: UserDocument): Promise<HttpSuccessResponse> {
+    const moveset = await this.pokemonService.changePokemonMove(changeMoveDto, user)
+    return { success: true, message: 'Pokemon move changed successfully.', data: { moveset } }
   }
 }

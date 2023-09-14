@@ -29,6 +29,7 @@ import {
   EVOLUTION_STAGES,
   TradeInfo,
   RANKING_TYPES,
+  MovesManager,
 } from '@utils/utils'
 import { ClientProxy } from '@nestjs/microservices'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
@@ -39,6 +40,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter'
 import { EvolvePokemonDto } from './dtos/evolve-pokemon.dto'
 import { Cron } from '@nestjs/schedule'
 import { RankingRepository } from '@lib/common'
+import { ChangeMoveDto } from './dtos/change-move.dto'
 
 @Injectable()
 export class PokemonService {
@@ -49,6 +51,7 @@ export class PokemonService {
     private readonly CaughtPokemonRepository: CaughtPokemonRepository,
     private readonly RankingRepository: RankingRepository,
     private readonly eventEmitter: EventEmitter2,
+    private readonly MovesManager: MovesManager,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(SERVICES.SPAWNS_SERVICE) private readonly spawnsService: ClientProxy,
   ) {}
@@ -365,5 +368,29 @@ export class PokemonService {
     } catch (error) {
       console.error(error)
     }
+  }
+
+  async changePokemonMove(changeMoveDto: ChangeMoveDto, user: UserDocument) {
+    const isCaughtByUser = user.pokemon.caught.inStorage.includes(changeMoveDto.caughtPokemonId)
+    if (!isCaughtByUser) throw new BadRequestException('You have not caught this pokemon.')
+
+    const caughtPokemon = await this.CaughtPokemonRepository.findById(changeMoveDto.caughtPokemonId, { pokemon: 1, moveset: 1, level: 1 })
+
+    if (!caughtPokemon.moveset.includes(changeMoveDto.currentMoveId))
+      throw new BadRequestException('This pokemon does not have current move.')
+    if (caughtPokemon.moveset.includes(changeMoveDto.newMoveId)) throw new BadRequestException('This pokemon already has the new move.')
+
+    const pokemonMovePool = this.MovesManager.getMovePool(caughtPokemon.pokemon.toString()).moves
+    const newMove = pokemonMovePool.find(move => move.moveId === changeMoveDto.newMoveId)
+
+    if (!newMove) throw new BadRequestException('This pokemon cannot learn this move.')
+    if (caughtPokemon.level < newMove.level)
+      throw new BadRequestException(`This pokemon needs to be atleast of level ${newMove.level} to learn this move.`)
+
+    const currentMoveIndex = caughtPokemon.moveset.findIndex(moveId => moveId === changeMoveDto.currentMoveId)
+    caughtPokemon.moveset[currentMoveIndex] = changeMoveDto.newMoveId
+
+    await caughtPokemon.save()
+    return caughtPokemon.moveset
   }
 }
