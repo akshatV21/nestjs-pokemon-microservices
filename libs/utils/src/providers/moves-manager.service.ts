@@ -38,9 +38,9 @@ export class MovesManager {
     const movePool = this.movePools[pokedexNo].moves
     const moveset: string[] = []
 
-    for (let i = 0; i < 4; i++) {
+    while (moveset.length < 4) {
       const randomMove = movePool[Math.floor(Math.random() * movePool.length)]
-      moveset.push(randomMove.moveId)
+      if (!moveset.includes(randomMove.moveId)) moveset.push(randomMove.moveId)
     }
 
     return moveset
