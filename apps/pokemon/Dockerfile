@@ -19,5 +19,6 @@ COPY /package*.json .
 RUN npm install --prod
 
 COPY --from=development /app/dist ./dist
+COPY --from=development /app/data ./dist/data
 
 CMD ["node", "dist/apps/pokemon/main"]
