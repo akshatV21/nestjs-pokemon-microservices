@@ -9,6 +9,8 @@ export class MovesManager {
   private movePools: Record<string, MovePool> = {}
 
   constructor() {
+    console.log(__dirname)
+
     this.loadMoves()
     this.loadMovePool()
 
