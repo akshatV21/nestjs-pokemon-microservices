@@ -22,7 +22,7 @@ import {
   UserSchema,
 } from '@lib/common'
 import { APP_GUARD } from '@nestjs/core'
-import { SERVICES, SocketSessions } from '@utils/utils'
+import { MovesManager, SERVICES, SocketSessions } from '@utils/utils'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { PokemonGateway } from './pokemon.gateway'
 
@@ -65,6 +65,7 @@ import { PokemonGateway } from './pokemon.gateway'
     { provide: APP_GUARD, useClass: Authorize },
     SocketSessions,
     PokemonGateway,
+    MovesManager
   ],
 })
 export class PokemonModule {}
