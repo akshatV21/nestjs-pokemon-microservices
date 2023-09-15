@@ -45,4 +45,8 @@ export class MovesManager {
 
     return moveset
   }
+
+  getMoveset(moveIds: string[]) {
+    return moveIds.map(moveId => this.moves[moveId])
+  }
 }

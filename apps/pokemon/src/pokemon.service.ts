@@ -393,4 +393,14 @@ export class PokemonService {
     await caughtPokemon.save()
     return caughtPokemon.moveset
   }
+
+  async getPokemonMoveset(caughtPokemonId: Types.ObjectId, user: UserDocument) {
+    const isCaughtByUser = user.pokemon.caught.inStorage.includes(caughtPokemonId)
+    if (!isCaughtByUser) throw new BadRequestException('You have not caught this pokemon.')
+
+    const caughtPokemon = await this.CaughtPokemonRepository.findById(caughtPokemonId, { moveset: 1 })
+    const moveset = this.MovesManager.getMoveset(caughtPokemon.moveset)
+
+    return moveset
+  }
 }

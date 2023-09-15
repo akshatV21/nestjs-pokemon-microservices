@@ -110,7 +110,18 @@ export class PokemonController {
     console.log(payload)
   }
 
-  @Patch('move')
+  // endpoint for fetching pokemon moveset
+  @Get('moves/:pokemonId')
+  @Auth({ cached: false })
+  async httpGetPokemonMoveset(
+    @Param('pokemonId', ParseObjectId) pokemonId: Types.ObjectId,
+    @AuthUser() user: UserDocument,
+  ): Promise<HttpSuccessResponse> {
+    const moveset = await this.pokemonService.getPokemonMoveset(pokemonId, user)
+    return { success: true, message: 'Pokemon moveset fetched successfully.', data: { moveset } }
+  }
+
+  @Patch('moves')
   @Auth({ cached: false })
   async httpChangeMove(@Body() changeMoveDto: ChangeMoveDto, @AuthUser() user: UserDocument): Promise<HttpSuccessResponse> {
     const moveset = await this.pokemonService.changePokemonMove(changeMoveDto, user)
