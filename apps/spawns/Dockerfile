@@ -22,8 +22,6 @@ COPY --from=development /app/dist ./dist
 
 RUN ls
 
-RUN cd ./dist
-
-RUN ls
+RUN ls ./dist
 
 CMD ["node", "dist/apps/spawns/main"]
