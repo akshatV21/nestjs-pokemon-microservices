@@ -18,7 +18,7 @@ export class UserRanking {
 
 @Schema()
 export class Ranking {
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   type: RankingType
 
   @Prop({ required: true })
