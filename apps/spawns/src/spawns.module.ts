@@ -23,7 +23,7 @@ import {
   CaughtPokemonSchema,
   CaughtPokemonRepository,
 } from '@lib/common'
-import { SERVICES, SocketSessions } from '@utils/utils'
+import { MovesManager, SERVICES, SocketSessions } from '@utils/utils'
 import { SpawnsManager } from './spawns-manager.service'
 import { APP_GUARD } from '@nestjs/core'
 import { SpawnsGateway } from './spawns.gateway'
@@ -72,6 +72,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
     { provide: APP_GUARD, useClass: Authorize },
     SpawnsGateway,
     SocketSessions,
+    MovesManager
   ],
 })
 export class SpawnsModule {}

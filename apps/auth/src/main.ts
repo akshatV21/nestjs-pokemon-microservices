@@ -5,7 +5,7 @@ import helmet from 'helmet'
 import * as morgan from 'morgan'
 import { ValidationPipe } from '@nestjs/common'
 import { RmqService } from '@lib/common'
-import { SERVICES } from '@utils/utils'
+import { MovesManager, SERVICES } from '@utils/utils'
 
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule)
@@ -14,6 +14,10 @@ async function bootstrap() {
   const configService = app.get<ConfigService>(ConfigService)
 
   const PORT = configService.get('PORT')
+  const movesManager = app.get<MovesManager>(MovesManager)
+
+  await movesManager.loadMoves()
+  await movesManager.loadMovePool()
 
   app.connectMicroservice(rmqService.getOptions(SERVICES.AUTH_SERVICE))
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))

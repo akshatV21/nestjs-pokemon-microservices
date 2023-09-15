@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Block, City } from '@utils/utils'
+import { Block, City, Move } from '@utils/utils'
 import { Types, Document } from 'mongoose'
 import { BasePokemonDocument } from './base-pokemon.model'
 
@@ -30,6 +30,9 @@ export class Spawn {
 
   @Prop({ required: true })
   isShiny: boolean
+
+  @Prop({ required: true })
+  moveset: string[]
 }
 
 export const SpawnSchema = SchemaFactory.createForClass(Spawn)

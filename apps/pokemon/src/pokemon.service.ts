@@ -11,6 +11,7 @@ import {
   UserRepository,
 } from '@lib/common'
 import { BadRequestException, Inject, Injectable } from '@nestjs/common'
+import { WsException } from '@nestjs/websockets'
 import { Types } from 'mongoose'
 import { CreatePokemonDto } from './dtos/create-pokemon.dto'
 import { CreateEvolutionLineDto } from './dtos/create-evolution-line.dto'
@@ -27,6 +28,8 @@ import {
   STAT_INCREMENT_VALUES,
   EVOLUTION_STAGES,
   TradeInfo,
+  RANKING_TYPES,
+  MovesManager,
 } from '@utils/utils'
 import { ClientProxy } from '@nestjs/microservices'
 import { AddActivePokemonDto } from './dtos/add-active-pokemon.dto'
@@ -35,6 +38,9 @@ import { TransferPokemonDto } from './dtos/transfer-pokemon.dto'
 import { UpdateNicknameDto } from './dtos/update-nickname.dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { EvolvePokemonDto } from './dtos/evolve-pokemon.dto'
+import { Cron } from '@nestjs/schedule'
+import { RankingRepository } from '@lib/common'
+import { ChangeMoveDto } from './dtos/change-move.dto'
 
 @Injectable()
 export class PokemonService {
@@ -43,7 +49,9 @@ export class PokemonService {
     private readonly EvolutionLineRepository: EvolutionLineRepository,
     private readonly UserRepository: UserRepository,
     private readonly CaughtPokemonRepository: CaughtPokemonRepository,
+    private readonly RankingRepository: RankingRepository,
     private readonly eventEmitter: EventEmitter2,
+    private readonly MovesManager: MovesManager,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(SERVICES.SPAWNS_SERVICE) private readonly spawnsService: ClientProxy,
   ) {}
@@ -298,24 +306,91 @@ export class PokemonService {
     const userOnePokemonId = tradeInfo.userOne.pokemon
     const userTwoPokemonId = tradeInfo.userTwo.pokemon
 
-    const userOneUpdatePromise = this.UserRepository.update(userOneId, {
-      $push: { 'pokemon.caught.inStorage': userTwoPokemonId },
-      $pull: { 'pokemon.caught.inStorage': userOnePokemonId },
-    })
+    const session = await this.UserRepository.startTransaction()
 
-    const userTwoUpdatePromise = this.UserRepository.update(userTwoId, {
-      $push: { 'pokemon.caught.inStorage': userOnePokemonId },
-      $pull: { 'pokemon.caught.inStorage': userTwoPokemonId },
-    })
+    try {
+      const userOnePullPromise = this.UserRepository.update(userOneId, {
+        $pull: { 'pokemon.caught.inStorage': userOnePokemonId },
+      })
+      const userOnePushPromise = this.UserRepository.update(userOneId, {
+        $push: { 'pokemon.caught.inStorage': userTwoPokemonId },
+      })
 
-    const userOnePokemonUpdatePromise = this.CaughtPokemonRepository.update(userOnePokemonId, { $set: { user: userTwoId } })
-    const userTwoPokemonUpdatePromise = this.CaughtPokemonRepository.update(userTwoPokemonId, { $set: { user: userOneId } })
+      const userTwoPullPromise = this.UserRepository.update(userTwoId, {
+        $pull: { 'pokemon.caught.inStorage': userTwoPokemonId },
+      })
+      const userTwoPushPromise = this.UserRepository.update(userTwoId, {
+        $push: { 'pokemon.caught.inStorage': userOnePokemonId },
+      })
 
-    await Promise.all([userOneUpdatePromise, userTwoUpdatePromise, userOnePokemonUpdatePromise, userTwoPokemonUpdatePromise])
+      const userOnePokemonUpdatePromise = this.CaughtPokemonRepository.update(userOnePokemonId, { $set: { user: userTwoId } })
+      const userTwoPokemonUpdatePromise = this.CaughtPokemonRepository.update(userTwoPokemonId, { $set: { user: userOneId } })
 
-    tradeInfo.userOne.pokemon = userTwoPokemonId
-    tradeInfo.userTwo.pokemon = userOnePokemonId
+      await Promise.all([
+        userOnePullPromise,
+        userOnePushPromise,
+        userTwoPullPromise,
+        userTwoPushPromise,
+        userOnePokemonUpdatePromise,
+        userTwoPokemonUpdatePromise,
+      ])
 
-    return tradeInfo
+      tradeInfo.userOne.pokemon = userTwoPokemonId
+      tradeInfo.userTwo.pokemon = userOnePokemonId
+
+      await session.commitTransaction()
+      return tradeInfo
+    } catch (error) {
+      await session.abortTransaction()
+      throw new WsException('Something went wrong while trading pokemon.')
+    }
+  }
+
+  // @Cron('0 0 0 * * *')
+  // async updateMostCaughtPokemonRankings() {
+  //   try {
+  //     const mostCaughtPokemonRanking = await this.RankingRepository.findOne({ type: RANKING_TYPES.MOST_CAUGHT_POKEMON })
+  //     const users = await this.UserRepository.aggregate([
+  //       { $project: { username: 1, pokemon: 1 } },
+  //       { $addFields: { totalPokemon: { $size: { $concatArrays: ['$pokemon.caught.inStorage', '$pokemon.caught.transferred'] } } } },
+  //       { $sort: { totalPokemon: -1 } },
+  //       { $limit: 10 },
+  //     ])
+
+  //     const newRankings = users.map(user => {
+  //       const totalPokemon = user.pokemon.caught.inStorage.length + user.pokemon.caught.transferred.length
+  //       return { _id: user._id, username: user.username, amount: totalPokemon }
+  //     })
+
+  //     await this.RankingRepository.update(mostCaughtPokemonRanking._id, {
+  //       $set: { users: newRankings },
+  //     })
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
+
+  async changePokemonMove(changeMoveDto: ChangeMoveDto, user: UserDocument) {
+    const isCaughtByUser = user.pokemon.caught.inStorage.includes(changeMoveDto.caughtPokemonId)
+    if (!isCaughtByUser) throw new BadRequestException('You have not caught this pokemon.')
+
+    const caughtPokemon = await this.CaughtPokemonRepository.findById(changeMoveDto.caughtPokemonId, { pokemon: 1, moveset: 1, level: 1 })
+
+    if (!caughtPokemon.moveset.includes(changeMoveDto.currentMoveId))
+      throw new BadRequestException('This pokemon does not have current move.')
+    if (caughtPokemon.moveset.includes(changeMoveDto.newMoveId)) throw new BadRequestException('This pokemon already has the new move.')
+
+    const pokemonMovePool = this.MovesManager.getMovePool(caughtPokemon.pokemon.toString()).moves
+    const newMove = pokemonMovePool.find(move => move.moveId === changeMoveDto.newMoveId)
+
+    if (!newMove) throw new BadRequestException('This pokemon cannot learn this move.')
+    if (caughtPokemon.level < newMove.level)
+      throw new BadRequestException(`This pokemon needs to be atleast of level ${newMove.level} to learn this move.`)
+
+    const currentMoveIndex = caughtPokemon.moveset.findIndex(moveId => moveId === changeMoveDto.currentMoveId)
+    caughtPokemon.moveset[currentMoveIndex] = changeMoveDto.newMoveId
+
+    await caughtPokemon.save()
+    return caughtPokemon.moveset
   }
 }

@@ -1,4 +1,4 @@
-import { Connection, Document, FilterQuery, Model, QueryOptions, Types, UpdateQuery } from 'mongoose'
+import { Connection, Document, FilterQuery, Model, QueryOptions, Types, UpdateQuery, PipelineStage } from 'mongoose'
 
 type ProjectionType<T> = Partial<Record<keyof T, 0 | 1>>
 
@@ -73,5 +73,9 @@ export class AbstractRepository<T extends Document, S extends Record<string, any
 
   async deleteMany(query: FilterQuery<T>) {
     return this.AbstractModel.deleteMany(query)
+  }
+
+  async aggregate(pipeline: PipelineStage[]) {
+    return this.AbstractModel.aggregate(pipeline)
   }
 }
