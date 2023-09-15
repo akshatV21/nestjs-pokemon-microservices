@@ -11,7 +11,7 @@ export class MovesManager {
   constructor() {
     this.loadMoves()
     this.loadMovePool()
-
+    console.log(this.moves)
     watch('./dist/data/moves.json').on('change', () => this.loadMoves())
     watch('./dist/data/move-pool.json').on('change', () => this.loadMovePool())
   }
