@@ -12,17 +12,17 @@ export class MovesManager {
     this.loadMoves()
     this.loadMovePool()
 
-    watch('../../../../data/moves.json').on('change', () => this.loadMoves())
-    watch('../../../../data/move-pool.json').on('change', () => this.loadMovePool())
+    watch('./dist/apps/data/moves.json').on('change', () => this.loadMoves())
+    watch('./dist/apps/data/move-pool.json').on('change', () => this.loadMovePool())
   }
 
   async loadMoves() {
-    const movesInJSON = await readFile('../../../../data/moves.json', { encoding: 'utf-8' })
+    const movesInJSON = await readFile('./dist/apps/data/moves.json', { encoding: 'utf-8' })
     this.moves = JSON.parse(movesInJSON)
   }
 
   async loadMovePool() {
-    const movePoolInJSON = await readFile('../../../../data/move-pool.json', { encoding: 'utf-8' })
+    const movePoolInJSON = await readFile('./dist/apps/data/move-pool.json', { encoding: 'utf-8' })
     this.movePools = JSON.parse(movePoolInJSON)
   }
 

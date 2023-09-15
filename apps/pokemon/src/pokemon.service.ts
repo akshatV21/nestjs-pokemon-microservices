@@ -49,7 +49,7 @@ export class PokemonService {
     private readonly EvolutionLineRepository: EvolutionLineRepository,
     private readonly UserRepository: UserRepository,
     private readonly CaughtPokemonRepository: CaughtPokemonRepository,
-    private readonly RankingRepository: RankingRepository,
+    // private readonly RankingRepository: RankingRepository,
     private readonly eventEmitter: EventEmitter2,
     private readonly MovesManager: MovesManager,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
