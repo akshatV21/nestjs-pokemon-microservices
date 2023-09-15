@@ -21,4 +21,8 @@ RUN npm install --prod
 COPY --from=development /app/dist ./dist
 COPY --from=development /app/data ./dist/data
 
+RUN ls
+
+RUN ls ./dist
+
 CMD ["node", "dist/apps/spawns/main"]
