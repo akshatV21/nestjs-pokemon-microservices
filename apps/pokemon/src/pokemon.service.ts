@@ -346,29 +346,29 @@ export class PokemonService {
     }
   }
 
-  @Cron('0 0 0 * * *')
-  async updateMostCaughtPokemonRankings() {
-    try {
-      const mostCaughtPokemonRanking = await this.RankingRepository.findOne({ type: RANKING_TYPES.MOST_CAUGHT_POKEMON })
-      const users = await this.UserRepository.aggregate([
-        { $project: { username: 1, pokemon: 1 } },
-        { $addFields: { totalPokemon: { $size: { $concatArrays: ['$pokemon.caught.inStorage', '$pokemon.caught.transferred'] } } } },
-        { $sort: { totalPokemon: -1 } },
-        { $limit: 10 },
-      ])
+  // @Cron('0 0 0 * * *')
+  // async updateMostCaughtPokemonRankings() {
+  //   try {
+  //     const mostCaughtPokemonRanking = await this.RankingRepository.findOne({ type: RANKING_TYPES.MOST_CAUGHT_POKEMON })
+  //     const users = await this.UserRepository.aggregate([
+  //       { $project: { username: 1, pokemon: 1 } },
+  //       { $addFields: { totalPokemon: { $size: { $concatArrays: ['$pokemon.caught.inStorage', '$pokemon.caught.transferred'] } } } },
+  //       { $sort: { totalPokemon: -1 } },
+  //       { $limit: 10 },
+  //     ])
 
-      const newRankings = users.map(user => {
-        const totalPokemon = user.pokemon.caught.inStorage.length + user.pokemon.caught.transferred.length
-        return { _id: user._id, username: user.username, amount: totalPokemon }
-      })
+  //     const newRankings = users.map(user => {
+  //       const totalPokemon = user.pokemon.caught.inStorage.length + user.pokemon.caught.transferred.length
+  //       return { _id: user._id, username: user.username, amount: totalPokemon }
+  //     })
 
-      await this.RankingRepository.update(mostCaughtPokemonRanking._id, {
-        $set: { users: newRankings },
-      })
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  //     await this.RankingRepository.update(mostCaughtPokemonRanking._id, {
+  //       $set: { users: newRankings },
+  //     })
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
 
   async changePokemonMove(changeMoveDto: ChangeMoveDto, user: UserDocument) {
     const isCaughtByUser = user.pokemon.caught.inStorage.includes(changeMoveDto.caughtPokemonId)
