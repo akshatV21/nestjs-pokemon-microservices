@@ -19,9 +19,6 @@ COPY /package*.json .
 RUN npm install --prod
 
 COPY --from=development /app/dist ./dist
-
-RUN ls
-
-RUN ls ./dist
+COPY --from=development /app/data ./dist/data
 
 CMD ["node", "dist/apps/spawns/main"]
