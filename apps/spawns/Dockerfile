@@ -22,7 +22,7 @@ COPY --from=development /app/dist ./dist
 
 RUN ls
 
-RUN cd /dist
+RUN cd ./dist
 
 RUN ls
 
