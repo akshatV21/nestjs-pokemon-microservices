@@ -174,7 +174,7 @@ export class SpawnsService {
         location: { city, block },
         despawnsAt: new Date(Date.now() + despawnsIn),
         isShiny,
-        moveset: this.movesManager.getPokemonRandomMoveset(randomPokemon.pokedexNo),
+        moveset: this.movesManager.getPokemonRandomMoveset(randomPokemon.id),
       },
       spawnObjectId,
     )

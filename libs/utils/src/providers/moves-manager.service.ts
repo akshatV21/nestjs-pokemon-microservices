@@ -34,8 +34,8 @@ export class MovesManager {
     return this.movePools[pokemonId]
   }
 
-  getPokemonRandomMoveset(pokedexNo: number) {
-    const movePool = this.movePools[pokedexNo].moves
+  getPokemonRandomMoveset(pokemonId: string) {
+    const movePool = this.movePools[pokemonId].moves
     const moveset: string[] = []
 
     while (moveset.length < 4) {
