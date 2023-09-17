@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Types, Document } from 'mongoose'
 import { BasePokemonDocument, PokemonStatsSchema } from './base-pokemon.model'
 import { SpawnLocationSchema } from './spawn.model'
+import { Move } from '@utils/utils'
 
 export type CaughtPokemonDocument = CaughtPokemon & Document
 
@@ -31,8 +32,8 @@ export class CaughtPokemon {
   @Prop({ required: true })
   stats: PokemonStatsSchema
 
-  @Prop({ required: true })
-  moveset: string[] // contains move ids
+  @Prop({ required: true, type: [String] })
+  moveset: string[] | Partial<Move>[] // contains move ids
 }
 
 export const CaughtPokemonSchema = SchemaFactory.createForClass(CaughtPokemon)

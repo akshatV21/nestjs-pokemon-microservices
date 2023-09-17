@@ -134,6 +134,20 @@ export class PokemonService {
 
   async getCaughtPokemonList(user: UserDocument) {
     const pokemon = await this.CaughtPokemonRepository.find({ user: user._id }, {}, { populate: { path: 'pokemon' } })
+
+    for (const currentPokemon of pokemon) {
+      const moves = this.MovesManager.getMoveset(currentPokemon.moveset as string[])
+      currentPokemon.moveset = moves.map(move => ({
+        id: move.id,
+        name: move.name,
+        description: move.description,
+        power: move.power,
+        accuracy: move.accuracy,
+        pp: move.pp,
+        type: move.type,
+      }))
+    }
+
     return pokemon
   }
 
@@ -399,7 +413,7 @@ export class PokemonService {
     if (!isCaughtByUser) throw new BadRequestException('You have not caught this pokemon.')
 
     const caughtPokemon = await this.CaughtPokemonRepository.findById(caughtPokemonId, { moveset: 1 })
-    const moveset = this.MovesManager.getMoveset(caughtPokemon.moveset)
+    const moveset = this.MovesManager.getMoveset(caughtPokemon.moveset as string[])
 
     return moveset
   }

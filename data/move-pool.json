@@ -1,6 +1,6 @@
 {
-  "1": {
-    "pokemonId": 1,
+  "64aa55eeab4fdef8b75c12ae": {
+    "pokemonId": "64aa55eeab4fdef8b75c12ae",
     "moves": [
       {
         "moveId": 7,
@@ -20,8 +20,8 @@
       }
     ]
   },
-  "2": {
-    "pokemonId": 2,
+  "64aa5612ab4fdef8b75c12b2": {
+    "pokemonId": "64aa5612ab4fdef8b75c12b2",
     "moves": [
       {
         "moveId": 7,
@@ -41,8 +41,8 @@
       }
     ]
   },
-  "3": {
-    "pokemonId": 3,
+  "64aa5633ab4fdef8b75c12b6": {
+    "pokemonId": "64aa5633ab4fdef8b75c12b6",
     "moves": [
       {
         "moveId": 6,
@@ -62,8 +62,8 @@
       }
     ]
   },
-  "4": {
-    "pokemonId": 4,
+  "64abf0964be7d77790905c7d": {
+    "pokemonId": "64abf0964be7d77790905c7d",
     "moves": [
       {
         "moveId": 2,
@@ -83,8 +83,8 @@
       }
     ]
   },
-  "5": {
-    "pokemonId": 5,
+  "64abf0d84be7d77790905c81": {
+    "pokemonId": "64abf0d84be7d77790905c81",
     "moves": [
       {
         "moveId": 3,
@@ -104,8 +104,8 @@
       }
     ]
   },
-  "6": {
-    "pokemonId": 6,
+  "64abf3334be7d77790905c85": {
+    "pokemonId": "64abf3334be7d77790905c85",
     "moves": [
       {
         "moveId": 7,
@@ -125,8 +125,8 @@
       }
     ]
   },
-  "7": {
-    "pokemonId": 7,
+  "64abf37f4be7d77790905c91": {
+    "pokemonId": "64abf37f4be7d77790905c91",
     "moves": [
       {
         "moveId": 12,
@@ -146,8 +146,8 @@
       }
     ]
   },
-  "8": {
-    "pokemonId": 8,
+  "64abf43c4be7d77790905c95": {
+    "pokemonId": "64abf43c4be7d77790905c95",
     "moves": [
       {
         "moveId": 10,
@@ -167,8 +167,8 @@
       }
     ]
   },
-  "9": {
-    "pokemonId": 9,
+  "64abf45e4be7d77790905c99": {
+    "pokemonId": "64abf45e4be7d77790905c99",
     "moves": [
       {
         "moveId": 5,
@@ -188,8 +188,8 @@
       }
     ]
   },
-  "10": {
-    "pokemonId": 10,
+  "64abf4da4be7d77790905ca6": {
+    "pokemonId": "64abf4da4be7d77790905ca6",
     "moves": [
       {
         "moveId": 3,
@@ -209,8 +209,8 @@
       }
     ]
   },
-  "11": {
-    "pokemonId": 11,
+  "64abf51f4be7d77790905caa": {
+    "pokemonId": "64abf51f4be7d77790905caa",
     "moves": [
       {
         "moveId": 7,
@@ -230,8 +230,8 @@
       }
     ]
   },
-  "12": {
-    "pokemonId": 12,
+  "64abf5484be7d77790905cad": {
+    "pokemonId": "64abf5484be7d77790905cad",
     "moves": [
       {
         "moveId": 4,
@@ -251,8 +251,8 @@
       }
     ]
   },
-  "13": {
-    "pokemonId": 13,
+  "64ac283ca7a4c2eb4c8f178a": {
+    "pokemonId": "64ac283ca7a4c2eb4c8f178a",
     "moves": [
       {
         "moveId": 10,
@@ -272,8 +272,8 @@
       }
     ]
   },
-  "14": {
-    "pokemonId": 14,
+  "64ac2a3317700c8a532a1030": {
+    "pokemonId": "64ac2a3317700c8a532a1030",
     "moves": [
       {
         "moveId": 11,
@@ -293,8 +293,8 @@
       }
     ]
   },
-  "15": {
-    "pokemonId": 15,
+  "64ac2a7017700c8a532a1033": {
+    "pokemonId": "64ac2a7017700c8a532a1033",
     "moves": [
       {
         "moveId": 6,
@@ -314,8 +314,8 @@
       }
     ]
   },
-  "16": {
-    "pokemonId": 16,
+  "64ac38359237556c0069cea9": {
+    "pokemonId": "64ac38359237556c0069cea9",
     "moves": [
       {
         "moveId": 2,
@@ -335,8 +335,8 @@
       }
     ]
   },
-  "17": {
-    "pokemonId": 17,
+  "64ac38579237556c0069ceac": {
+    "pokemonId": "64ac38579237556c0069ceac",
     "moves": [
       {
         "moveId": 1,
@@ -356,8 +356,8 @@
       }
     ]
   },
-  "18": {
-    "pokemonId": 18,
+  "64ac38749237556c0069ceaf": {
+    "pokemonId": "64ac38749237556c0069ceaf",
     "moves": [
       {
         "moveId": 3,
@@ -377,8 +377,8 @@
       }
     ]
   },
-  "19": {
-    "pokemonId": 19,
+  "64ac38ea9237556c0069ceba": {
+    "pokemonId": "64ac38ea9237556c0069ceba",
     "moves": [
       {
         "moveId": 2,
@@ -398,8 +398,8 @@
       }
     ]
   },
-  "20": {
-    "pokemonId": 20,
+  "64ac391d9237556c0069cebd": {
+    "pokemonId": "64ac391d9237556c0069cebd",
     "moves": [
       {
         "moveId": 2,
@@ -419,8 +419,8 @@
       }
     ]
   },
-  "21": {
-    "pokemonId": 21,
+  "64ac399b9237556c0069cec7": {
+    "pokemonId": "64ac399b9237556c0069cec7",
     "moves": [
       {
         "moveId": 8,
@@ -440,8 +440,8 @@
       }
     ]
   },
-  "22": {
-    "pokemonId": 22,
+  "64ac39b39237556c0069ceca": {
+    "pokemonId": "64ac39b39237556c0069ceca",
     "moves": [
       {
         "moveId": 8,
@@ -461,8 +461,8 @@
       }
     ]
   },
-  "23": {
-    "pokemonId": 23,
+  "64ac3a079237556c0069ced4": {
+    "pokemonId": "64ac3a079237556c0069ced4",
     "moves": [
       {
         "moveId": 6,
@@ -482,8 +482,8 @@
       }
     ]
   },
-  "24": {
-    "pokemonId": 24,
+  "64ac3a1f9237556c0069ced7": {
+    "pokemonId": "64ac3a1f9237556c0069ced7",
     "moves": [
       {
         "moveId": 11,
@@ -503,8 +503,8 @@
       }
     ]
   },
-  "25": {
-    "pokemonId": 25,
+  "64ac3a939237556c0069cee4": {
+    "pokemonId": "64ac3a939237556c0069cee4",
     "moves": [
       {
         "moveId": 9,
@@ -524,8 +524,8 @@
       }
     ]
   },
-  "26": {
-    "pokemonId": 26,
+  "64ac3adc9237556c0069cee7": {
+    "pokemonId": "64ac3adc9237556c0069cee7",
     "moves": [
       {
         "moveId": 10,
@@ -545,8 +545,8 @@
       }
     ]
   },
-  "27": {
-    "pokemonId": 27,
+  "64ac3c149237556c0069cef4": {
+    "pokemonId": "64ac3c149237556c0069cef4",
     "moves": [
       {
         "moveId": 8,
@@ -566,8 +566,8 @@
       }
     ]
   },
-  "28": {
-    "pokemonId": 28,
+  "64ac3c3b9237556c0069cef7": {
+    "pokemonId": "64ac3c3b9237556c0069cef7",
     "moves": [
       {
         "moveId": 6,
@@ -587,8 +587,8 @@
       }
     ]
   },
-  "29": {
-    "pokemonId": 29,
+  "64ac3c6f9237556c0069cf01": {
+    "pokemonId": "64ac3c6f9237556c0069cf01",
     "moves": [
       {
         "moveId": 12,
@@ -608,8 +608,8 @@
       }
     ]
   },
-  "30": {
-    "pokemonId": 30,
+  "64ac3c899237556c0069cf04": {
+    "pokemonId": "64ac3c899237556c0069cf04",
     "moves": [
       {
         "moveId": 7,
@@ -629,8 +629,8 @@
       }
     ]
   },
-  "31": {
-    "pokemonId": 31,
+  "64ac3cb89237556c0069cf07": {
+    "pokemonId": "64ac3cb89237556c0069cf07",
     "moves": [
       {
         "moveId": 9,
@@ -650,8 +650,8 @@
       }
     ]
   },
-  "32": {
-    "pokemonId": 32,
+  "64ac3d059237556c0069cf12": {
+    "pokemonId": "64ac3d059237556c0069cf12",
     "moves": [
       {
         "moveId": 12,
@@ -671,8 +671,8 @@
       }
     ]
   },
-  "33": {
-    "pokemonId": 33,
+  "64ac3d169237556c0069cf15": {
+    "pokemonId": "64ac3d169237556c0069cf15",
     "moves": [
       {
         "moveId": 4,
@@ -692,8 +692,8 @@
       }
     ]
   },
-  "34": {
-    "pokemonId": 34,
+  "64ac3d2e9237556c0069cf18": {
+    "pokemonId": "64ac3d2e9237556c0069cf18",
     "moves": [
       {
         "moveId": 9,
@@ -713,8 +713,8 @@
       }
     ]
   },
-  "35": {
-    "pokemonId": 35,
+  "64ac3d6f9237556c0069cf23": {
+    "pokemonId": "64ac3d6f9237556c0069cf23",
     "moves": [
       {
         "moveId": 7,
@@ -734,8 +734,8 @@
       }
     ]
   },
-  "36": {
-    "pokemonId": 36,
+  "64ac3d9a9237556c0069cf26": {
+    "pokemonId": "64ac3d9a9237556c0069cf26",
     "moves": [
       {
         "moveId": 3,
@@ -755,8 +755,8 @@
       }
     ]
   },
-  "37": {
-    "pokemonId": 37,
+  "64ac3de49237556c0069cf30": {
+    "pokemonId": "64ac3de49237556c0069cf30",
     "moves": [
       {
         "moveId": 5,
@@ -776,8 +776,8 @@
       }
     ]
   },
-  "38": {
-    "pokemonId": 38,
+  "64ac3e069237556c0069cf33": {
+    "pokemonId": "64ac3e069237556c0069cf33",
     "moves": [
       {
         "moveId": 1,
@@ -797,8 +797,8 @@
       }
     ]
   },
-  "39": {
-    "pokemonId": 39,
+  "64ac3e239237556c0069cf3d": {
+    "pokemonId": "64ac3e239237556c0069cf3d",
     "moves": [
       {
         "moveId": 3,
@@ -818,8 +818,8 @@
       }
     ]
   },
-  "40": {
-    "pokemonId": 40,
+  "64ac3e3e9237556c0069cf40": {
+    "pokemonId": "64ac3e3e9237556c0069cf40",
     "moves": [
       {
         "moveId": 1,
