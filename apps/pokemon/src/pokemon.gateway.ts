@@ -14,10 +14,11 @@ import {
   generateTradeCode,
 } from '@utils/utils'
 import { lastValueFrom } from 'rxjs'
-import { AuthorizeDto } from '@lib/common'
+import { AuthorizeDto, CaughtPokemonRepository } from '@lib/common'
 import { TradePokemonDto } from './dtos/trade-pokemon.dto'
 import { PokemonService } from './pokemon.service'
 
+@UsePipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }))
 @WebSocketGateway({ namespace: 'pokemon', cors: { origin: '*' } })
 export class PokemonGateway {
   private trades: Map<`${number}`, TradeInfo>
@@ -26,6 +27,7 @@ export class PokemonGateway {
     private socketSessions: SocketSessions,
     @Inject(SERVICES.AUTH_SERVICE) private readonly authService: ClientProxy,
     private readonly pokemonService: PokemonService,
+    private readonly CaughtPokemonRepository: CaughtPokemonRepository,
   ) {
     this.trades = new Map()
   }
@@ -88,6 +90,9 @@ export class PokemonGateway {
   async handleSelectPokemonEvent(@MessageBody() payload: TradePokemonDto) {
     const trade = this.trades.get(payload.code)
     this.canTrade(payload, trade)
+
+    const pokemon = await this.CaughtPokemonRepository.findOne({ _id: payload.pokemonId, user: payload.userId })
+    if (!pokemon) throw new WsException('You have not caught this pokemon.')
 
     if (trade.userOne.id.equals(payload.userId)) trade.userOne.pokemon = payload.pokemonId
     else trade.userTwo.pokemon = payload.pokemonId

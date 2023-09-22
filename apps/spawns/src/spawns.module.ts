@@ -59,7 +59,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
     ]),
     RmqModule.register([SERVICES.AUTH_SERVICE, SERVICES.INVENTORY_SERVICE, SERVICES.POKEMON_SERVICE]),
     RedisModule.register(),
-    EventEmitterModule.forRoot({ global: true }),
+    EventEmitterModule.forRoot(),
   ],
   controllers: [SpawnsController],
   providers: [
@@ -72,7 +72,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
     { provide: APP_GUARD, useClass: Authorize },
     SpawnsGateway,
     SocketSessions,
-    MovesManager
+    MovesManager,
   ],
 })
 export class SpawnsModule {}
