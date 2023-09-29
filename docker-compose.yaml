@@ -52,6 +52,19 @@ services:
     env_file:
       - ./apps/inventory/.env
 
+  battle:
+    build:
+      context: .
+      dockerfile: ./apps/battle/Dockerfile
+      target: development
+    command: npm run start:dev battle
+    ports:
+      - '8085:8085'
+    volumes:
+      - .:/app
+    env_file:
+      - ./apps/battle/.env
+
   mongo-server:
     image: mongo
     logging:
