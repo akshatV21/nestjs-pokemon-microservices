@@ -63,6 +63,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/inventory/tsconfig.app.json"
       }
+    },
+    "battle": {
+      "type": "application",
+      "root": "apps/battle",
+      "entryFile": "main",
+      "sourceRoot": "apps/battle/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/battle/tsconfig.app.json"
+      }
     }
   }
 }
