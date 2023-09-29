@@ -65,7 +65,7 @@ import { PokemonGateway } from './pokemon.gateway'
     { provide: APP_GUARD, useClass: Authorize },
     SocketSessions,
     PokemonGateway,
-    // MovesManager
+    MovesManager
   ],
 })
 export class PokemonModule {}
