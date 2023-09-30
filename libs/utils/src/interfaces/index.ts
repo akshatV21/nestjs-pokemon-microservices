@@ -109,7 +109,6 @@ export interface PokemonBattleInfo {
   currentHp: number
   baseStats: PokemonStatsSchema
   modifiedStats: ModifiedPokemonStats[]
-  time: Date
 }
 
 export interface PlayerBattleInfo {
@@ -117,6 +116,7 @@ export interface PlayerBattleInfo {
   username: string
   pokemon: Record<string, PokemonBattleInfo>
   onFieldPokemonId: string | null
+  time: number
 }
 
 export interface BattleInfo {

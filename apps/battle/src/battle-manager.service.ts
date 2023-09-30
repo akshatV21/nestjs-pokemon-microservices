@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common'
-import { BattleInfo, PlayerBattleInfo } from '@utils/utils'
+import crypto from 'crypto'
+import { BattleInfo, DEFAULT_VALUES, PlayerBattleInfo } from '@utils/utils'
 
 @Injectable()
 export class BattleManager {
@@ -26,6 +27,10 @@ export class BattleManager {
     this.battlesPool.push(battleInfo)
   }
 
+  private generateBattleId() {
+    return crypto.randomBytes(DEFAULT_VALUES.BATTLE_ID_LENGTH).toString('hex')
+  }
+
   joinBattle(player: PlayerBattleInfo) {
     let battle: BattleInfo
     if (this.waitingBattles.length > 0) battle = this.waitingBattles.pop()!
@@ -34,10 +39,13 @@ export class BattleManager {
     if (battle[player.id]) throw new BadRequestException('Can only play one battle at a time.')
 
     battle.players[player.id] = player
+    battle.id = this.generateBattleId()
     if (Object.keys(battle.players).length === 2) {
       battle.status = 'in-progress'
       this.liveBattles.set(battle.id, battle)
     } else this.waitingBattles.push(battle)
+
+    return battle
   }
 
   leaveBattle(battleId: string, playerId: string) {
