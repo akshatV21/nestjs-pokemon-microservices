@@ -205,3 +205,9 @@ export const MOVE_TYPES = {
   DAMAGE: 'damage',
   STATUS: 'status',
 } as const
+
+export const BATTLE_STATUS = {
+  WAITING: 'waiting',
+  IN_PROGRESS: 'in-progress',
+  COMPLETED: 'completed',
+} as const

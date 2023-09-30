@@ -26,6 +26,7 @@ import {
 import { MovesManager, SERVICES, SocketSessions } from '@utils/utils'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { APP_GUARD } from '@nestjs/core'
+import { BattleManager } from './battle-manager.service';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { APP_GUARD } from '@nestjs/core'
     { provide: APP_GUARD, useClass: Authorize },
     SocketSessions,
     MovesManager,
+    BattleManager
   ],
 })
 export class BattleModule {}
