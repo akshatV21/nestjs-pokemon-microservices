@@ -58,4 +58,12 @@ export class BattleManager {
       this.returnBattleInfoToPool(battle)
     }
   }
+
+  getWaitingBattles() {
+    return this.waitingBattles
+  }
+
+  getLiveBattles() {
+    return this.liveBattles
+  }
 }

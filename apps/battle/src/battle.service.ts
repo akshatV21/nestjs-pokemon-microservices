@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { BattleManager } from './battle-manager.service'
 import { CaughtPokemonRepository, UserDocument } from '@lib/common'
-import { DEFAULT_VALUES, PlayerBattleInfo, PokemonBattleInfo } from '@utils/utils'
+import { BattleStatus, DEFAULT_VALUES, PlayerBattleInfo, PokemonBattleInfo } from '@utils/utils'
 
 @Injectable()
 export class BattleService {
@@ -32,5 +32,10 @@ export class BattleService {
 
     const battle = this.battleManager.joinBattle(playerInfo)
     return battle
+  }
+
+  getBattleByStatus(status: BattleStatus) {
+    if (status === 'in-progress') return this.battleManager.getLiveBattles()
+    else if (status === 'waiting') return this.battleManager.getWaitingBattles()
   }
 }
