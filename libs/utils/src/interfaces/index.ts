@@ -1,6 +1,7 @@
 import { Socket } from 'socket.io'
-import { Block, City, MoveType, PokemonTyping } from '../types'
+import { BattleStatus, Block, City, MoveType, PokemonTyping } from '../types'
 import { Types } from 'mongoose'
+import { PokemonStatsSchema } from '@lib/common'
 
 export interface HttpSuccessResponse {
   success: boolean
@@ -84,4 +85,43 @@ export interface MovePool {
     moveId: string
     level: number
   }[]
+}
+
+export interface ModifiedPokemonStats {
+  attack: {
+    current: number
+    stages: number
+  }
+  defense: {
+    current: number
+    stages: number
+  }
+  speed: {
+    current: number
+    stages: number
+  }
+}
+
+export interface PokemonBattleInfo {
+  id: string
+  level: number
+  moves: string[]
+  currentHp: number
+  baseStats: PokemonStatsSchema
+  modifiedStats: ModifiedPokemonStats[]
+}
+
+export interface PlayerBattleInfo {
+  id: string
+  username: string
+  pokemon: Record<string, PokemonBattleInfo>
+  onFieldPokemonId: string | null
+  time: number
+}
+
+export interface BattleInfo {
+  id: string
+  status: BattleStatus
+  players: Record<string, PlayerBattleInfo>
+  turns: number
 }

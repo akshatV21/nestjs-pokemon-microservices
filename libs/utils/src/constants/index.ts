@@ -6,6 +6,8 @@ export const DEFAULT_VALUES = {
   ACTIVE_POKEMON_LIMIT: 6,
   MIN_LEVEL: 1,
   MAX_LEVEL: 40,
+  BATTLE_TIMEOUT: 180,
+  BATTLE_ID_LENGTH: 8,
 } as const
 
 export const REQUEST_TYPES = ['http', 'rpc', 'ws'] as const
@@ -204,4 +206,10 @@ export const RANKING_TYPES = {
 export const MOVE_TYPES = {
   DAMAGE: 'damage',
   STATUS: 'status',
+} as const
+
+export const BATTLE_STATUS = {
+  WAITING: 'waiting',
+  IN_PROGRESS: 'in-progress',
+  COMPLETED: 'completed',
 } as const
