@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common'
 import { SpawnsController } from './spawns.controller'
 import { SpawnsService } from './spawns.service'
 import { ConfigModule } from '@nestjs/config'
-import Joi from 'joi'
+import * as Joi from 'joi'
 import {
   BasePokemon,
   BasePokemonRepository,
