@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common'
-import crypto from 'crypto'
+import { randomBytes } from 'crypto'
 import { BattleInfo, DEFAULT_VALUES, PlayerBattleInfo } from '@utils/utils'
 
 @Injectable()
@@ -28,7 +28,7 @@ export class BattleManager {
   }
 
   private generateBattleId() {
-    return crypto.randomBytes(DEFAULT_VALUES.BATTLE_ID_LENGTH).toString('hex')
+    return randomBytes(DEFAULT_VALUES.BATTLE_ID_LENGTH).toString('hex')
   }
 
   joinBattle(player: PlayerBattleInfo) {
