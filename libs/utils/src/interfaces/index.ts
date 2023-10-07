@@ -125,3 +125,9 @@ export interface BattleInfo {
   players: Record<string, PlayerBattleInfo>
   turns: number
 }
+
+export interface SelectFirstPokemon {
+  pokemonId: string
+  playerId: string
+  battleId: string
+}

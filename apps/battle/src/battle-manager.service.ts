@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common'
 import { randomBytes } from 'crypto'
 import { BattleInfo, DEFAULT_VALUES, PlayerBattleInfo } from '@utils/utils'
+import { WsException } from '@nestjs/websockets'
 
 @Injectable()
 export class BattleManager {
@@ -40,7 +41,7 @@ export class BattleManager {
 
     battle.players[player.id] = player
     if (Object.keys(battle.players).length === 2) {
-      battle.status = 'in-progress'
+      battle.status = 'starting'
       this.liveBattles.set(battle.id, battle)
     } else {
       battle.id = this.generateBattleId()
@@ -67,5 +68,28 @@ export class BattleManager {
 
   getLiveBattles() {
     return this.liveBattles
+  }
+
+  selectFirstPokemon(battleId: string, playerId: string, pokemonId: string) {
+    let isInProgress = false
+
+    const battle = this.liveBattles.get(battleId)
+    if (!battle) throw new WsException('Battle not found.')
+
+    const player = battle.players[playerId]
+    const secondPlayerId = Object.keys(battle.players).find(id => id !== playerId)!
+
+    if (!player) throw new WsException('Player not found.')
+    if (player.onFieldPokemonId) throw new WsException('You has already selected a pokemon.')
+    if (!Object.keys(player.pokemon).includes(pokemonId)) throw new WsException('You do not have this pokemon in your team.')
+
+    player.onFieldPokemonId = pokemonId
+    if (battle.players[playerId].onFieldPokemonId && battle.players[secondPlayerId].onFieldPokemonId) {
+      battle.status = 'in-progress'
+      isInProgress = true
+    }
+
+    this.liveBattles.set(battleId, battle)
+    return isInProgress
   }
 }

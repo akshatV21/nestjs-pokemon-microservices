@@ -47,6 +47,8 @@ export const EVENTS = {
   CANCEL_TRADE: 'cancel-trade',
   TRADE_CANCELED: 'trade-canceled',
   USER_JOINED_BATTLE: 'user-joined-battle',
+  FIRST_POKE_SELECTED: 'first-poke-selected',
+  BATTLE_STARTED: 'battle-started',
 } as const
 
 export const POKEMON_TYPINGS = {
@@ -211,6 +213,7 @@ export const MOVE_TYPES = {
 
 export const BATTLE_STATUS = {
   WAITING: 'waiting',
+  STARTING: 'starting',
   IN_PROGRESS: 'in-progress',
   COMPLETED: 'completed',
 } as const
