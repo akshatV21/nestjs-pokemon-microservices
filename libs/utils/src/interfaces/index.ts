@@ -131,3 +131,9 @@ export interface SelectFirstPokemon {
   playerId: string
   battleId: string
 }
+
+export interface UpdatePlayerTimer {
+  battleId: string
+  playerId: string
+  time: number
+}

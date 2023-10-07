@@ -49,6 +49,9 @@ export const EVENTS = {
   USER_JOINED_BATTLE: 'user-joined-battle',
   FIRST_POKE_SELECTED: 'first-poke-selected',
   BATTLE_STARTED: 'battle-started',
+  UPDATE_PLAYER_TIMER: 'update-player-timer',
+  PLAYER_TIMER_UPDATED: 'player-timer-updated',
+  BATTLE_ENDED: 'battle-ended',
 } as const
 
 export const POKEMON_TYPINGS = {

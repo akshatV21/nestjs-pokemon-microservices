@@ -11,6 +11,7 @@ import {
   SERVICES,
   SelectFirstPokemon,
   SocketSessions,
+  UpdatePlayerTimer,
   catchAuthErrors,
 } from '@utils/utils'
 import { lastValueFrom } from 'rxjs'
@@ -52,5 +53,28 @@ export class BattleGateway {
   handleFirstPokeSelectedEvent(@MessageBody() payload: SelectFirstPokemon) {
     const battle = this.battleManager.selectFirstPokemon(payload.battleId, payload.playerId, payload.pokemonId)
     if (battle) this.server.to(payload.battleId).emit(EVENTS.BATTLE_STARTED, payload)
+  }
+
+  @SubscribeMessage(EVENTS.UPDATE_PLAYER_TIMER)
+  handleUpdateBattleTimerEvent(@MessageBody() payload: UpdatePlayerTimer) {
+    let message: string
+    const { username, time: remainingTime, battleId } = this.battleManager.updateTimer(payload.battleId, payload.playerId, payload.time)
+
+    if (remainingTime <= 0) {
+      message = `${username} has no time left.`
+      this.handlePlayerTimeout(battleId, payload.playerId)
+    } else if (remainingTime <= 10) message = `${username} has 10 seconds left.`
+    else if (remainingTime <= 30) message = `${username} has 30 seconds left.`
+    else if (remainingTime <= 60) message = `${username} has 1 minute left.`
+    else if (remainingTime <= 120) message = `${username} has 2 minutes left.`
+
+    if (message) this.server.to(battleId).emit(EVENTS.PLAYER_TIMER_UPDATED, { battleId: payload.battleId, message })
+  }
+
+  handlePlayerTimeout(battleId: string, playerId: string) {
+    const players = this.battleManager.endBattle(battleId)
+    const winnerPlayerId = Object.values(players).find(player => player.id !== playerId)
+
+    this.server.to(battleId).emit(EVENTS.BATTLE_ENDED, { battleId, winner: winnerPlayerId })
   }
 }

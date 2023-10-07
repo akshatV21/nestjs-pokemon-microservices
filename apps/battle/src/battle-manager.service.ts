@@ -92,4 +92,27 @@ export class BattleManager {
     this.liveBattles.set(battleId, battle)
     return isInProgress ? battle : null
   }
+
+  updateTimer(battleId: string, playerId: string, time: number) {
+    const battle = this.liveBattles.get(battleId)
+    if (!battle) throw new WsException('Battle not found.')
+
+    const player = battle.players[playerId]
+    if (!player) throw new WsException('Player not found.')
+
+    player.time = time
+    this.liveBattles.set(battleId, battle)
+
+    return { username: player.username, time: DEFAULT_VALUES.BATTLE_TIMEOUT - time, battleId }
+  }
+
+  endBattle(battleId: string) {
+    const battle = this.liveBattles.get(battleId)
+    if (!battle) throw new WsException('Battle not found.')
+
+    this.liveBattles.delete(battleId)
+    this.returnBattleInfoToPool(battle)
+
+    return battle.players
+  }
 }
