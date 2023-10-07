@@ -46,6 +46,7 @@ export const EVENTS = {
   TRADE_COMPLETED: 'trade-completed',
   CANCEL_TRADE: 'cancel-trade',
   TRADE_CANCELED: 'trade-canceled',
+  USER_JOINED_BATTLE: 'user-joined-battle',
 } as const
 
 export const POKEMON_TYPINGS = {

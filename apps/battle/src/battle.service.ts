@@ -2,11 +2,16 @@ import { Injectable } from '@nestjs/common'
 import { Types } from 'mongoose'
 import { BattleManager } from './battle-manager.service'
 import { CaughtPokemonRepository, UserDocument } from '@lib/common'
-import { BattleStatus, DEFAULT_VALUES, PlayerBattleInfo } from '@utils/utils'
+import { BattleStatus, DEFAULT_VALUES, EVENTS, PlayerBattleInfo } from '@utils/utils'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
 export class BattleService {
-  constructor(private readonly battleManager: BattleManager, private readonly CaughtPokemonRepository: CaughtPokemonRepository) {}
+  constructor(
+    private readonly battleManager: BattleManager,
+    private readonly CaughtPokemonRepository: CaughtPokemonRepository,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   async join(user: UserDocument) {
     const pokemonBattleInfo = {}
@@ -35,6 +40,8 @@ export class BattleService {
     }
 
     const battle = this.battleManager.joinBattle(playerInfo)
+    this.eventEmitter.emitAsync(EVENTS.USER_JOINED_BATTLE, user._id.toString(), battle)
+
     return battle
   }
 
