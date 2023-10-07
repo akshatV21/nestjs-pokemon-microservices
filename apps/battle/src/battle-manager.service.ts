@@ -90,6 +90,6 @@ export class BattleManager {
     }
 
     this.liveBattles.set(battleId, battle)
-    return isInProgress
+    return isInProgress ? battle : null
   }
 }

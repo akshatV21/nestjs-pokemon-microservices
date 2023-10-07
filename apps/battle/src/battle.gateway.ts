@@ -50,7 +50,7 @@ export class BattleGateway {
 
   @SubscribeMessage(EVENTS.FIRST_POKE_SELECTED)
   handleFirstPokeSelectedEvent(@MessageBody() payload: SelectFirstPokemon) {
-    const isInProgress = this.battleManager.selectFirstPokemon(payload.battleId, payload.playerId, payload.pokemonId)
-    if (isInProgress) this.server.to(payload.battleId).emit(EVENTS.BATTLE_STARTED, payload)
+    const battle = this.battleManager.selectFirstPokemon(payload.battleId, payload.playerId, payload.pokemonId)
+    if (battle) this.server.to(payload.battleId).emit(EVENTS.BATTLE_STARTED, payload)
   }
 }
