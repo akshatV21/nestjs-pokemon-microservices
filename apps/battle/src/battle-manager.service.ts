@@ -39,11 +39,13 @@ export class BattleManager {
     if (battle[player.id]) throw new BadRequestException('Can only play one battle at a time.')
 
     battle.players[player.id] = player
-    battle.id = this.generateBattleId()
     if (Object.keys(battle.players).length === 2) {
       battle.status = 'in-progress'
       this.liveBattles.set(battle.id, battle)
-    } else this.waitingBattles.push(battle)
+    } else {
+      battle.id = this.generateBattleId()
+      this.waitingBattles.push(battle)
+    }
 
     return battle
   }
