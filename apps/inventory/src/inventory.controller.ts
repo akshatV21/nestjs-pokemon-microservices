@@ -11,7 +11,7 @@ export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
   @Get('drops')
-  @Auth()
+  @Auth({ cached: false })
   async httpGetDrops(@AuthUser() user: UserDocument): Promise<HttpSuccessResponse> {
     const drops = await this.inventoryService.drops(user)
     return { success: true, message: 'Fetch drops successfully.', data: { drops } }

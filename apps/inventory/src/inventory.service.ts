@@ -18,8 +18,6 @@ export class InventoryService {
       throw new BadRequestException('No space left in your inventory.')
     }
 
-    console.log(totalItems, user.inventory.storageLimit, totalItems >= user.inventory.storageLimit)
-
     // Initialize the dropped items object.
     const drops: Record<Item, number> = {
       pokeballs: 0,
