@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { BattleManager } from './battle-manager.service'
 import { CaughtPokemonRepository, UserDocument } from '@lib/common'
-import { BattleStatus, DEFAULT_VALUES, PlayerBattleInfo, PokemonBattleInfo } from '@utils/utils'
+import { BattleStatus, DEFAULT_VALUES, PlayerBattleInfo } from '@utils/utils'
 
 @Injectable()
 export class BattleService {
