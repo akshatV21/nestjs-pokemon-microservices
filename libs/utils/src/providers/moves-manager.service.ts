@@ -40,8 +40,6 @@ export class MovesManager {
     const movePool = this.movePools[pokemonId].moves
     const moveset: string[] = []
 
-    console.log(pokemonId)
-
     while (moveset.length < 4) {
       const randomMove = movePool[Math.floor(Math.random() * movePool.length)]
       if (!moveset.includes(randomMove.moveId)) moveset.push(randomMove.moveId)
