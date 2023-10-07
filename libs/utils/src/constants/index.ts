@@ -52,6 +52,7 @@ export const EVENTS = {
   UPDATE_PLAYER_TIMER: 'update-player-timer',
   PLAYER_TIMER_UPDATED: 'player-timer-updated',
   BATTLE_ENDED: 'battle-ended',
+  GET_BATTLE_INFO: 'get-battle-info',
 } as const
 
 export const POKEMON_TYPINGS = {

@@ -115,4 +115,8 @@ export class BattleManager {
 
     return battle.players
   }
+
+  getBattle(battleId: string) {
+    return this.liveBattles.get(battleId)
+  }
 }

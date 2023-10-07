@@ -77,4 +77,12 @@ export class BattleGateway {
 
     this.server.to(battleId).emit(EVENTS.BATTLE_ENDED, { battleId, winner: winnerPlayerId })
   }
+
+  @SubscribeMessage(EVENTS.GET_BATTLE_INFO)
+  handleGetBattleInfoEvent(@MessageBody() battleId: string) {
+    const battle = this.battleManager.getBattle(battleId)
+    if (!battle) throw new WsException('Battle not found.')
+
+    return battle
+  }
 }
