@@ -201,10 +201,10 @@ export const PER_ITEM_COSTS = {
   goldenRazzBerry: 0.8,
 } as const
 
-// export const RANKING_TYPES = {
-//   MOST_CAUGHT_POKEMON: 'most-caught-pokemon',
-//   MOST_XP: 'most-xp',
-// } as const
+export const RANKING_TYPES = {
+  MOST_CAUGHT_POKEMON: 'most-caught-pokemon',
+  MOST_XP: 'most-xp',
+} as const
 
 export const MOVE_TYPES = {
   DAMAGE: 'damage',

@@ -28,6 +28,7 @@ import {
   STAT_INCREMENT_VALUES,
   EVOLUTION_STAGES,
   TradeInfo,
+  RANKING_TYPES,
   MovesManager,
 } from '@utils/utils'
 import { ClientProxy } from '@nestjs/microservices'
