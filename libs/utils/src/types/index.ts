@@ -8,7 +8,6 @@ import {
   ITEMS,
   MOVE_TYPES,
   POKEMON_TYPINGS,
-  RANKING_TYPES,
   SERVICES,
 } from '../constants'
 import { Types } from 'mongoose'
@@ -41,7 +40,7 @@ export type Ball = (typeof BALLS)[number]
 
 export type Berry = (typeof BERRIES)[number]
 
-export type RankingType = ObjectValuesUnion<typeof RANKING_TYPES>
+// export type RankingType = ObjectValuesUnion<typeof RANKING_TYPES>
 
 export type MoveType = ObjectValuesUnion<typeof MOVE_TYPES>
 
