@@ -73,9 +73,9 @@ export class BattleGateway {
 
   handlePlayerTimeout(battleId: string, playerId: string) {
     const players = this.battleManager.endBattle(battleId)
-    const winnerPlayerId = Object.values(players).find(player => player.id !== playerId)
+    const winner = Object.values(players).find(player => player.id !== playerId)
 
-    this.server.to(battleId).emit(EVENTS.BATTLE_ENDED, { battleId, winner: winnerPlayerId })
+    this.server.to(battleId).emit(EVENTS.BATTLE_ENDED, { battleId, winner })
   }
 
   @SubscribeMessage(EVENTS.GET_BATTLE_INFO)
