@@ -112,6 +112,9 @@ export class BattleGateway {
     const loserPoints = loser.points - POINTS[reason]
     const winnerPoints = winner.points + POINTS[reason]
 
+    messages.push(`${loser.username} lost ${POINTS[reason]} points.`)
+    messages.push(`${winner.username} gained ${POINTS[reason]} points.`)
+
     const loserRank = loserPoints < POINTS_TO_RANK_UP[loser.rank] ? RANKING_ORDER_DESC[loser.rank] : loser.rank
     const winnerRank = winnerPoints >= POINTS_TO_RANK_UP[winner.rank] ? RANKING_ORDER_ASC[winner.rank] : winner.rank
 
@@ -119,8 +122,15 @@ export class BattleGateway {
     if (winner.rank !== winnerRank) messages.push(`${winner.username} has been promoted to ${winnerRank} rank.`)
 
     try {
-      const loserUpdatePromise = this.UserRepository.update(loser.id, { $set: { points: loserPoints, rank: loserRank } })
-      const winnerUpdatePromise = this.UserRepository.update(winner.id, { $set: { points: winnerPoints, rank: winnerRank } })
+      const loserUpdatePromise = this.UserRepository.update(loser.id, {
+        $set: { 'battle.points': loserPoints, 'battle.rank': loserRank },
+        $inc: { 'battle.stats.lost': 1 },
+      })
+
+      const winnerUpdatePromise = this.UserRepository.update(winner.id, {
+        $set: { 'battle.points': winnerPoints, 'battle.rank': winnerRank },
+        $inc: { 'battle.stats.won': 1 },
+      })
 
       await Promise.all([loserUpdatePromise, winnerUpdatePromise])
       await session.commitTransaction()
