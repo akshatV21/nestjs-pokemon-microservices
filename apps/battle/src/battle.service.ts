@@ -38,6 +38,7 @@ export class BattleService {
       onFieldPokemonId: null,
       time: DEFAULT_VALUES.BATTLE_TIMEOUT,
       points: user.battle.points,
+      rank: user.battle.rank,
     }
 
     const battle = this.battleManager.joinBattle(playerInfo)

@@ -57,12 +57,30 @@ class InventorySchema {
 }
 
 @Schema({ _id: false })
+class BattleStatsSchema {
+  @Prop({ default: 0 })
+  played: number
+
+  @Prop({ default: 0 })
+  won: number
+
+  @Prop({ default: 0 })
+  lost: number
+
+  @Prop({ default: 0 })
+  draw: number
+}
+
+@Schema({ _id: false })
 class BattleSchema {
   @Prop({ default: 0 })
   points: number
 
   @Prop({ default: RANKS.BRONZE })
   rank: Rank
+
+  @Prop({ default: new BattleStatsSchema() })
+  stats: BattleStatsSchema
 }
 
 @Schema({ timestamps: true })
