@@ -9,6 +9,7 @@ import {
   BattleInfo,
   EVENTS,
   EXCEPTION_MSGS,
+  PlayerTimedOut,
   SERVICES,
   SelectFirstPokemon,
   SocketSessions,
@@ -69,19 +70,17 @@ export class BattleGateway {
     if (message) this.server.to(battleId).emit(EVENTS.PLAYER_TIMER_UPDATED, { battleId: payload.battleId, message })
   }
 
-  handlePlayerTimeout(battleId: string, playerId: string) {
-    const players = this.battleManager.endBattle(battleId)
-    const winner = Object.values(players).find(player => player.id !== playerId)
-
-    this.server.to(battleId).emit(EVENTS.BATTLE_ENDED, { battleId, winner })
-  }
-
   @SubscribeMessage(EVENTS.GET_BATTLE_INFO)
   handleGetBattleInfoEvent(@MessageBody() battleId: string) {
     const battle = this.battleManager.getBattle(battleId)
     if (!battle) throw new WsException('Battle not found.')
 
     return battle
+  }
+
+  @SubscribeMessage(EVENTS.PLAYER_TIMED_OUT)
+  handlePlayerTimeoutEvent(@MessageBody() payload: PlayerTimedOut) {
+    this.endBattle(payload.battleId, 'timeout', payload.playerId)
   }
 
   endBattle(battleId: string, reason: BattleEndingReason, playerId: string) {

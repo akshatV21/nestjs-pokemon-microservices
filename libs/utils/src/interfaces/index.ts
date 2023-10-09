@@ -137,3 +137,8 @@ export interface UpdatePlayerTimer {
   playerId: string
   time: number
 }
+
+export interface PlayerTimedOut {
+  battleId: string
+  playerId: string
+}
