@@ -119,4 +119,8 @@ export class BattleManager {
   getBattle(battleId: string) {
     return this.liveBattles.get(battleId)
   }
+
+  getBattleByPlayerId(playerId: string) {
+    return [...this.liveBattles.values()].find(battle => Object.keys(battle.players).includes(playerId))
+  }
 }

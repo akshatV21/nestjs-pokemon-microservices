@@ -48,6 +48,20 @@ export class BattleGateway {
     this.socketSessions.setSocket(response.user, socket)
   }
 
+  async handleDisconnect(socket: AuthenticatedSocket) {
+    const token = socket.handshake.auth.token || socket.handshake.headers.token
+    if (!token) throw new WsException(EXCEPTION_MSGS.NULL_TOKEN)
+
+    const response = await lastValueFrom(
+      this.authService.send<any, AuthorizeDto>(EVENTS.AUTHORIZE, { token, requestType: 'ws', cached: false }),
+    ).catch(err => catchAuthErrors(err, 'ws'))
+
+    const battle = this.battleManager.getBattleByPlayerId(response.user)
+    if (battle) this.endBattle(battle.id, 'disconnect', response.user)
+
+    this.socketSessions.removeSocket(response.user)
+  }
+
   @OnEvent(EVENTS.USER_JOINED_BATTLE)
   joinBattleRoom(userId: string, battle: BattleInfo) {
     const socket = this.socketSessions.getSocket(userId)
