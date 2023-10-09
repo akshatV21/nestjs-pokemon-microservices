@@ -103,7 +103,7 @@ export class BattleManager {
     player.time = time
     this.liveBattles.set(battleId, battle)
 
-    return { username: player.username, time: DEFAULT_VALUES.BATTLE_TIMEOUT - time, battleId }
+    return { username: player.username, time, battleId }
   }
 
   endBattle(battleId: string) {
