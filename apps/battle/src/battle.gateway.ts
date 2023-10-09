@@ -5,6 +5,7 @@ import { ClientProxy } from '@nestjs/microservices'
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, WsException, MessageBody } from '@nestjs/websockets'
 import {
   AuthenticatedSocket,
+  BattleEndingReason,
   BattleInfo,
   EVENTS,
   EXCEPTION_MSGS,
@@ -60,8 +61,7 @@ export class BattleGateway {
     let message: string
     const { username, time: remainingTime, battleId } = this.battleManager.updateTimer(payload.battleId, payload.playerId, payload.time)
 
-    if (remainingTime <= 0) message = `${username} has no time left.`
-    else if (remainingTime <= 10) message = `${username} has less than 10 seconds left.`
+    if (remainingTime <= 10) message = `${username} has less than 10 seconds left.`
     else if (remainingTime <= 30) message = `${username} has less than 30 seconds left.`
     else if (remainingTime <= 60) message = `${username} has less than 1 minute left.`
     else if (remainingTime <= 120) message = `${username} has less than 2 minutes left.`
@@ -82,5 +82,28 @@ export class BattleGateway {
     if (!battle) throw new WsException('Battle not found.')
 
     return battle
+  }
+
+  endBattle(battleId: string, reason: BattleEndingReason, playerId: string) {
+    const messages = []
+    const players = this.battleManager.endBattle(battleId)
+    const winner = Object.values(players).find(player => player.id !== playerId)
+    const loser = players[playerId]
+
+    if (reason === 'timeout') {
+      messages.push(`${loser.username} has no time left.`)
+      messages.push(`${winner.username} won the battle!`)
+    } else if (reason === 'surrender') {
+      messages.push(`${loser.username} surrendered.`)
+      messages.push(`${winner.username} won the battle!`)
+    } else if (reason === 'disconnect') {
+      messages.push(`${loser.username} disconnected.`)
+      messages.push(`${winner.username} won the battle!`)
+    } else if (reason === 'all-pokemon-fainted') {
+      messages.push(`${loser.username}'s all pokemon fainted.`)
+      messages.push(`${winner.username} won the battle!`)
+    }
+
+    this.server.to(battleId).emit(EVENTS.BATTLE_ENDED, { battleId, messages })
   }
 }

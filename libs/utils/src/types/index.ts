@@ -1,5 +1,6 @@
 import {
   BALLS,
+  BATTLE_ENDING_REASONS,
   BATTLE_STATUS,
   BERRIES,
   BLOCKS_VALUE,
@@ -46,3 +47,5 @@ export type RankingType = ObjectValuesUnion<typeof RANKING_TYPES>
 export type MoveType = ObjectValuesUnion<typeof MOVE_TYPES>
 
 export type BattleStatus = ObjectValuesUnion<typeof BATTLE_STATUS>
+
+export type BattleEndingReason = ObjectValuesUnion<typeof BATTLE_ENDING_REASONS>

@@ -221,3 +221,10 @@ export const BATTLE_STATUS = {
   IN_PROGRESS: 'in-progress',
   COMPLETED: 'completed',
 } as const
+
+export const BATTLE_ENDING_REASONS = {
+  TIMEOUT: 'timeout',
+  SURRENDER: 'surrender',
+  DISCONNECT: 'disconnect',
+  ALL_POKEMON_FAINTED: 'all-pokemon-fainted',
+} as const
