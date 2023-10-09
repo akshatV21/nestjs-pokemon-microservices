@@ -239,6 +239,22 @@ export const RANKS = {
   ELITE: 'elite',
 } as const
 
+export const RANKING_ORDER_ASC = {
+  bronze: 'silver',
+  silver: 'gold',
+  gold: 'platinum',
+  platinum: 'diamond',
+  diamond: 'elite',
+} as const
+
+export const RANKING_ORDER_DESC = {
+  elite: 'diamond',
+  diamond: 'platinum',
+  platinum: 'gold',
+  gold: 'silver',
+  silver: 'bronze',
+} as const
+
 export const POINTS_TO_RANK_UP = {
   BRONZE: 0,
   SILVER: 100,
@@ -246,4 +262,11 @@ export const POINTS_TO_RANK_UP = {
   PLATINUM: 800,
   DIAMOND: 1400,
   ELITE: 2000,
+} as const
+
+export const POINTS = {
+  timeout: 10,
+  disconnect: 5,
+  surrender: 15,
+  'all-pokemon-fainted': 20,
 } as const

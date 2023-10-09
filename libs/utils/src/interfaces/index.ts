@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io'
-import { BattleStatus, Block, City, MoveType, PokemonTyping } from '../types'
+import { BattleStatus, Block, City, MoveType, PokemonTyping, Rank } from '../types'
 import { Types } from 'mongoose'
 import { PokemonStatsSchema } from '@lib/common'
 
@@ -117,6 +117,8 @@ export interface PlayerBattleInfo {
   pokemon: Record<string, PokemonBattleInfo>
   onFieldPokemonId: string | null
   time: number
+  points: number
+  rank: Rank
 }
 
 export interface BattleInfo {

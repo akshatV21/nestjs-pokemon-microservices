@@ -1,4 +1,4 @@
-import { AuthorizeDto } from '@lib/common'
+import { AuthorizeDto, UserRepository } from '@lib/common'
 import { UsePipes, ValidationPipe, Inject } from '@nestjs/common'
 import { OnEvent } from '@nestjs/event-emitter'
 import { ClientProxy } from '@nestjs/microservices'
@@ -9,7 +9,11 @@ import {
   BattleInfo,
   EVENTS,
   EXCEPTION_MSGS,
+  POINTS,
+  POINTS_TO_RANK_UP,
   PlayerTimedOut,
+  RANKING_ORDER_ASC,
+  RANKING_ORDER_DESC,
   SERVICES,
   SelectFirstPokemon,
   SocketSessions,
@@ -29,6 +33,7 @@ export class BattleGateway {
   constructor(
     private socketSessions: SocketSessions,
     private readonly battleManager: BattleManager,
+    private readonly UserRepository: UserRepository,
     @Inject(SERVICES.AUTH_SERVICE) private readonly authService: ClientProxy,
   ) {}
 
@@ -83,7 +88,7 @@ export class BattleGateway {
     this.endBattle(payload.battleId, 'timeout', payload.playerId)
   }
 
-  endBattle(battleId: string, reason: BattleEndingReason, playerId: string) {
+  async endBattle(battleId: string, reason: BattleEndingReason, playerId: string) {
     const messages = []
     const players = this.battleManager.endBattle(battleId)
     const winner = Object.values(players).find(player => player.id !== playerId)
@@ -103,6 +108,27 @@ export class BattleGateway {
       messages.push(`${winner.username} won the battle!`)
     }
 
-    this.server.to(battleId).emit(EVENTS.BATTLE_ENDED, { battleId, messages })
+    const session = await this.UserRepository.startTransaction()
+    const loserPoints = loser.points - POINTS[reason]
+    const winnerPoints = winner.points + POINTS[reason]
+
+    const loserRank = loserPoints < POINTS_TO_RANK_UP[loser.rank] ? RANKING_ORDER_DESC[loser.rank] : loser.rank
+    const winnerRank = winnerPoints >= POINTS_TO_RANK_UP[winner.rank] ? RANKING_ORDER_ASC[winner.rank] : winner.rank
+
+    if (loser.rank !== loserRank) messages.push(`${loser.username} has been demoted to ${loserRank} rank.`)
+    if (winner.rank !== winnerRank) messages.push(`${winner.username} has been promoted to ${winnerRank} rank.`)
+
+    try {
+      const loserUpdatePromise = this.UserRepository.update(loser.id, { $set: { points: loserPoints, rank: loserRank } })
+      const winnerUpdatePromise = this.UserRepository.update(winner.id, { $set: { points: winnerPoints, rank: winnerRank } })
+
+      await Promise.all([loserUpdatePromise, winnerUpdatePromise])
+      await session.commitTransaction()
+
+      this.server.to(battleId).emit(EVENTS.BATTLE_ENDED, { battleId, messages })
+    } catch (error) {
+      await session.abortTransaction()
+      throw new WsException('Error while ending battle.')
+    }
   }
 }
