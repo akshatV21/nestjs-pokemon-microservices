@@ -10,6 +10,7 @@ import {
   MOVE_TYPES,
   POKEMON_TYPINGS,
   RANKING_TYPES,
+  RANKS,
   SERVICES,
 } from '../constants'
 import { Types } from 'mongoose'
@@ -49,3 +50,5 @@ export type MoveType = ObjectValuesUnion<typeof MOVE_TYPES>
 export type BattleStatus = ObjectValuesUnion<typeof BATTLE_STATUS>
 
 export type BattleEndingReason = ObjectValuesUnion<typeof BATTLE_ENDING_REASONS>
+
+export type Rank = ObjectValuesUnion<typeof RANKS>

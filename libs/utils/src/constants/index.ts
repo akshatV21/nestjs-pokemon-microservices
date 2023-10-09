@@ -229,3 +229,21 @@ export const BATTLE_ENDING_REASONS = {
   DISCONNECT: 'disconnect',
   ALL_POKEMON_FAINTED: 'all-pokemon-fainted',
 } as const
+
+export const RANKS = {
+  BRONZE: 'bronze',
+  SILVER: 'silver',
+  GOLD: 'gold',
+  PLATINUM: 'platinum',
+  DIAMOND: 'diamond',
+  ELITE: 'elite',
+} as const
+
+export const POINTS_TO_RANK_UP = {
+  BRONZE: 0,
+  SILVER: 100,
+  GOLD: 400,
+  PLATINUM: 800,
+  DIAMOND: 1400,
+  ELITE: 2000,
+} as const

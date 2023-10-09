@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { DEFAULT_VALUES } from '@utils/utils'
+import { DEFAULT_VALUES, RANKS, Rank } from '@utils/utils'
 import { hashSync } from 'bcrypt'
 import { Types, Document } from 'mongoose'
 
@@ -56,6 +56,15 @@ class InventorySchema {
   storageLimit: number
 }
 
+@Schema({ _id: false })
+class BattleSchema {
+  @Prop({ default: 0 })
+  points: number
+
+  @Prop({ default: RANKS.BRONZE })
+  rank: Rank
+}
+
 @Schema({ timestamps: true })
 export class User {
   @Prop({ required: true })
@@ -72,6 +81,9 @@ export class User {
 
   @Prop({ default: new InventorySchema() })
   inventory?: InventorySchema
+
+  @Prop({ default: new BattleSchema() })
+  battle?: BattleSchema
 }
 
 const UserSchema = SchemaFactory.createForClass(User)
