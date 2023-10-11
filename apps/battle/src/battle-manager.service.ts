@@ -123,4 +123,21 @@ export class BattleManager {
   getBattleByPlayerId(playerId: string) {
     return [...this.liveBattles.values()].find(battle => Object.keys(battle.players).includes(playerId))
   }
+
+  selectMove(battleId: string, playerId: string, moveId: string) {
+    const battle = this.liveBattles.get(battleId)
+    if (!battle) throw new WsException('Battle not found.')
+
+    const player = battle.players[playerId]
+    if (!player) throw new WsException('Player not found.')
+
+    const pokemon = player.pokemon[player.onFieldPokemonId!]
+    if (!pokemon) throw new WsException(`${player.username} does not have a pokemon on field.`)
+
+    battle.players[playerId].selectedMoveId = moveId
+    this.liveBattles.set(battleId, battle)
+
+    const opponentId = Object.keys(battle.players).find(id => id !== playerId)!
+    return battle.players[opponentId].selectedMoveId ? battle : null
+  }
 }

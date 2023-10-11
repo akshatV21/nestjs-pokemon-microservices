@@ -39,6 +39,7 @@ export class BattleService {
       time: DEFAULT_VALUES.BATTLE_TIMEOUT,
       points: user.battle.points,
       rank: user.battle.rank,
+      selectedMoveId: null,
     }
 
     const battle = this.battleManager.joinBattle(playerInfo)

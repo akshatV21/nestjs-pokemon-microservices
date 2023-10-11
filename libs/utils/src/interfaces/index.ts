@@ -116,6 +116,7 @@ export interface PlayerBattleInfo {
   username: string
   pokemon: Record<string, PokemonBattleInfo>
   onFieldPokemonId: string | null
+  selectedMoveId: string | null
   time: number
   points: number
   rank: Rank
@@ -143,4 +144,10 @@ export interface UpdatePlayerTimer {
 export interface PlayerTimedOut {
   battleId: string
   playerId: string
+}
+
+export interface SelectMove {
+  battleId: string
+  playerId: string
+  moveId: string
 }

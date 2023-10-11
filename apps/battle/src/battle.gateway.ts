@@ -16,6 +16,7 @@ import {
   RANKING_ORDER_DESC,
   SERVICES,
   SelectFirstPokemon,
+  SelectMove,
   SocketSessions,
   UpdatePlayerTimer,
   catchAuthErrors,
@@ -97,12 +98,20 @@ export class BattleGateway {
     return battle
   }
 
+  @SubscribeMessage(EVENTS.SELECT_MOVE)
+  handleSelectMoveEvent(@MessageBody() payload: SelectMove) {
+    const battle = this.battleManager.selectMove(payload.battleId, payload.playerId, payload.moveId)
+    if (battle) this.handleBothPlayersSelectedMoveEvent(battle)
+  }
+
   @SubscribeMessage(EVENTS.PLAYER_TIMED_OUT)
   handlePlayerTimeoutEvent(@MessageBody() payload: PlayerTimedOut) {
     this.endBattle(payload.battleId, 'timeout', payload.playerId)
   }
 
-  async endBattle(battleId: string, reason: BattleEndingReason, playerId: string) {
+  private handleBothPlayersSelectedMoveEvent(battle: BattleInfo) {}
+
+  private async endBattle(battleId: string, reason: BattleEndingReason, playerId: string) {
     const messages = []
     const players = this.battleManager.endBattle(battleId)
     const winner = Object.values(players).find(player => player.id !== playerId)
