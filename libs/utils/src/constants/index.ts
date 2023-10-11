@@ -272,3 +272,202 @@ export const POINTS = {
   surrender: 15,
   'all-pokemon-fainted': 20,
 } as const
+
+export const STAGE_MODIFIERS = {
+  0: 1,
+  1: 1.5,
+  2: 2,
+  3: 2.5,
+  4: 3,
+} as const
+
+export const NEG_STAGE_MODIFIERS = {
+  0: 1,
+  1: 0.66,
+  2: 0.5,
+  3: 0.4,
+  4: 0.33,
+} as const
+
+export const STATUS_CONDITIONS = {
+  PARALYZE: 'paralyze',
+  POISON: 'poison',
+  BURN: 'burn',
+  FREEZE: 'freeze',
+  SLEEP: 'sleep',
+} as const
+
+export const STATUS_CONDITION_PAST = {
+  paralyze: 'paralyzed',
+  poison: 'poisoned',
+  burn: 'burned',
+  freeze: 'frozen',
+  sleep: 'asleep',
+} as const
+
+export const TYPE_CHART = {
+  normal: {},
+  fire: {
+    grass: 'super-effective',
+    ice: 'super-effective',
+    bug: 'super-effective',
+    steel: 'super-effective',
+    rock: 'not-very-effective',
+    dragon: 'not-very-effective',
+    fire: 'not-very-effective',
+    water: 'not-very-effective',
+    ground: 'not-very-effective',
+  },
+  water: {
+    fire: 'super-effective',
+    ground: 'super-effective',
+    rock: 'super-effective',
+    water: 'not-very-effective',
+    grass: 'not-very-effective',
+    dragon: 'not-very-effective',
+    electric: 'not-very-effective',
+  },
+  grass: {
+    water: 'super-effective',
+    ground: 'super-effective',
+    rock: 'super-effective',
+    grass: 'not-very-effective',
+    fire: 'not-very-effective',
+    bug: 'not-very-effective',
+    dragon: 'not-very-effective',
+    flying: 'not-very-effective',
+    poison: 'not-very-effective',
+    steel: 'not-very-effective',
+  },
+  electric: {
+    water: 'super-effective',
+    flying: 'super-effective',
+    electric: 'not-very-effective',
+    ground: 'not-very-effective',
+  },
+  ice: {
+    grass: 'super-effective',
+    ground: 'super-effective',
+    flying: 'super-effective',
+    dragon: 'super-effective',
+    fire: 'not-very-effective',
+    water: 'not-very-effective',
+    ice: 'not-very-effective',
+    steel: 'not-very-effective',
+  },
+  fighting: {
+    normal: 'super-effective',
+    ice: 'super-effective',
+    rock: 'super-effective',
+    dark: 'super-effective',
+    steel: 'not-very-effective',
+    flying: 'not-very-effective',
+    poison: 'not-very-effective',
+    psychic: 'not-very-effective',
+    fairy: 'not-very-effective',
+  },
+  poison: {
+    grass: 'super-effective',
+    fairy: 'super-effective',
+    poison: 'not-very-effective',
+    ground: 'not-very-effective',
+    rock: 'not-very-effective',
+    ghost: 'not-very-effective',
+  },
+  ground: {
+    fire: 'super-effective',
+    electric: 'super-effective',
+    poison: 'super-effective',
+    rock: 'super-effective',
+    steel: 'super-effective',
+    flying: 'not-very-effective',
+    bug: 'not-very-effective',
+    grass: 'not-very-effective',
+  },
+  flying: {
+    grass: 'super-effective',
+    fighting: 'super-effective',
+    bug: 'super-effective',
+    flying: 'not-very-effective',
+    electric: 'not-very-effective',
+    rock: 'not-very-effective',
+  },
+  psychic: {
+    fighting: 'super-effective',
+    poison: 'super-effective',
+    psychic: 'not-very-effective',
+    dark: 'not-very-effective',
+    steel: 'not-very-effective',
+  },
+  bug: {
+    grass: 'super-effective',
+    psychic: 'super-effective',
+    dark: 'super-effective',
+    fire: 'not-very-effective',
+    fighting: 'not-very-effective',
+    flying: 'not-very-effective',
+    poison: 'not-very-effective',
+    ghost: 'not-very-effective',
+    steel: 'not-very-effective',
+    fairy: 'not-very-effective',
+  },
+  rock: {
+    fire: 'super-effective',
+    ice: 'super-effective',
+    flying: 'super-effective',
+    bug: 'super-effective',
+    fighting: 'not-very-effective',
+    ground: 'not-very-effective',
+    steel: 'not-very-effective',
+  },
+  ghost: {
+    psychic: 'super-effective',
+    ghost: 'super-effective',
+    dark: 'not-very-effective',
+    normal: 'not-very-effective',
+  },
+  dragon: {
+    dragon: 'super-effective',
+    steel: 'not-very-effective',
+    fairy: 'not-very-effective',
+  },
+  dark: {
+    psychic: 'super-effective',
+    ghost: 'super-effective',
+    fighting: 'not-very-effective',
+    dark: 'not-very-effective',
+    fairy: 'not-very-effective',
+  },
+  steel: {
+    ice: 'super-effective',
+    rock: 'super-effective',
+    fairy: 'super-effective',
+    steel: 'not-very-effective',
+    fire: 'not-very-effective',
+    water: 'not-very-effective',
+    electric: 'not-very-effective',
+  },
+  fairy: {
+    fighting: 'super-effective',
+    dragon: 'super-effective',
+    dark: 'super-effective',
+    poison: 'not-very-effective',
+    steel: 'not-very-effective',
+    fire: 'not-very-effective',
+  },
+} as const
+
+export const EFFECTIVENESS_MODIFIERS = {
+  'super-effective': 1.5,
+  'not-very-effective': 0.5,
+  nuetral: 1,
+} as const
+
+export const CRITICAL_HIT_CHANCE = 0.1
+
+export const STATUS_DAMANGE = {
+  burn: 5,
+  poison: 10,
+} as const
+
+export const STAT_NAMES = ['attack', 'defense', 'speed'] as const

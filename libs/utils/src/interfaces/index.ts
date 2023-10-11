@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io'
-import { BattleStatus, Block, City, MoveType, PokemonTyping, Rank } from '../types'
+import { BattleStatus, Block, City, MoveType, PokemonTyping, Rank, StatusCondition } from '../types'
 import { Types } from 'mongoose'
 import { PokemonStatsSchema } from '@lib/common'
 
@@ -51,7 +51,7 @@ export interface Move {
   id: string
   name: string
   description: string
-  typing: PokemonTyping[]
+  typing: PokemonTyping
   power: number
   accuracy: number
   pp: number
@@ -69,13 +69,11 @@ export interface Move {
     attack?: number // no of stages to increase or decrease attack
     defense?: number // no of stages to increase or decrease defense
     speed?: number // no of stages to increase or decrease speed
-    hp?: number // no of stages to increase or decrease hp
   }
   opponent?: {
     attack?: number // no of stages to increase or decrease attack
     defense?: number // no of stages to increase or decrease defense
     speed?: number // no of stages to increase or decrease speed
-    hp?: number // no of stages to increase or decrease hp
   }
 }
 
@@ -104,11 +102,14 @@ export interface ModifiedPokemonStats {
 
 export interface PokemonBattleInfo {
   id: string
+  name: string
+  typings: PokemonTyping[]
   level: number
   moves: string[]
   currentHp: number
   baseStats: PokemonStatsSchema
-  modifiedStats: ModifiedPokemonStats[]
+  modifiedStats: ModifiedPokemonStats
+  status: StatusCondition | null
 }
 
 export interface PlayerBattleInfo {
@@ -150,4 +151,18 @@ export interface SelectMove {
   battleId: string
   playerId: string
   moveId: string
+}
+
+export interface TurnStage {
+  from: string
+  to: string
+  missed: boolean
+  damage?: number
+  critical?: boolean
+  effectiveness?: 'super-effective' | 'not-very-effective' | 'nuetral'
+  fainted: boolean
+  failed?: boolean
+  status?: StatusCondition
+  statChanges?: Record<string, Partial<ModifiedPokemonStats>>
+  messages: string[]
 }

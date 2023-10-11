@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Types } from 'mongoose'
 import { BattleManager } from './battle-manager.service'
-import { CaughtPokemonRepository, UserDocument } from '@lib/common'
+import { BasePokemonDocument, CaughtPokemonRepository, UserDocument } from '@lib/common'
 import { BattleStatus, DEFAULT_VALUES, EVENTS, PlayerBattleInfo } from '@utils/utils'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 
@@ -17,17 +17,25 @@ export class BattleService {
     const pokemonBattleInfo = {}
     const pokemon = await this.CaughtPokemonRepository.find(
       { _id: { $in: user.pokemon.active.map(id => new Types.ObjectId(id)) } },
-      { level: 1, moveset: 1, stats: 1 },
+      { level: 1, moveset: 1, stats: 1, nickname: 1, pokemon: 1 },
+      { populate: { path: 'pokemon', select: 'typings' } },
     )
 
     pokemon.forEach(pokemon => {
       pokemonBattleInfo[pokemon._id.toString()] = {
         id: pokemon._id.toString(),
+        name: pokemon.nickname,
+        typings: [],
         level: pokemon.level,
         moves: pokemon.moveset,
         currentHp: pokemon.stats.hp,
         baseStats: pokemon.stats,
-        modifiedStats: [],
+        modifiedStats: {
+          attack: { current: pokemon.stats.attack, stages: 0 },
+          defense: { current: pokemon.stats.defence, stages: 0 },
+          speed: { current: pokemon.stats.speed, stages: 0 },
+        },
+        status: null,
       }
     })
 

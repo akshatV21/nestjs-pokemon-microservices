@@ -12,6 +12,7 @@ import {
   RANKING_TYPES,
   RANKS,
   SERVICES,
+  STATUS_CONDITIONS,
 } from '../constants'
 import { Types } from 'mongoose'
 
@@ -52,3 +53,7 @@ export type BattleStatus = ObjectValuesUnion<typeof BATTLE_STATUS>
 export type BattleEndingReason = ObjectValuesUnion<typeof BATTLE_ENDING_REASONS>
 
 export type Rank = ObjectValuesUnion<typeof RANKS>
+
+export type Effectiveness = 'not-very-effective' | 'super-effective' | 'nuetral'
+
+export type StatusCondition = ObjectValuesUnion<typeof STATUS_CONDITIONS>
