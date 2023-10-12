@@ -166,3 +166,17 @@ export interface TurnStage {
   statChanges?: Record<string, Partial<ModifiedPokemonStats>>
   messages: string[]
 }
+
+export interface TurnInfo {
+  player1?: PlayerBattleInfo
+  player2?: PlayerBattleInfo
+  pokemon1?: PokemonBattleInfo
+  pokemon2?: PokemonBattleInfo
+  pokemon1Move?: Move
+  msgs?: string[]
+  stageInTurn?: TurnStage
+  player?: PlayerBattleInfo
+  pokemon?: PokemonBattleInfo
+  move?: Move
+  target?: 'user' | 'opponent'
+}

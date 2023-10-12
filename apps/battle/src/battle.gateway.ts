@@ -30,6 +30,7 @@ import {
   SocketSessions,
   StatusCondition,
   TYPE_CHART,
+  TurnInfo,
   TurnStage,
   UpdatePlayerTimer,
   catchAuthErrors,
@@ -143,288 +144,144 @@ export class BattleGateway {
     const pokemonToMoveFirst = pokemon1IsFaster ? player1Pokemon : player2Pokemon
     const pokemonToMoveSecond = pokemon1IsFaster ? player2Pokemon : player1Pokemon
 
-    const firstStagesMsgs = [`${pokemonToMoveFirst.name} used ${pokemon1Move.name}.`]
-    const firstStageInTurn: TurnStage = {
-      from: pokemonToMoveFirst.id,
-      to: pokemonToMoveSecond.id,
-      missed: false,
-      fainted: false,
-      messages: firstStagesMsgs,
-    }
+    const firstStageInTurn: TurnStage = this.getStageInTurn({
+      pokemon1: pokemonToMoveFirst,
+      pokemon2: pokemonToMoveSecond,
+      pokemon1Move,
+      player1,
+      player2,
+    })
 
-    const pokemon1MoveMissed = Math.random() * 100 > pokemon1Move.accuracy
-    if (pokemon1MoveMissed) {
-      firstStagesMsgs.push(`${pokemonToMoveFirst.name}'s missed its ${pokemon1Move.name}.`)
-      firstStageInTurn.missed = true
-    } else {
-      let damage = Math.floor(
-        (pokemonToMoveFirst.modifiedStats.attack.current / pokemonToMoveSecond.modifiedStats.defense.current) * pokemon1Move.power,
-      )
-
-      let effectiveness: Effectiveness
-      for (const type of player1Pokemon.typings) {
-        const currentEffectiveness = TYPE_CHART[pokemon1Move.typing][type]
-
-        if (!effectiveness) effectiveness = currentEffectiveness
-        else if (currentEffectiveness === 'super-effective' && effectiveness === 'not-very-effective') effectiveness = 'nuetral'
-        else if (currentEffectiveness === 'not-very-effective' && effectiveness === 'super-effective') effectiveness = 'nuetral'
-        else if (currentEffectiveness === 'super-effective' && effectiveness === 'nuetral') effectiveness = 'super-effective'
-        else if (currentEffectiveness === 'not-very-effective' && effectiveness === 'nuetral') effectiveness = 'not-very-effective'
-      }
-
-      damage = Math.floor(damage * EFFECTIVENESS_MODIFIERS[effectiveness])
-      damage = player1Pokemon.typings.includes(pokemon1Move.typing) ? Math.floor(damage * 1.5) : damage
-
-      const isCriticalHit = Math.random() <= CRITICAL_HIT_CHANCE
-      if (isCriticalHit) damage = Math.floor(damage * 1.5)
-
-      pokemonToMoveSecond.currentHp -= damage
-      firstStagesMsgs.push(`${pokemonToMoveSecond.name}'s hp was reduced to ${pokemonToMoveSecond.currentHp}.`)
-
-      if (effectiveness === 'super-effective' || effectiveness === 'not-very-effective') firstStagesMsgs.push(`It was ${effectiveness}!`)
-      if (isCriticalHit) firstStagesMsgs.push(`It was a critical hit!`)
-
-      firstStageInTurn.damage = damage
-      firstStageInTurn.effectiveness = effectiveness
-      firstStageInTurn.critical = isCriticalHit
-
-      if (pokemonToMoveSecond.currentHp <= 0) {
-        firstStagesMsgs.push(`${pokemonToMoveSecond.name} fainted!`)
-        firstStageInTurn.fainted = true
-      }
-
-      if (!firstStageInTurn.fainted) {
-        let statusCondition: StatusCondition
-        for (const status of Object.values(STATUS_CONDITIONS)) {
-          const canStatusChance = pokemon1Move[status]
-          if (canStatusChance && Math.random() * 100 <= canStatusChance) {
-            statusCondition = status
-            break
-          }
-        }
-
-        const gotStatusConditionThisTurn = statusCondition && !pokemonToMoveSecond.status
-        player2Pokemon.status = gotStatusConditionThisTurn ? statusCondition : player2Pokemon.status
-
-        if (gotStatusConditionThisTurn) {
-          firstStagesMsgs.push(`${pokemonToMoveSecond.name} was ${STATUS_CONDITION_PAST[statusCondition]}!`)
-
-          if (statusCondition === 'burn')
-            player2Pokemon.modifiedStats.attack.current = Math.floor(player2Pokemon.modifiedStats.attack.current * 0.5)
-
-          if (statusCondition === 'paralyze')
-            player2Pokemon.modifiedStats.speed.current = Math.floor(player2Pokemon.modifiedStats.speed.current * 0.5)
-        }
-
-        if (pokemon1Move.user) {
-          for (const stat of STAT_NAMES) {
-            if (player1Pokemon.modifiedStats[stat].stages >= 6 || player1Pokemon.modifiedStats[stat].stages <= -6) {
-              firstStagesMsgs.push(`${pokemonToMoveFirst.name}'s ${stat} cannot go any higher!`)
-              continue
-            }
-
-            let stage: number
-            const statChangeDirection = pokemon1Move.user[stat]! > 0 ? 'increased' : 'decreased'
-
-            if (statChangeDirection === 'increased') {
-              stage = Math.min(pokemon1Move.user[stat]!, 6 - player1Pokemon.modifiedStats[stat].stages)
-              player1Pokemon.modifiedStats[stat].stages += stage
-              player1Pokemon.modifiedStats[stat].current = Math.floor(player1Pokemon.modifiedStats[stat].current * STAGE_MODIFIERS[stage])
-            } else {
-              stage = Math.abs(Math.max(pokemon1Move.user[stat]!, -6 - player1Pokemon.modifiedStats[stat].stages))
-              player1Pokemon.modifiedStats[stat].stages -= stage
-              player1Pokemon.modifiedStats[stat].current = Math.floor(
-                player1Pokemon.modifiedStats[stat].current * NEG_STAGE_MODIFIERS[stage],
-              )
-            }
-
-            if (!firstStageInTurn.statChanges[player1.id]) firstStageInTurn.statChanges[player1.id] = {}
-            firstStageInTurn.statChanges[player1.id][stat] = {
-              current: player1Pokemon.modifiedStats[stat].current,
-              stages: player1Pokemon.modifiedStats[stat].stages,
-            }
-
-            firstStagesMsgs.push(`${pokemonToMoveFirst.name}'s ${stat} ${statChangeDirection} by ${stage} stages!`)
-          }
-        }
-
-        if (pokemon1Move.opponent) {
-          for (const stat of STAT_NAMES) {
-            if (player2Pokemon.modifiedStats[stat].stages >= 6 || player2Pokemon.modifiedStats[stat].stages <= -6) {
-              firstStagesMsgs.push(`${pokemonToMoveFirst.name}'s ${stat} cannot go any higher!`)
-              continue
-            }
-
-            let stage: number
-            const statChangeDirection = pokemon2Move.user[stat]! > 0 ? 'increased' : 'decreased'
-
-            if (statChangeDirection === 'increased') {
-              stage = Math.min(pokemon2Move.user[stat]!, 6 - player2Pokemon.modifiedStats[stat].stages)
-              player2Pokemon.modifiedStats[stat].stages += stage
-              player2Pokemon.modifiedStats[stat].current = Math.floor(player2Pokemon.modifiedStats[stat].current * STAGE_MODIFIERS[stage])
-            } else {
-              stage = Math.abs(Math.max(pokemon2Move.user[stat]!, -6 - player2Pokemon.modifiedStats[stat].stages))
-              player2Pokemon.modifiedStats[stat].stages -= stage
-              player2Pokemon.modifiedStats[stat].current = Math.floor(
-                player2Pokemon.modifiedStats[stat].current * NEG_STAGE_MODIFIERS[stage],
-              )
-            }
-
-            if (!firstStageInTurn.statChanges[player1.id]) firstStageInTurn.statChanges[player1.id] = {}
-            firstStageInTurn.statChanges[player1.id][stat] = {
-              current: player2Pokemon.modifiedStats[stat].current,
-              stages: player2Pokemon.modifiedStats[stat].stages,
-            }
-
-            firstStagesMsgs.push(`${pokemonToMoveFirst.name}'s ${stat} ${statChangeDirection} by ${stage} stages!`)
-          }
-        }
-      }
-    }
-
-    const secondStagesMsgs = [`${pokemonToMoveSecond.name} used ${pokemon2Move.name}.`]
-    const secondStageInTurn: TurnStage = {
-      from: pokemonToMoveSecond.id,
-      to: pokemonToMoveFirst.id,
-      missed: false,
-      fainted: false,
-      messages: secondStagesMsgs,
-    }
-
-    const pokemon2MoveMissed = Math.random() * 100 > pokemon2Move.accuracy
-    if (pokemon2MoveMissed) {
-      secondStagesMsgs.push(`${pokemonToMoveSecond.name}'s missed its ${pokemon2Move.name}.`)
-      secondStageInTurn.missed = true
-    } else {
-      let damage = Math.floor(
-        (pokemonToMoveSecond.modifiedStats.attack.current / pokemonToMoveFirst.modifiedStats.defense.current) * pokemon2Move.power,
-      )
-
-      let effectiveness: Effectiveness
-      for (const type of player2Pokemon.typings) {
-        const currentEffectiveness = TYPE_CHART[pokemon2Move.typing][type]
-
-        if (!effectiveness) effectiveness = currentEffectiveness
-        else if (currentEffectiveness === 'super-effective' && effectiveness === 'not-very-effective') effectiveness = 'nuetral'
-        else if (currentEffectiveness === 'not-very-effective' && effectiveness === 'super-effective') effectiveness = 'nuetral'
-        else if (currentEffectiveness === 'super-effective' && effectiveness === 'nuetral') effectiveness = 'super-effective'
-        else if (currentEffectiveness === 'not-very-effective' && effectiveness === 'nuetral') effectiveness = 'not-very-effective'
-      }
-
-      damage = Math.floor(damage * EFFECTIVENESS_MODIFIERS[effectiveness])
-      damage = player2Pokemon.typings.includes(pokemon2Move.typing) ? Math.floor(damage * 1.5) : damage
-
-      const isCriticalHit = Math.random() <= CRITICAL_HIT_CHANCE
-      if (isCriticalHit) damage = Math.floor(damage * 1.5)
-
-      pokemonToMoveFirst.currentHp -= damage
-      secondStagesMsgs.push(`${pokemonToMoveFirst.name}'s hp was reduced to ${pokemonToMoveFirst.currentHp}.`)
-
-      if (effectiveness === 'super-effective' || effectiveness === 'not-very-effective') secondStagesMsgs.push(`It was ${effectiveness}!`)
-      if (isCriticalHit) secondStagesMsgs.push(`It was a critical hit!`)
-
-      secondStageInTurn.damage = damage
-      secondStageInTurn.effectiveness = effectiveness
-      secondStageInTurn.critical = isCriticalHit
-
-      if (pokemonToMoveFirst.currentHp <= 0) {
-        secondStagesMsgs.push(`${pokemonToMoveFirst.name} fainted!`)
-        secondStageInTurn.fainted = true
-      }
-
-      if (!secondStageInTurn.fainted) {
-        let statusCondition: StatusCondition
-        for (const status of Object.values(STATUS_CONDITIONS)) {
-          const canStatusChance = pokemon2Move[status]
-          if (canStatusChance && Math.random() * 100 <= canStatusChance) {
-            statusCondition = status
-            break
-          }
-        }
-
-        const gotStatusConditionThisTurn = statusCondition && !pokemonToMoveFirst.status
-        player1Pokemon.status = gotStatusConditionThisTurn ? statusCondition : player1Pokemon.status
-
-        if (gotStatusConditionThisTurn) {
-          secondStagesMsgs.push(`${pokemonToMoveFirst.name} was ${STATUS_CONDITION_PAST[statusCondition]}!`)
-
-          if (statusCondition === 'burn')
-            player1Pokemon.modifiedStats.attack.current = Math.floor(player1Pokemon.modifiedStats.attack.current * 0.5)
-
-          if (statusCondition === 'paralyze')
-            player1Pokemon.modifiedStats.speed.current = Math.floor(player1Pokemon.modifiedStats.speed.current * 0.5)
-        }
-
-        if (pokemon2Move.user) {
-          for (const stat of STAT_NAMES) {
-            if (player2Pokemon.modifiedStats[stat].stages >= 6 || player2Pokemon.modifiedStats[stat].stages <= -6) {
-              secondStagesMsgs.push(`${pokemonToMoveSecond.name}'s ${stat} cannot go any higher!`)
-              continue
-            }
-
-            let stage: number
-            const statChangeDirection = pokemon2Move.user[stat]! > 0 ? 'increased' : 'decreased'
-
-            if (statChangeDirection === 'increased') {
-              stage = Math.min(pokemon2Move.user[stat]!, 6 - player2Pokemon.modifiedStats[stat].stages)
-              player2Pokemon.modifiedStats[stat].stages += stage
-              player2Pokemon.modifiedStats[stat].current = Math.floor(player2Pokemon.modifiedStats[stat].current * STAGE_MODIFIERS[stage])
-            } else {
-              stage = Math.abs(Math.max(pokemon2Move.user[stat]!, -6 - player2Pokemon.modifiedStats[stat].stages))
-              player2Pokemon.modifiedStats[stat].stages -= stage
-              player2Pokemon.modifiedStats[stat].current = Math.floor(
-                player2Pokemon.modifiedStats[stat].current * NEG_STAGE_MODIFIERS[stage],
-              )
-            }
-
-            if (!secondStageInTurn.statChanges[player2.id]) secondStageInTurn.statChanges[player2.id] = {}
-            secondStageInTurn.statChanges[player2.id][stat] = {
-              current: player2Pokemon.modifiedStats[stat].current,
-              stages: player2Pokemon.modifiedStats[stat].stages,
-            }
-
-            secondStagesMsgs.push(`${pokemonToMoveSecond.name}'s ${stat} ${statChangeDirection} by ${stage} stages!`)
-          }
-        }
-
-        if (pokemon2Move.opponent) {
-          for (const stat of STAT_NAMES) {
-            if (player1Pokemon.modifiedStats[stat].stages >= 6 || player1Pokemon.modifiedStats[stat].stages <= -6) {
-              secondStagesMsgs.push(`${pokemonToMoveSecond.name}'s ${stat} cannot go any higher!`)
-              continue
-            }
-
-            let stage: number
-            const statChangeDirection = pokemon1Move.user[stat]! > 0 ? 'increased' : 'decreased'
-
-            if (statChangeDirection === 'increased') {
-              stage = Math.min(pokemon1Move.user[stat]!, 6 - player1Pokemon.modifiedStats[stat].stages)
-              player1Pokemon.modifiedStats[stat].stages += stage
-              player1Pokemon.modifiedStats[stat].current = Math.floor(player1Pokemon.modifiedStats[stat].current * STAGE_MODIFIERS[stage])
-            } else {
-              stage = Math.abs(Math.max(pokemon1Move.user[stat]!, -6 - player1Pokemon.modifiedStats[stat].stages))
-              player1Pokemon.modifiedStats[stat].stages -= stage
-              player1Pokemon.modifiedStats[stat].current = Math.floor(
-                player1Pokemon.modifiedStats[stat].current * NEG_STAGE_MODIFIERS[stage],
-              )
-            }
-
-            if (!secondStageInTurn.statChanges[player2.id]) secondStageInTurn.statChanges[player2.id] = {}
-            secondStageInTurn.statChanges[player2.id][stat] = {
-              current: player1Pokemon.modifiedStats[stat].current,
-              stages: player1Pokemon.modifiedStats[stat].stages,
-            }
-
-            secondStagesMsgs.push(`${pokemonToMoveSecond.name}'s ${stat} ${statChangeDirection} by ${stage} stages!`)
-          }
-        }
-      }
-    }
+    const secondStageInTurn: TurnStage = this.getStageInTurn({
+      pokemon1: pokemonToMoveSecond,
+      pokemon2: pokemonToMoveFirst,
+      pokemon1Move,
+      player1,
+      player2,
+    })
 
     turn.push(firstStageInTurn)
     turn.push(secondStageInTurn)
 
     this.server.to(battle.id).emit(EVENTS.MOVES_SELECTED_BY_BOTH_PLAYERS, { battleId: battle.id, turn })
+  }
+
+  private getStageInTurn({ pokemon1, pokemon2, pokemon1Move, player1, player2 }: TurnInfo) {
+    const msgs = [`${pokemon1.name} used ${pokemon1Move.name}.`]
+    const stageInTurn: TurnStage = {
+      from: pokemon1.id,
+      to: pokemon2.id,
+      missed: false,
+      fainted: false,
+      messages: msgs,
+    }
+
+    const pokemon1MoveMissed = Math.random() * 100 > pokemon1Move.accuracy
+    if (pokemon1MoveMissed) {
+      msgs.push(`${pokemon1.name}'s missed its ${pokemon1Move.name}.`)
+      stageInTurn.missed = true
+    } else {
+      let damage = Math.floor((pokemon1.modifiedStats.attack.current / pokemon2.modifiedStats.defense.current) * pokemon1Move.power)
+      const effectiveness = this.movesManager.getEffectiveness(pokemon1Move, pokemon2.typings)
+
+      damage = Math.floor(damage * EFFECTIVENESS_MODIFIERS[effectiveness])
+      damage = pokemon1.typings.includes(pokemon1Move.typing) ? Math.floor(damage * 1.5) : damage
+
+      const isCriticalHit = Math.random() <= CRITICAL_HIT_CHANCE
+      if (isCriticalHit) damage = Math.floor(damage * 1.5)
+
+      pokemon2.currentHp -= damage
+      msgs.push(`${pokemon2.name}'s hp was reduced to ${pokemon2.currentHp}.`)
+
+      if (effectiveness === 'super-effective' || effectiveness === 'not-very-effective') msgs.push(`It was ${effectiveness}!`)
+      if (isCriticalHit) msgs.push(`It was a critical hit!`)
+
+      stageInTurn.damage = damage
+      stageInTurn.critical = isCriticalHit
+      stageInTurn.effectiveness = effectiveness
+
+      if (pokemon2.currentHp <= 0) {
+        msgs.push(`${pokemon2.name} fainted!`)
+        stageInTurn.fainted = true
+      }
+
+      if (!stageInTurn.fainted) {
+        const alreadyHasStatusCondition = pokemon2.status
+        if (!alreadyHasStatusCondition) this.checkForAndApplyStatus({ pokemon2, pokemon1Move, msgs })
+
+        if (pokemon1Move.user)
+          this.checkForAndApplyStatChanges({
+            pokemon: pokemon1,
+            move: pokemon1Move,
+            player: player1,
+            msgs,
+            stageInTurn,
+            target: 'user',
+          })
+
+        if (pokemon1Move.opponent)
+          this.checkForAndApplyStatChanges({
+            pokemon: pokemon2,
+            move: pokemon1Move,
+            player: player2,
+            msgs,
+            stageInTurn,
+            target: 'opponent',
+          })
+      }
+    }
+
+    return stageInTurn
+  }
+
+  private checkForAndApplyStatus({ pokemon2, pokemon1Move, msgs }: TurnInfo) {
+    let statusCondition: StatusCondition
+    for (const status of Object.values(STATUS_CONDITIONS)) {
+      const canStatusChance = pokemon1Move[status]
+      if (canStatusChance && Math.random() * 100 <= canStatusChance) {
+        statusCondition = status
+        break
+      }
+    }
+
+    const gotStatusConditionThisTurn = statusCondition && !pokemon2.status
+    if (!gotStatusConditionThisTurn) return
+
+    pokemon2.status = gotStatusConditionThisTurn ? statusCondition : pokemon2.status
+    msgs.push(`${pokemon2.name} was ${STATUS_CONDITION_PAST[statusCondition]}!`)
+
+    if (statusCondition === 'burn') pokemon2.modifiedStats.attack.current = Math.floor(pokemon2.modifiedStats.attack.current * 0.5)
+    if (statusCondition === 'paralyze') pokemon2.modifiedStats.speed.current = Math.floor(pokemon2.modifiedStats.speed.current * 0.5)
+  }
+
+  private checkForAndApplyStatChanges({ pokemon, move, player, msgs, stageInTurn, target }: TurnInfo) {
+    for (const stat of STAT_NAMES) {
+      if (pokemon.modifiedStats[stat].stages >= 6 || pokemon.modifiedStats[stat].stages <= -6) {
+        msgs.push(`${pokemon.name}'s ${stat} cannot go any higher!`)
+        continue
+      }
+
+      let stage: number
+      const statChangeDirection = move[target][stat]! > 0 ? 'increased' : 'decreased'
+
+      if (statChangeDirection === 'increased') {
+        stage = Math.min(move.user[stat]!, 6 - pokemon.modifiedStats[stat].stages)
+        pokemon.modifiedStats[stat].stages += stage
+        pokemon.modifiedStats[stat].current = Math.floor(pokemon.modifiedStats[stat].current * STAGE_MODIFIERS[stage])
+      } else {
+        stage = Math.abs(Math.max(move.user[stat]!, -6 - pokemon.modifiedStats[stat].stages))
+        pokemon.modifiedStats[stat].stages -= stage
+        pokemon.modifiedStats[stat].current = Math.floor(pokemon.modifiedStats[stat].current * NEG_STAGE_MODIFIERS[stage])
+      }
+
+      if (!stageInTurn.statChanges[player.id]) stageInTurn.statChanges[player.id] = {}
+      stageInTurn.statChanges[player.id][stat] = {
+        current: pokemon.modifiedStats[stat].current,
+        stages: pokemon.modifiedStats[stat].stages,
+      }
+
+      msgs.push(`${pokemon.name}'s ${stat} ${statChangeDirection} by ${stage} stages!`)
+    }
   }
 
   private async endBattle(battleId: string, reason: BattleEndingReason, playerId: string) {
