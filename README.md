@@ -26,11 +26,11 @@ NestJS Pokemon Backend is a comprehensive solution for building the server-side 
 
 ## 🛠️ Technologies Used
 
-- **NestJS**: A progressive Node.js framework for building scalable and efficient server-side applications.
-- **MongoDB**: A popular NoSQL database for storing Pokémon and player data.
-- **RabbitMQ**: A robust message broker for implementing a microservice architecture.
-- **Docker**: A containerization platform for development and deployment.
-- **NestJS Workspaces**: A monorepo structure for managing multiple NestJS services.
+- **[NestJS](https://nestjs.com/)**: A progressive Node.js framework for building scalable and efficient server-side applications.
+- **[MongoDB](https://www.mongodb.com/)**: A popular NoSQL database for storing Pokémon and player data.
+- **[RabbitMQ](https://www.rabbitmq.com/)**: A robust message broker for implementing a microservice architecture.
+- **[Docker](https://www.docker.com/)**: A containerization platform for development and deployment.
+- **[NestJS Workspaces](https://docs.nestjs.com/cli/workspaces)**: A monorepo structure for managing multiple NestJS services.
 
 ## Prerequisites
 
@@ -46,14 +46,26 @@ Before you begin, ensure you have met the following requirements:
 
 You can set up the project locally by following these steps:
 
+
 1. Clone the repository to your local machine.
-2. Install the required dependencies by running `npm install`.
-3. Start the application in development mode by running `npm run start:dev`.
+```bash
+git clone https://github.com/akshatV21/nestjs-pokemon-microservices.git
+```
+2. Install the required dependencies.
+```bash
+npm install
+```
+3. Start the application in development.
+```bash
+npm run start:dev <service_name>
+```
 
-Alternatively, you can use Docker to set up the project:
+Alternatively, you can use Docker to set/start up the project:
 
-1. Build the Docker image by running `docker build -t nestjs-pokemon-backend ..`.
-2. Start the Docker container by running `docker-compose up`.
+1. Start the Docker container.
+```
+docker-compose up
+```
 
 ## Environment Variables
 
