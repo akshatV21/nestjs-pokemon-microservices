@@ -4,7 +4,7 @@ Welcome to the NestJS Pokemon Backend! This project serves as the backend for a 
 
 ## Description
 
-NestJS Pokemon Backend is a comprehensive solution for building the server-side functionality of a Pokémon game. It encompasses features such as secure authentication, dynamic Pokémon spawning, interactive catching mechanisms, evolution processes, trading capabilities, a sophisticated battle engine, real-time updates through websockets, and a microservices architecture for scalability. The project utilizes technologies like NestJS, MongoDB, RabbitMQ, Docker, and NestJS Workspaces to deliver a scalable and efficient backend infrastructure.
+NestJS Pokemon Backend is a 🚀 comprehensive solution for building the server-side functionality of a Pokémon game. It encompasses features such as secure authentication, dynamic Pokémon spawning, interactive catching mechanisms, evolution processes, trading capabilities, a sophisticated battle engine, real-time updates through websockets, and a microservices architecture for scalability. The project utilizes technologies like [NestJS](https://nestjs.com/), [MongoDB](https://www.mongodb.com/), [RabbitMQ](https://www.rabbitmq.com/), [Docker](https://www.docker.com/), and [NestJS Workspaces](https://docs.nestjs.com/cli/workspaces) to deliver a scalable and efficient backend infrastructure.
 
 ## 🎯 Features
 
