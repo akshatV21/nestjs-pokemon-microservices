@@ -2,6 +2,10 @@
 
 Welcome to the NestJS Pokemon Backend! This project serves as the backend for a Pokémon game, providing a robust API and essential features for gameplay.
 
+## Description
+
+NestJS Pokemon Backend is a comprehensive solution for building the server-side functionality of a Pokémon game. It encompasses features such as secure authentication, dynamic Pokémon spawning, interactive catching mechanisms, evolution processes, trading capabilities, a sophisticated battle engine, real-time updates through websockets, and a microservices architecture for scalability. The project utilizes technologies like NestJS, MongoDB, RabbitMQ, Docker, and NestJS Workspaces to deliver a scalable and efficient backend infrastructure.
+
 ## 🎯 Features
 
 - 🔐 **Authentication**: Secure user registration and login functionality using JWT (JSON Web Tokens). The authentication service validates user credentials and generates a JWT for authenticated users. This token is used to authenticate subsequent requests from the client.
@@ -18,9 +22,7 @@ Welcome to the NestJS Pokemon Backend! This project serves as the backend for a 
 
 - 📡 **Websockets**: Real-time updates are provided to the users through websockets. The websocket service sends updates to the client whenever there is a change in the game state, such as a new Pokémon spawn or the outcome of a battle.
 
-- 🏭 **Microservices**: The application is divided into multiple microservices, each responsible for a specific feature. This makes the application more scalable and easier to maintain. The microservices communicate with each other using RabbitMQ.
-
-- 📨 **RabbitMQ**: RabbitMQ is used as a message broker to facilitate communication between the microservices. Each microservice publishes messages to a RabbitMQ exchange, and the other microservices subscribe to the exchange to receive the messages.
+- 🏭 **Microservices**: The application is divided into multiple microservices, each responsible for a specific feature. This makes the application more scalable
 
 ## 🛠️ Technologies Used
 
@@ -59,36 +61,36 @@ Each service in the application requires specific environment variables to be se
 
 ### Auth Service
 
-- [PORT](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/auth/src/auth.module.ts#15%2C9-15%2C9): The port on which the service will run.
-- [MONGO_URI](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/auth/src/auth.module.ts#16%2C9-16%2C9): The URI of your MongoDB database.
-- [DB_NAME](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/auth/src/auth.module.ts#17%2C9-17%2C9): The name of the database to use.
-- [JWT_SECRET](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/auth/src/auth.module.ts#18%2C9-18%2C9): The secret key used for JWT authentication.
-- [RMQ_URL](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/auth/src/auth.module.ts#19%2C9-19%2C9): The URL of your RabbitMQ server.
-- [RMQ_AUTH_QUEUE](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/auth/src/auth.module.ts#20%2C9-20%2C9): The name of the RabbitMQ queue for the auth service.
-- [REDIS_HOST](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/auth/src/auth.module.ts#21%2C9-21%2C9): The host of your Redis server.
-- [REDIS_PORT](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/auth/src/auth.module.ts#22%2C9-22%2C9): The port of your Redis server.
-- [REDIS_USERNAME](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/auth/src/auth.module.ts#23%2C9-23%2C9): The username for your Redis server.
-- [REDIS_PASSWORD](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/auth/src/auth.module.ts#24%2C9-24%2C9): The password for your Redis server.
+- `[PORT]`: The port on which the service will run.
+- `[MONGO_URI]`: The URI of your MongoDB database.
+- `[DB_NAME]`: The name of the database to use.
+- `[JWT_SECRET]`: The secret key used for JWT authentication.
+- `[RMQ_URL]`: The URL of your RabbitMQ server.
+- `[RMQ_AUTH_QUEUE]`: The name of the RabbitMQ queue for the auth service.
+- `[REDIS_HOST]`: The host of your Redis server.
+- `[REDIS_PORT]`: The port of your Redis server.
+- `[REDIS_USERNAME]`: The username for your Redis server.
+- `[REDIS_PASSWORD]`: The password for your Redis server.
 
 ### Inventory Service
 
 - Same as the Auth Service, with the addition of:
-- [RMQ_INVENTORY_QUEUE](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/inventory/src/inventory.module.ts#20%2C9-20%2C9): The name of the RabbitMQ queue for the inventory service.
+- `[RMQ_INVENTORY_QUEUE]`: The name of the RabbitMQ queue for the inventory service.
 
 ### Spawns Service
 
 - Same as the Inventory Service, with the addition of:
-- [RMQ_SPAWNS_QUEUE](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/inventory/src/inventory.module.ts#21%2C9-21%2C9): The name of the RabbitMQ queue for the spawns service.
+- `[RMQ_SPAWNS_QUEUE]`: The name of the RabbitMQ queue for the spawns service.
 
 ### Battle Service
 
 - Same as the Spawns Service, with the addition of:
-- [RMQ_BATTLE_QUEUE](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/battle/src/battle.module.ts#42%2C9-42%2C9): The name of the RabbitMQ queue for the battle service.
+- `[RMQ_BATTLE_QUEUE]`: The name of the RabbitMQ queue for the battle service.
 
 ### Pokemon Service
 
 - Same as the Battle Service, with the addition of:
-- [RMQ_POKEMON_QUEUE](file:///c%3A/Users/ashis/OneDrive/Desktop/JavaScript/Nest%20js/pokemon-microservices/apps/spawns/src/spawns.module.ts#43%2C9-43%2C9): The name of the RabbitMQ queue for the pokemon service.
+- `[RMQ_POKEMON_QUEUE]`: The name of the RabbitMQ queue for the pokemon service.
 
 Remember to replace the placeholder values with your actual values before running the services.
 
